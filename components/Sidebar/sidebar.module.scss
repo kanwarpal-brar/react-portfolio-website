@@ -1,0 +1,42 @@
+// .sidebar {
+//     display: flex;
+//     flex-direction: column;
+//     height: 100vh;
+//     background-color: red;
+//     position: absolute;
+//     z-index: 2;
+//     transition: width 250ms 100ms;
+//     padding-top: 10px;
+//     padding-bottom: 10px;
+//     align-items: center;
+// }
+@use '~/styles/variables';
+
+.sidebar {
+    transition: width 150ms ease-in-out;
+    height: 100vh;
+    background-color: variables.$secondary_color;
+    z-index: 3;
+    overflow: hidden;
+    position: relative;
+}
+
+.sidebar_button {
+    position: absolute;
+    top: 25px;
+    transform: scale(2.2, 4);
+    color: black;
+    z-index: 2;
+    transition: left 150ms ease-in-out;
+    transition-delay: 100ms;
+
+    &:hover {
+        background-color: variables.$base_color_hover;
+    }
+}
+
+.sidebar_lower_icons {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}

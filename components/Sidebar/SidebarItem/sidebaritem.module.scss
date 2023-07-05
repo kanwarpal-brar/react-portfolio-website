@@ -1,0 +1,39 @@
+@use '~/styles/variables';
+
+.sidebar_item {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    cursor: pointer; 
+    color: variables.$accent_color;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &_active {
+        @extend .sidebar_item;
+        background-color: variables.$secondary_color_hover;
+    }
+
+    &:hover {
+        background-color: variables.$secondary_color_hover;
+    }
+}
+
+.sidebar_item_icon {
+    transform: scale(1.8);
+    position: absolute;
+}
+
+.sidebar_icon_container {
+    position: relative;
+    display: inline-block;
+    color: white;
+    left: 9%;
+    vertical-align: middle;
+    margin-right: 2vw;
+}
+
+.sidebar_item_text {
+    display: inline-block;
+    margin-left: 600px;
+}
