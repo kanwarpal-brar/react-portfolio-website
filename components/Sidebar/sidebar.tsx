@@ -2,14 +2,14 @@ import styles from './sidebar.module.scss'
 import SideBarIcon, { SideBarIconProps } from './SidebarItem/sidebaritem';
 import { useState } from 'react';
 import { AiFillHome, AiFillGithub, AiFillLinkedin } from 'react-icons/ai'
-import { BsChevronCompactRight, BsFillPersonFill } from 'react-icons/bs';
+import { BsChevronCompactRight, BsFillPersonFill, BsCode, BsChevronLeft, BsChevronCompactLeft } from 'react-icons/bs';
 import { usePathname } from 'next/navigation';
 
 
 export default function SideBar() {
     // 
-    const barSize = {base: 68, expanded: 200};
-    const btnOffset = {base: 78, minimized: 10}
+    const barSize = {base: 60, expanded: 200};
+    const btnOffset = {base: 70, minimized: 10}
     const barMinimizeDelay = 0.2;  // sec the bar waits for mouse re-entry before minimize
 
     const [width, setWidth] = useState(barSize.base);
@@ -21,6 +21,7 @@ export default function SideBar() {
     const items: Array<SideBarIconProps> = [
         {name: 'Home', icon: AiFillHome, redirectUrl: '/'},
         {name: 'About', icon: BsFillPersonFill,redirectUrl: '/about'},
+        {name: 'Projects', icon: BsCode, redirectUrl: '/projects' }
     ];
 
     const lowerItems: Array<SideBarIconProps> = [
@@ -60,14 +61,16 @@ export default function SideBar() {
 
     return(
         <>
-            <div className={styles.sidebar} style={{width: `${width}px`}} onMouseEnter={expandBar} onMouseLeave={shrinkBar}>
-                {sidebarIcons}
-                <div className={styles.sidebar_lower_icons}>
-                    {sideBarLowerIcons}
+            <div className={styles.sidebar_container} style={{width: `${active ? barSize.base : 0}px`}}>
+                <div className={styles.sidebar} style={{width: `${width}px`}} onMouseEnter={expandBar} onMouseLeave={shrinkBar}>
+                    {sidebarIcons}
+                    <div className={styles.sidebar_lower_icons}>
+                        {sideBarLowerIcons}
+                    </div>
                 </div>
             </div>
             <button className={styles.sidebar_button} onClick={toggleBarActive} style={{left: btnLeft}}>
-                <BsChevronCompactRight />
+                { active ? <BsChevronCompactLeft/> :  <BsChevronCompactRight /> }
             </button>
         </>
     );

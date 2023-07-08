@@ -12,7 +12,7 @@ export default function Home() {
             <title>Kanwarpal Brar</title>
           </Head>
           <h1>
-            <Link href="/about">Go To About</Link>
+            <Link href="/about">A</Link>
           </h1>
         </main>
       </div>

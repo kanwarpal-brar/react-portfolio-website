@@ -3,7 +3,7 @@
 .sidebar_item {
     display: flex;
     align-items: center;
-    padding: 20px 25px;
+    padding: 12px 22px;
     cursor: pointer; 
     color: variables.$accent_color;
     text-decoration: none;
@@ -20,7 +20,7 @@
 }
 
 .sidebar_item_icon {
-    transform: scale(1.8);
+    transform: scale(1.4);
     position: absolute;
 }
 

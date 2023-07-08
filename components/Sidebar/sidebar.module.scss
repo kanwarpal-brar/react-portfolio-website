@@ -12,8 +12,15 @@
 // }
 @use '~/styles/variables';
 
+.sidebar_container {
+    transition: width 80ms ease-in-out;
+    height: 100vh;
+    background-color: variables.$secondary_color;
+    overflow: visible;
+}
+
 .sidebar {
-    transition: width 150ms ease-in-out;
+    transition: width 80ms ease-in-out;
     height: 100vh;
     background-color: variables.$secondary_color;
     z-index: 3;
@@ -23,8 +30,8 @@
 
 .sidebar_button {
     position: absolute;
-    top: 25px;
-    transform: scale(2.2, 4);
+    top: 20px;
+    transform: scale(2.2, 3.4);
     color: black;
     z-index: 2;
     transition: left 150ms ease-in-out;
@@ -37,6 +44,6 @@
 
 .sidebar_lower_icons {
     position: absolute;
-    bottom: 0;
+    bottom: 10px;
     width: 100%;
 }
