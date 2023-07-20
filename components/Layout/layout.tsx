@@ -1,7 +1,7 @@
 import SideBar from '../Sidebar/sidebar'
 import styles from'./layout.module.scss'
 
-export default function Layout({children }: {children: React.ReactNode}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
     return(
         <div className={styles.layout_container}>
             <SideBar/>

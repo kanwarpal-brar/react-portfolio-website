@@ -23,6 +23,7 @@
     transition: width 80ms ease-in-out;
     height: 100vh;
     background-color: variables.$secondary_color;
+    background-image: variables.$secondary_gradient;
     z-index: 3;
     overflow: hidden;
     position: relative;
@@ -31,15 +32,12 @@
 .sidebar_button {
     position: absolute;
     top: 20px;
-    transform: scale(2.2, 3.4);
     color: black;
     z-index: 2;
     transition: left 150ms ease-in-out;
     transition-delay: 100ms;
-
-    &:hover {
-        background-color: variables.$base_color_hover;
-    }
+    transform: scale(2, 3);
+    height: 20px;
 }
 
 .sidebar_lower_icons {

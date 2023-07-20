@@ -1,8 +1,9 @@
 import styles from './sidebar.module.scss'
 import SideBarIcon, { SideBarIconProps } from './SidebarItem/sidebaritem';
 import { useState } from 'react';
-import { AiFillHome, AiFillGithub, AiFillLinkedin } from 'react-icons/ai'
-import { BsChevronCompactRight, BsFillPersonFill, BsCode, BsChevronLeft, BsChevronCompactLeft } from 'react-icons/bs';
+import { AiFillGithub, AiFillLinkedin } from 'react-icons/ai'
+import { MdHomeFilled, MdPerson, MdOutlineCode } from 'react-icons/md';
+import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { usePathname } from 'next/navigation';
 
 
@@ -19,9 +20,9 @@ export default function SideBar() {
     const pathname = usePathname()
 
     const items: Array<SideBarIconProps> = [
-        {name: 'Home', icon: AiFillHome, redirectUrl: '/'},
-        {name: 'About', icon: BsFillPersonFill,redirectUrl: '/about'},
-        {name: 'Projects', icon: BsCode, redirectUrl: '/projects' }
+        {name: 'Home', icon: MdHomeFilled, redirectUrl: '/'},
+        {name: 'About', icon: MdPerson,redirectUrl: '/about'},
+        {name: 'Projects', icon: MdOutlineCode, redirectUrl: '/projects' }
     ];
 
     const lowerItems: Array<SideBarIconProps> = [
@@ -70,7 +71,7 @@ export default function SideBar() {
                 </div>
             </div>
             <button className={styles.sidebar_button} onClick={toggleBarActive} style={{left: btnLeft}}>
-                { active ? <BsChevronCompactLeft/> :  <BsChevronCompactRight /> }
+                { active ? <BsChevronLeft/> :  <BsChevronRight /> }
             </button>
         </>
     );
