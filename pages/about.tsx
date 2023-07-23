@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import Head from "next/head"
 
 export default function AboutMe() {
@@ -6,12 +7,11 @@ export default function AboutMe() {
         <div>
             <Head>
                 <title>
-                    About Me
+                    Kanwarpal Brar
                 </title>
             </Head>
             <main>
-                <h1>Bruh</h1>
-                <Link href="/">Back to Home</Link>
+                
             </main>
         </div>
     )
