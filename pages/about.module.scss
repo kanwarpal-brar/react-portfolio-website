@@ -1,0 +1,43 @@
+@use '~/styles/variables';
+
+.info_box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    position: relative;
+    left: -2px;
+
+    &_text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        p {
+            text-align: center;
+        }
+    }
+
+    button {
+        margin-top: 50px;
+    }
+}
+
+.headshot {
+    border: 2px solid variables.$accent_color;
+    border-radius: 50%;
+}
+
+.work_info_box {
+    width: 60vw;
+    min-height: 200px;
+}
+
+.about_container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content:flex-start;
+    align-items: center;
+    gap: 100px;
+}

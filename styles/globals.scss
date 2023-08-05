@@ -10,13 +10,19 @@ h1 {
 }
 
 h2 {
-  font-weight: 100;
+  font-weight: 200;
+  color: variables.$text_color;
+  font-size: 2vw;
+}
+
+h3 {
+  font-weight: 200;
   color: variables.$text_color;
   font-size: 1.5vw;
 }
 
 p {
-  font-weight: 20;
+  font-weight: 100;
   color: variables.$text_color;
   font-size: 0.9vw;
 }
