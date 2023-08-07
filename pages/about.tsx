@@ -4,8 +4,25 @@ import Head from "next/head"
 import styles from "./about.module.scss"
 import TabbedContentBox from "@/components/TabbedContentBox/tabbedcontentbox"
 import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentboxtab"
+import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
 
 const aboutBlurb = "ok"
+
+const workExperience: ExpBoxProps[] = [
+    {
+        title: "job 1",
+        company: "My Company",
+        date: "sept-oct 2023",
+        bullets: ["did some stuff", "did some more stuff", "very cool stuff"]
+    },
+    {
+        title: "job 2",
+        company: "My Company2",
+        date: "sept-oct 2023",
+        bullets: ["did some stuff", "did some more stuff", "very cool stuff"]
+    }
+]
+
 
 export default function AboutMe() {
     return (
@@ -32,16 +49,13 @@ export default function AboutMe() {
 
             <div className={styles.work_info_box}>
                 <TabbedContentBox>
-                    <ContentBoxTab name="tab1">
-                        <div>
-                            <h1>My Title</h1>
-                            <h2>My Second</h2>
-                            <p>words words words worwdmwad w wdfwadn nwad nwakd naiw dnai d</p>
-                        </div>
-                    </ContentBoxTab>
-                    <ContentBoxTab name="tab2">
-                        ok2
-                    </ContentBoxTab>
+                    {workExperience.map((exp, i) => {
+                        return (
+                            <ContentBoxTab name={exp.company}>
+                                <ExpBox {...exp}/>
+                            </ContentBoxTab>
+                        )
+                    })}
                 </TabbedContentBox>
             </div>
             
