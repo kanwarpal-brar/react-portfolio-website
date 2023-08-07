@@ -5,6 +5,7 @@ import styles from "./about.module.scss"
 import TabbedContentBox from "@/components/TabbedContentBox/tabbedcontentbox"
 import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentboxtab"
 import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
+import ExtraCurricularBox, { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox"
 
 const aboutBlurb = "ok"
 
@@ -23,13 +24,26 @@ const workExperience: ExpBoxProps[] = [
     }
 ]
 
+const extraCurriculer: ExtraCurricularBoxProps[] = [
+    {
+        name: "curricular",
+        img: "/headshot.jpeg",
+        desc: "This is a club I am inwdbwfjkabfawifbawkjdb wdb uawobda kjbdw awoudb oawjldb waoudb waljdb awoud wabd aod bwalj dbaw douwa"
+    },
+    {
+        name: "curricular2",
+        img: "/headshot.jpeg",
+        desc: "This is a club I am in"
+    }
+]
+
 
 export default function AboutMe() {
     return (
         <div className={styles.about_container}>
             <Head>
                 <title>
-                    Kanwarpal Brar
+                    About: Kanwarpal Brar
                 </title>
             </Head>
             <div className={styles.info_box}>
@@ -41,14 +55,14 @@ export default function AboutMe() {
                     height={200}
                 />
                 <div className={styles.info_box_text}>
-                    <h2>AAAAAAAAA</h2>
+                    <h2>Kanwarpal Brar</h2>
                     <p>{aboutBlurb}</p>
                 </div>
                 <Link href={"/Kanwarpal_Brar_Resume.pdf"} target="_blank"><button>View Resume</button></Link>
             </div>
 
             <div className={styles.work_info_box}>
-                <TabbedContentBox>
+                <TabbedContentBox title="Work Experience">
                     {workExperience.map((exp, i) => {
                         return (
                             <ContentBoxTab name={exp.company}>
@@ -57,11 +71,11 @@ export default function AboutMe() {
                         )
                     })}
                 </TabbedContentBox>
-                <TabbedContentBox>
-                    {workExperience.map((exp, i) => {
+                <TabbedContentBox title="Extra-Curriculars">
+                    {extraCurriculer.map((ec, i) => {
                         return (
-                            <ContentBoxTab name={exp.company}>
-                                <ExpBox {...exp}/>
+                            <ContentBoxTab name={ec.name}>
+                                <ExtraCurricularBox {...ec}/>
                             </ContentBoxTab>
                         )
                     })}

@@ -15,13 +15,13 @@
 
 .inline_title {
     display: inline-block;
-    h2, h3 {
-        display: inline;
-    }
+
     h2 {
+        display: inline-block;
         text-align: left;
     }
+
     h3 {
-        text-align: right;
+        float:right;
     }
 }

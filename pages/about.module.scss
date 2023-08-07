@@ -34,8 +34,15 @@
 }
 
 .work_info_box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 60vw;
-    min-height: 200px;
+    gap: 20px;
+    padding: 10px 10px;
+    background-color: variables.$secondary_color;
+    border-radius: 10px;
+    margin-bottom: 100px;
 }
 
 .about_container {
@@ -43,6 +50,5 @@
     flex-direction: column;
     justify-content:flex-start;
     align-items: center;
-    gap: 100px;
-    height: 95vh;
+    gap: 30px;
 }

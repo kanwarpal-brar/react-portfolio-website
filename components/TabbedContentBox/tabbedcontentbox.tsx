@@ -5,13 +5,15 @@ import { useState } from "react"
 
 export type TabbedContentBoxProps = {
     children: React.ReactElement<typeof ContentBoxTab>[]
+    title?: string;
 }
 
-export default function TabbedContentBox({children}: TabbedContentBoxProps) {
+export default function TabbedContentBox({children, title}: TabbedContentBoxProps) {
   const [activeTab, setActiveTab] = useState(0)
 
   return (
     <div className={styles.tabs_container}>
+      {title ? <h2><u>{title}</u></h2> : null}
       <div className={styles.tab_buttons_container}>
         {children.map((child, i) => {
           return (<TabButton active={i == activeTab} key={i} name={child.props.name} activateCallback={() => setActiveTab(i)}/>)
