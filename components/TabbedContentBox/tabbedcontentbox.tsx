@@ -9,25 +9,17 @@ export type TabbedContentBoxProps = {
 
 export default function TabbedContentBox({children}: TabbedContentBoxProps) {
   const [activeTab, setActiveTab] = useState(0)
-  const tabButtons: React.ReactElement<typeof TabButton>[] = []
-  const tabs = children.map(
-    (child, i) => {
-      const setActiveCallback = () => { setActiveTab(i) }
-      tabButtons.push(<TabButton active={false} name={child.props.name} activateCallback={setActiveCallback} key={child.props.name}/>)
-      return(child)
-  })
-  
-
 
   return (
     <div className={styles.tabs_container}>
       <div className={styles.tab_buttons_container}>
-        {tabButtons}
+        {children.map((child, i) => {
+          return (<TabButton active={i == activeTab} key={i} name={child.props.name} activateCallback={() => setActiveTab(i)}/>)
+        })}
       </div>
       <div className={styles.tab_content_container}>
-        { tabs[activeTab] }
+        { children[activeTab] }
       </div>
-      
     </div>
   )
 }

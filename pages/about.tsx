@@ -33,7 +33,11 @@ export default function AboutMe() {
             <div className={styles.work_info_box}>
                 <TabbedContentBox>
                     <ContentBoxTab name="tab1">
-                        ok1
+                        <div>
+                            <h1>My Title</h1>
+                            <h2>My Second</h2>
+                            <p>words words words worwdmwad w wdfwadn nwad nwakd naiw dnai d</p>
+                        </div>
                     </ContentBoxTab>
                     <ContentBoxTab name="tab2">
                         ok2

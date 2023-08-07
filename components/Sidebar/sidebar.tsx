@@ -70,7 +70,7 @@ export default function SideBar() {
                     </div>
                 </div>
             </div>
-            <button className={styles.sidebar_button} onClick={toggleBarActive} style={{left: btnLeft}}>
+            <button className={width == barSize.expanded ? styles.sidebar_button_active : styles.sidebar_button} onClick={toggleBarActive} style={{left: btnLeft}}>
                 { active ? <BsChevronLeft/> :  <BsChevronRight /> }
             </button>
         </>

@@ -2,9 +2,12 @@
 $base_color: rgb(193, 193, 193);
 $base_gradient: radial-gradient(circle at bottom left,#a01bff 5%,#4b48ff 70%,rgba(75,72,255,0) 100%),radial-gradient(circle at top right,#a01bff 25%,rgba(75,72,255,0) 100%);
 $base_color_hover: rgb(226, 226, 226);
+
 $secondary_color: black;
+$secondary_color_focus: rgb(32, 32, 32);
 $secondary_gradient: linear-gradient(rgb(7, 7, 7) 50%, rgb(32, 32, 32));
 $secondary_color_hover: rgba(255, 255, 255, 0.12);
+
 $accent_color: white;
 $accent_color_hover: rgb(220, 220, 220);
 

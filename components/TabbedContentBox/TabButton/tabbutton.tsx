@@ -8,9 +8,9 @@ export type TabButtonProps = {
 }
 
 export default function TabButton({ name, active, activateCallback }: TabButtonProps) {
-  return (
-    <button className={active ? styles.tab_button_active : styles.tab_button} onClick={activateCallback}>
-        {name}
-    </button>
-  )
+    return (
+        <button className={active ? styles.tab_button_active : styles.tab_button} onClick={activateCallback}>
+            {name}
+        </button>
+    )
 }
