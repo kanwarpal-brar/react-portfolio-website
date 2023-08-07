@@ -21,12 +21,10 @@
 }
 
 .sidebar_button {
-    position: -webkit-sticky;
-    position: sticky;
+    position: fixed;
     top: 20px;
     color: black;
     transition: left 150ms ease-in-out;
-    transition-delay: 100ms;
     transform: scale(2, 3);
     height: 20px;
 

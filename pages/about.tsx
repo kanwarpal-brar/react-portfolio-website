@@ -24,10 +24,10 @@ export default function AboutMe() {
                     height={200}
                 />
                 <div className={styles.info_box_text}>
-                    <h2>Kanwarpal Brar</h2>
+                    <h2>AAAAAAAAA</h2>
                     <p>{aboutBlurb}</p>
                 </div>
-                <button>Download Resume</button>
+                <Link href={"/Kanwarpal_Brar_Resume.pdf"} target="_blank"><button>View Resume</button></Link>
             </div>
 
             <div className={styles.work_info_box}>
