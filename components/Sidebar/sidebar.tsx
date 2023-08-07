@@ -1,17 +1,15 @@
 import styles from './sidebar.module.scss'
 import SideBarIcon, { SideBarIconProps } from './SidebarItem/sidebaritem';
 import { useState } from 'react';
-import { AiFillGithub, AiFillLinkedin } from 'react-icons/ai'
+import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from 'react-icons/ai'
 import { MdHomeFilled, MdPerson, MdOutlineCode } from 'react-icons/md';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { usePathname } from 'next/navigation';
 
 
 export default function SideBar() {
-    // 
     const barSize = {base: 60, expanded: 200};
     const btnOffset = {base: 70, minimized: 10}
-    const barMinimizeDelay = 0.2;  // sec the bar waits for mouse re-entry before minimize
 
     const [width, setWidth] = useState(barSize.base);
     const [btnLeft, setBtnLeft] = useState(btnOffset.base);
@@ -26,8 +24,9 @@ export default function SideBar() {
     ];
 
     const lowerItems: Array<SideBarIconProps> = [
+        {name: 'Email Me', icon: AiTwotoneMail, redirectUrl: 'mailto:kanwarpal.brar@outlook.com'},
         {name: 'Github', icon: AiFillGithub, redirectUrl: 'https://github.com/kanwarpal-brar'},
-        {name: 'LinkedIn', icon: AiFillLinkedin, redirectUrl: 'https://www.linkedin.com/in/kanwarpal-brar/' }
+        {name: 'LinkedIn', icon: AiFillLinkedin, redirectUrl: 'https://www.linkedin.com/in/kanwarpal-brar/' },
     ];
 
     const sidebarIcons = items.map(item => {

@@ -1,7 +1,27 @@
 .expbox_container {
     display: flex;
+    align-self: flex-start;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: start;
-     
+    width: 100%;
+    height: 100%;
+    padding: 0px 5%;
+    gap: 0px;
+
+    ul {
+        padding: 0 5%;
+        list-style-type: square;
+    }
+}
+
+.inline_title {
+    display: inline-block;
+    h2, h3 {
+        display: inline;
+    }
+    h2 {
+        text-align: left;
+    }
+    h3 {
+        text-align: right;
+    }
 }

@@ -57,6 +57,15 @@ export default function AboutMe() {
                         )
                     })}
                 </TabbedContentBox>
+                <TabbedContentBox>
+                    {workExperience.map((exp, i) => {
+                        return (
+                            <ContentBoxTab name={exp.company}>
+                                <ExpBox {...exp}/>
+                            </ContentBoxTab>
+                        )
+                    })}
+                </TabbedContentBox>
             </div>
             
         </div>

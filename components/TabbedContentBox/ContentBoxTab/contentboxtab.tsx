@@ -7,6 +7,6 @@ export type ContentBoxTabProps = {
 
 export default function ContentBoxTab({ children }: ContentBoxTabProps) {
   return (
-    <div className={styles.content_box_tab}>{children}</div>
+    <>{children}</>
   )
 }

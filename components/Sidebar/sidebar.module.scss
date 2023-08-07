@@ -17,7 +17,7 @@
     background-image: variables.$secondary_gradient;
     z-index: 3;
     overflow: hidden;
-    position: relative;
+    position: fixed;
 }
 
 .sidebar_button {
