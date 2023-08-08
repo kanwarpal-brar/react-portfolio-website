@@ -1,5 +1,6 @@
 import Link from "next/link"
 import Head from "next/head"
+import styles from "./projects.module.scss"
 
 export default function AboutMe() {
     return (
@@ -9,10 +10,10 @@ export default function AboutMe() {
                     Projects
                 </title>
             </Head>
-            <main>
-                <h1>Bruh</h1>
-                <Link href="/">Back to Home</Link>
+            <main className={styles.projects_box}>
+                
             </main>
+
         </div>
     )
 }

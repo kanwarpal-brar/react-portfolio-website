@@ -62,7 +62,7 @@ export default function AboutMe() {
             </div>
 
             <div className={styles.work_info_box}>
-                <TabbedContentBox title="Work Experience">
+                <TabbedContentBox title="Work Experience" key="1">
                     {workExperience.map((exp, i) => {
                         return (
                             <ContentBoxTab name={exp.company}>
@@ -71,7 +71,7 @@ export default function AboutMe() {
                         )
                     })}
                 </TabbedContentBox>
-                <TabbedContentBox title="Extra-Curriculars">
+                <TabbedContentBox title="Extra-Curriculars" key="2">
                     {extraCurriculer.map((ec, i) => {
                         return (
                             <ContentBoxTab name={ec.name}>
