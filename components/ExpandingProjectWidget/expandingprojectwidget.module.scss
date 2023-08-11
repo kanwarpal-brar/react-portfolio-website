@@ -19,11 +19,6 @@
         padding: 5px 5px;
     }
 
-    button {
-        min-width: 100%;
-        flex-grow: 2;
-    }
-
     &:hover {
         transform: scale(1.030);
     }
@@ -32,8 +27,7 @@
 .img_box {
     position: relative;
     min-width: 100%;
-    min-height: 65%;
-    background-color: red;
+    min-height: 75%;
 }
 
 .modal {
