@@ -27,7 +27,7 @@
     transition: left 150ms ease-in-out;
     transform: scale(2, 3);
     height: 20px;
-
+    
     &_active {
         @extend .sidebar_button;
         z-index: -1;

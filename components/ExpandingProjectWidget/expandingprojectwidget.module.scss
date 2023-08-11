@@ -1,4 +1,27 @@
+@use '~/styles/variables';
+
 .container {
     display: flex;
     flex-direction: column;
+    border: 2px solid black;
+    border-radius: 15px;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.modal_content {
+    height: 40%;
+    width: 50%;
+    background-color: variables.$secondary_color;
+    margin:auto auto;
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
