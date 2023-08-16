@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export type ExpandingProjectWidgetProps = {
     title: string;
-    img: string;
+    img?: string;
     desc: string;
     link: string;
     style?: {[key: string]: string};
@@ -16,16 +16,13 @@ export type ExpandingProjectWidgetProps = {
 export default function ExpandingProjectWidget({ title, img, desc, link, style, imgSize, tags }: ExpandingProjectWidgetProps) {
 	const [open, setOpen] = useState(false)
   let debounce = false
+  const displayTags = tags ? tags : []
 
   function handleOpenByContainer() {
     if (!debounce) {
       setOpen(true)
     }
   }
-
-	function handleOpen() {
-		setOpen(true)
-	}
 
 	function handleClose() {
 		debounce = true
@@ -34,14 +31,17 @@ export default function ExpandingProjectWidget({ title, img, desc, link, style, 
 	}
 
   return (
-    <div className={styles.container} onClick={handleOpenByContainer} style={style}>
+    <div className={styles.container} onClick={handleOpenByContainer}>
         <h3>{title}</h3>
-        <div className={styles.img_box}>
-          <Image src={img} alt={`Image for ${title} project`} fill={true}/>
-        </div>
+        {/* <p>{desc}</p> */}
+        <div className={styles.tag_block}>
+            {displayTags.map(tag => {
+              return <div className={styles.tag}>{tag}</div>
+            })}
+          </div>
         <Modal open={open} onClose={handleClose} className={styles.modal}>
             <div className={styles.modal_content}>
-              <h3 style={{color: "white"}}>{title}</h3>
+              <h3>{title}</h3>
               <button onClick={handleClose}>close</button>
             </div>
         </Modal>

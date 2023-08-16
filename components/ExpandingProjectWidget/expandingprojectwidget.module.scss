@@ -3,24 +3,17 @@
 .container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border: px solid transparent;
+    align-items: flex-start;
+    justify-content: space-between;
+    border: 1px solid transparent;
     border-radius: 15px;
-    padding: 0;
-    // max-width: calc(50vh * (10 / 16));
-    // max-height: 50vh;
-    // flex-grow: 1;
-    // flex-basis: 50vh;
     background-color: variables.$secondary_color;
-    transition: width 500ms, height 500ms;
-
-    h3 {
-        margin: 0;
-        padding: 5px 5px;
-    }
+    padding: 15px 20px;
+    height: 22vh;
+    width: 24vw;
 
     &:hover {
-        transform: scale(1.030);
+        transform: scale(1.05);
         border: 1px solid variables.$accent_color;
     }
 }
@@ -29,6 +22,9 @@
     position: relative;
     min-width: 100%;
     min-height: 75%;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
 }
 
 .modal {
@@ -48,4 +44,20 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.tag_block {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 80%;
+
+    .tag {
+        color: variables.$text_color;
+        padding: 1px 5px;
+        border: 1px solid white;
+        background-color: rgba(255, 255, 255, 0.03);
+    }
 }
