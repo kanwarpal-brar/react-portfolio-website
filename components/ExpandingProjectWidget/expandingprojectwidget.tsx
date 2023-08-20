@@ -1,26 +1,44 @@
 import { Modal } from "@mui/material";
 import styles from "./expandingprojectwidget.module.scss"
 import Image from "next/image"
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import projectConfig from "../../public/targetProjects.json";
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from "remark-gfm";
+import Link from "next/link";
 
 export type ExpandingProjectWidgetProps = {
     title: string;
-    img?: string;
     desc: string;
     link: string;
     style?: {[key: string]: string};
-    imgSize?: {height: string, width: string};
     tags?: string[]
 }
 
-export default function ExpandingProjectWidget({ title, img, desc, link, style, imgSize, tags }: ExpandingProjectWidgetProps) {
+export default function ExpandingProjectWidget({ title, desc, link, style, tags }: ExpandingProjectWidgetProps) {
 	const [open, setOpen] = useState(false)
   let debounce = false
   const displayTags = tags ? tags : []
+  const [modelDesc, setModelDesc] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const imgUrl = `${projectConfig.repoImageUrl}/${title.toLowerCase()}.png`
 
-  function handleOpenByContainer() {
+  function extractDesc(rawText: string): string {
+    const results = rawText.match(/<!--start-->(.*?)<!--end-->/s)
+    return results ? results[0] : ""
+  }
+
+  async function fetchReadme() {
+    const url = projectConfig.fileUrl + `${title}/main/README.md`
+    setModelDesc(extractDesc(await (await fetch(url)).text()))
+    setIsLoading(false)
+  }
+
+  async function handleOpenByContainer() {
     if (!debounce) {
       setOpen(true)
+      setIsLoading(true)
+      await fetchReadme()
     }
   }
 
@@ -33,17 +51,32 @@ export default function ExpandingProjectWidget({ title, img, desc, link, style, 
   return (
     <div className={styles.container} onClick={handleOpenByContainer}>
         <h3>{title}</h3>
-        {/* <p>{desc}</p> */}
+        <div className={styles.desc_box}>
+          <p>{desc}</p>
+        </div>
         <div className={styles.tag_block}>
-            {displayTags.map(tag => {
-              return <div className={styles.tag}>{tag}</div>
+            {displayTags.map((tag, i) => {
+              return <div key={i} className={styles.tag}>{tag}</div>
             })}
           </div>
+
         <Modal open={open} onClose={handleClose} className={styles.modal}>
+          <div className={styles.modal_container}>
             <div className={styles.modal_content}>
-              <h3>{title}</h3>
-              <button onClick={handleClose}>close</button>
+              <div className={styles.markdown_box}>
+                <div className={styles.img_box}>
+                  <Image src={modelDesc ? imgUrl : "/SMPTE_Color_Bars.svg"} alt={`Image for ${title} project`} width={250} height={250}/>
+                </div>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {modelDesc ? modelDesc : `# ${title}\n${desc}`}
+                </ReactMarkdown>
+              </div>
             </div>
+            <div className={styles.button_box}>
+              <button onClick={handleClose}>Close</button>
+              <Link href={link} target="_blank"><button>Github</button></Link>
+            </div>
+          </div>
         </Modal>
     </div>
   )
