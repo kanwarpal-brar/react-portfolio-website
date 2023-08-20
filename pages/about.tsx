@@ -7,7 +7,8 @@ import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentbo
 import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
 import ExtraCurricularBox, { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox"
 
-const aboutBlurb = "ok"
+const aboutBlurb = "Hi, my name is Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a variety if industry standard technologies, but I'm always looking for more to learn."
+const resumeBlurb = "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature."
 
 const workExperience: ExpBoxProps[] = [
     {
@@ -46,26 +47,27 @@ export default function AboutMe() {
                     About: Kanwarpal Brar
                 </title>
             </Head>
-            <div className={styles.info_box}>
+            <section className={styles.info_box}>
                 <Image
                     className={styles.headshot}
                     src="/headshot.jpeg"
                     alt="Headshot of me"
-                    width={200}
-                    height={200}
+                    width={250}
+                    height={250}
                 />
                 <div className={styles.info_box_text}>
                     <h2>Kanwarpal Brar</h2>
                     <p>{aboutBlurb}</p>
+                    <p className={styles.resume_blurb}><b>{resumeBlurb}</b></p>
                 </div>
                 <Link href={"/Kanwarpal_Brar_Resume.pdf"} target="_blank"><button>View Resume</button></Link>
-            </div>
+            </section>
 
-            <div className={styles.work_info_box}>
+            <section className={styles.work_info_box}>
                 <TabbedContentBox title="Work Experience" key="1">
                     {workExperience.map((exp, i) => {
                         return (
-                            <ContentBoxTab name={exp.company}>
+                            <ContentBoxTab key={exp.company} name={exp.company}>
                                 <ExpBox {...exp}/>
                             </ContentBoxTab>
                         )
@@ -74,14 +76,13 @@ export default function AboutMe() {
                 <TabbedContentBox title="Extra-Curriculars" key="2">
                     {extraCurriculer.map((ec, i) => {
                         return (
-                            <ContentBoxTab name={ec.name}>
+                            <ContentBoxTab key={ec.name} name={ec.name}>
                                 <ExtraCurricularBox {...ec}/>
                             </ContentBoxTab>
                         )
                     })}
                 </TabbedContentBox>
-            </div>
-            
+            </section>
         </div>
     )
 }

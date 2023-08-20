@@ -4,6 +4,8 @@
     display: flex;
     flex-direction: column;
     background-color: variables.$secondary_color;
+    border: 1px solid variables.$accent_color;
+    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
     border-radius: 10px;
     padding: 10px 10px;
     width: 100%;
