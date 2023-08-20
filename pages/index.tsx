@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import styles from './index.module.scss'
 import SplitText from '@/components/SplitText/splittext'
+import "animate.css"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,7 +14,7 @@ export default function Home() {
           <Head>
             <title>Kanwarpal Brar</title>
           </Head>
-          <SplitText childStyle={styles.title_name} letterWrapper='h1'>
+          <SplitText childStyle={`${styles.title_name}`} letterWrapper='h1'>
             Kanwarpal &ensp; Brar
           </SplitText>
           <h3 className={styles.title_tagline}>Developer, Student, Innovator</h3>

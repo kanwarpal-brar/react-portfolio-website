@@ -1,15 +1,22 @@
 @use '~/styles/variables';
+@import "animate.css/source/attention_seekers/rubberBand";
+@import "animate.css/source/fading_entrances/fadeIn";
 
 .intro_box {
- position: relative;
- bottom: 4vh;
- width: 68vw;
+    position: relative;
+    bottom: 4vh;
+    width: 68vw;
+
+    h3 {
+        animation: fadeIn 4s;
+}
 }
 
 .blurb_box {
     margin-top: 50px;
     p {
         margin-bottom: 20px;
+        animation: fadeIn 6s;
     }
 
     button {
@@ -19,9 +26,11 @@
         box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 6px 5px 0 rgba(0,0,0,0.19);
         text-transform: uppercase;
         outline: none;
+        animation: fadeIn 6s;
 
         &:hover {
             outline: 2px solid variables.$accent_color;
+            animation: fadeIn 6s;
         }
     }
 }
@@ -32,6 +41,9 @@
     bottom: -3vw;
     left: -0.45vw;
     display: inline-block;
-    animation: animate__tada;
-    animation-duration: 2s;
+    animation: fadeIn 2s;
+
+    &:hover {
+        animation: rubberBand 1s, fadeIn 2s;
+    }
 }
