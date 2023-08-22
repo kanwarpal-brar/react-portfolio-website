@@ -1,4 +1,6 @@
 @use '~/styles/variables';
+@import "animate.css/source/fading_entrances/fadeInRight";
+@import "animate.css/source/fading_entrances/fadeInLeft";
 
 .info_box {
     display: flex;
@@ -9,6 +11,18 @@
     position: relative;
     max-width: 65%;
     scroll-snap-align: start;
+    animation: fadeInRight 1s 0s ease-in-out;
+    animation-fill-mode: forwards;
+    background-color: variables.$secondary_color;
+    border: 1px solid variables.$accent_color;
+    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 10px 10px;
+
+    &::after {
+        background-color: variables.$secondary_color_focus;
+        padding: 10px 10px;
+    }
 
     &_text {
         display: flex;
@@ -39,6 +53,8 @@
     border: 2px solid variables.$accent_color;
     border-radius: 50%;
     position: relative;
+    animation: fadeInRight 1s 0s ease-in-out;
+    animation-fill-mode: forwards;
 }
 
 .work_info_box {
@@ -50,6 +66,9 @@
     padding: 10px 10px;
     border-radius: 10px;
     scroll-snap-align: start;
+    opacity: 0;
+    animation: fadeInLeft 1s 500ms ease-in-out;
+    animation-fill-mode: forwards;
 }
 
 .about_container {
@@ -61,4 +80,6 @@
     scroll-snap-type: y mandatory;
     padding-top: 12vh;
     padding-bottom: 12vh;
+    // animation: fadeInRight 2s 0s ease-in-out;
+    // animation-fill-mode: forwards;
 }
