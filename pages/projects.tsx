@@ -85,12 +85,10 @@ type GithubRepoOwner = {
 
 export default function Project() {
     const [projects, setProjects] = useState<ExpandingProjectWidgetProps[]>([])
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true)
-            const data: GithubRepo[] = await fetch(projectConfig.targetUrl).then( async (r) => await r.json()).finally(() => setLoading(false))
+            const data: GithubRepo[] = await fetch(projectConfig.targetUrl).then( async (r) => await r.json())
             setProjects(
                 data.filter((proj: GithubRepo) => projectConfig.targetProjectIds.includes(proj.id))
                     .map((proj: GithubRepo) => {
@@ -116,7 +114,7 @@ export default function Project() {
                 </title>
             </Head>
             <main className={styles.projects_box}>
-                <div className={styles.widgets_box} aria-describedby="loading_circle">
+                <div className={styles.widgets_box}>
                     {projectWidgets}
                 </div>
             </main>

@@ -7,7 +7,7 @@ import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentbo
 import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
 import ExtraCurricularBox, { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox"
 
-const aboutBlurb = "Hi, my name is Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a variety if industry standard technologies, but I'm always looking for more to learn."
+const aboutBlurb = "Hi, my name is Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a of industry standard technologies, but I'm always looking for more to learn." 
 const resumeBlurb = "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature."
 
 const workExperience: ExpBoxProps[] = [
@@ -55,12 +55,14 @@ export default function AboutMe() {
                     width={250}
                     height={250}
                 />
-                <div className={styles.info_box_text}>
-                    <h2>Kanwarpal Brar</h2>
-                    <p>{aboutBlurb}</p>
-                    <p className={styles.resume_blurb}><b>{resumeBlurb}</b></p>
+                <div className={styles.info_box_outer}>
+                    <div className={styles.info_box_text}>
+                        <h2>Kanwarpal Brar</h2>
+                        <p>{aboutBlurb}</p>
+                        <p className={styles.resume_blurb}><b>{resumeBlurb}</b></p>
+                        <Link href={"/Kanwarpal_Brar_Resume.pdf"} target="_blank"><button>View Resume</button></Link>
+                    </div>
                 </div>
-                <Link href={"/Kanwarpal_Brar_Resume.pdf"} target="_blank"><button>View Resume</button></Link>
             </section>
 
             <section className={styles.work_info_box}>

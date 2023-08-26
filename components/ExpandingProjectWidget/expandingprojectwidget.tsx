@@ -20,7 +20,6 @@ export default function ExpandingProjectWidget({ title, desc, link, style, tags 
   let debounce = false
   const displayTags = tags ? tags : []
   const [modelDesc, setModelDesc] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const imgUrl = `${projectConfig.repoImageUrl}/${title.toLowerCase()}.png`
 
   function extractDesc(rawText: string): string {
@@ -31,13 +30,11 @@ export default function ExpandingProjectWidget({ title, desc, link, style, tags 
   async function fetchReadme() {
     const url = projectConfig.fileUrl + `${title}/main/README.md`
     setModelDesc(extractDesc(await (await fetch(url)).text()))
-    setIsLoading(false)
   }
 
   async function handleOpenByContainer() {
     if (!debounce) {
       setOpen(true)
-      setIsLoading(true)
       await fetchReadme()
     }
   }

@@ -13,11 +13,7 @@
     scroll-snap-align: start;
     animation: fadeInRight 1s 0s ease-in-out;
     animation-fill-mode: forwards;
-    background-color: variables.$secondary_color;
-    border: 1px solid variables.$accent_color;
-    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
-    border-radius: 10px;
-    padding: 10px 10px;
+
 
     &::after {
         background-color: variables.$secondary_color_focus;
@@ -29,6 +25,18 @@
         flex-direction: column;
         align-items: center;
         gap: 25px;
+        background-color: variables.$secondary_color_focus;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
+
+    &_outer {
+        background-color: variables.$secondary_color;
+        border-radius: 10px;
+        box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+        padding: 15px 15px;
+        padding-top: 20px;
+        border: 1px solid variables.$accent_color;
     }
 
     button {
@@ -38,6 +46,7 @@
         box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 6px 5px 0 rgba(0,0,0,0.19);
         text-transform: uppercase;
         outline: none;
+        background-color: variables.$secondary_color;
 
         &:hover {
             outline: 2px solid variables.$accent_color;
@@ -55,6 +64,7 @@
     position: relative;
     animation: fadeInRight 1s 0s ease-in-out;
     animation-fill-mode: forwards;
+    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
 }
 
 .work_info_box {
