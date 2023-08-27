@@ -8,7 +8,7 @@ import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
 import ExtraCurricularBox, { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox"
 import projectConfig from "../public/targetProjects.json"
 
-const aboutBlurb = "Hi, my name is Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a of industry standard technologies, but I'm always looking for more to learn." 
+const aboutBlurb = "Hi, I'm Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a of industry standard technologies, but I'm always looking for more to learn." 
 const resumeBlurb = "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature."
 
 const workExperience: ExpBoxProps[] = [
@@ -57,12 +57,18 @@ const extraCurriculer: ExtraCurricularBoxProps[] = [
     {
         name: "Improv Club",
         img: "improvclub.png",
-        desc: "This is a club I am in"
+        desc: [
+            "UWaterloo Improv Club is, as the name implies, a club where you do improv. The club runs weekly improv game sessions, as well as guided improv tutorials. Improv Club is full of friendly and welcoming people, so it's super easy to get into.",
+            "I joined improv club wanting to learn how to think on the spot better, but ended up having an amazing time and making tonnes of friends."
+        ]
     },
     {
         name: "Tea & Culture Club",
         img: "teaclub.png",
-        desc: "This is a club I am in"
+        desc: [
+            "UWaterloo Tea Club is a laid-back gathering of games, socialization, and, of course, tea. They run weekly meetings in the evenings with new tea flavors every week.",
+            "I love tea, so tea club was a \"must attend\" for me. Socializing and destroying people in UNO are great bonuses."
+        ]
     }
 ]
 
