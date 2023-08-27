@@ -1,11 +1,11 @@
 import { Modal } from "@mui/material";
 import styles from "./expandingprojectwidget.module.scss"
-import Image from "next/image"
 import { useState } from "react";
 import projectConfig from "../../public/targetProjects.json";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
+import Imgix from "react-imgix";
 
 export type ExpandingProjectWidgetProps = {
     title: string;
@@ -21,7 +21,7 @@ export default function ExpandingProjectWidget({ title, desc, link, style, tags,
   let debounce = false
   const displayTags = tags ? tags : []
   const [modelDesc, setModelDesc] = useState("")
-  const imgUrl = `${projectConfig.repoImageUrl}/${title.toLowerCase()}.png`
+  const imgUrl = `${projectConfig.repoImageUrl}/repo-logos/${title.toLowerCase()}.png`
   const expanding = useModal ? useModal : false
 
   function extractDesc(rawText: string): string {
@@ -65,7 +65,7 @@ export default function ExpandingProjectWidget({ title, desc, link, style, tags,
               <div className={styles.modal_content}>
                 <div className={styles.markdown_box}>
                   <div className={styles.img_box}>
-                    <Image src={modelDesc ? imgUrl : "/SMPTE_Color_Bars.svg"} alt={`Image for ${title} project`} width={250} height={250}/>
+                    <Imgix src={modelDesc ? imgUrl : "/SMPTE_Color_Bars.svg"} width={250} height={250}/>
                   </div>
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {modelDesc ? modelDesc : `# ${title}\n${desc}`}

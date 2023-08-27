@@ -1,15 +1,27 @@
+$font-scaling: 1.28vw;
+
 .expbox_container {
     display: flex;
     align-self: flex-start;
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: 0px 5%;
+    padding: 0px 2%;
     gap: 0px;
 
     ul {
-        padding: 0 5%;
+        padding: 0 2%;
         list-style-type: square;
+
+        li:not(:last-child) {
+            margin-bottom: 10px;
+        }
+
+        li {
+            font-weight: 200;
+            $font-scaling-offset: 0.35vw;
+            font-size: calc($font-scaling - $font-scaling-offset);
+        }
     }
 }
 
@@ -19,9 +31,12 @@
     h2 {
         display: inline-block;
         text-align: left;
+        font-size:  $font-scaling;
+        font-weight: 500;
     }
 
     h3 {
         float:right;
+        font-size:  $font-scaling;
     }
 }

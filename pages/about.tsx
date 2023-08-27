@@ -1,39 +1,67 @@
 import Link from "next/link"
-import Image from "next/image"
+import Imgix from "react-imgix"
 import Head from "next/head"
 import styles from "./about.module.scss"
 import TabbedContentBox from "@/components/TabbedContentBox/tabbedcontentbox"
 import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentboxtab"
 import ExpBox, { ExpBoxProps } from "@/components/ExpBox/expbox"
 import ExtraCurricularBox, { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox"
+import projectConfig from "../public/targetProjects.json"
 
 const aboutBlurb = "Hi, my name is Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a of industry standard technologies, but I'm always looking for more to learn." 
 const resumeBlurb = "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature."
 
 const workExperience: ExpBoxProps[] = [
     {
-        title: "job 1",
-        company: "My Company",
-        date: "sept-oct 2023",
-        bullets: ["did some stuff", "did some more stuff", "very cool stuff"]
+        title: "Full Stack Software Developer",
+        company: "Genesys Laboratories",
+        date: "Sept - Dec 2022",
+        bullets: [
+            "Demonstrated exceptional skill with AWS technologies such as CloudFormation, DynamoDB, Lambda, EC2, SNS, and SQS", 
+            "Developed Event-Driven Microservices using Apache Kafka",
+            "Built elegant REST APIs using Python & Flask",
+            "Designed attractive and user-friendly UI with Vue.js",
+            "Developed robust microservices for a massive web platform based on AWS using Python, Java, and Kotlin to provide functionality to hundreds of thousands of users internationally"
+        ]
     },
     {
-        title: "job 2",
-        company: "My Company2",
-        date: "sept-oct 2023",
-        bullets: ["did some stuff", "did some more stuff", "very cool stuff"]
+        title: "Software Engineering Intern",
+        company: "Creospark/Cloudspark Labs",
+        date: "Jan - Apr 2022",
+        bullets: [
+            "Designed and developed scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure",
+            "Implemented numerous core microservices in TypeScript using Nest.JS, CosmosDB, and Microsoft Graph to add features",
+            "Independently led design and development of claims-based authorization, licensing, and notification systems"
+        ]
+    },
+    {
+        title: "DevOps Specialist",
+        company: "Pillar To Post",
+        date: "May - Aug 2021",
+        bullets: [
+            "Designed and Developed an Automated Web Software Testing Framework in Selenium using Python and JavaScript",
+            "Saved hundreds of company hours by automating regression testing suite and eliminating manual testing"
+        ]
     }
 ]
 
 const extraCurriculer: ExtraCurricularBoxProps[] = [
     {
-        name: "curricular",
-        img: "/headshot.jpeg",
-        desc: "This is a club I am inwdbwfjkabfawifbawkjdb wdb uawobda kjbdw awoudb oawjldb waoudb waljdb awoud wabd aod bwalj dbaw douwa"
+        name: "Humans vs. Zombies",
+        img: "uwhvz.svg",
+        desc: [
+            "UWaterloo Humans vs. Zombies (UWHVZ) is a club that runs week-long campus-wide games of nerf tag between two teams: the Humans and the Zombies. It is my favourite club, combining good exercise with teamwork and strategy. ",
+            "As 3x Webmaster of UWHVZ I have a hand in the development of the club website using Django, Python, HTML, CSS, and Javascript"
+        ]
     },
     {
-        name: "curricular2",
-        img: "/headshot.jpeg",
+        name: "Improv Club",
+        img: "improvclub.png",
+        desc: "This is a club I am in"
+    },
+    {
+        name: "Tea & Culture Club",
+        img: "teaclub.png",
         desc: "This is a club I am in"
     }
 ]
@@ -48,12 +76,10 @@ export default function AboutMe() {
                 </title>
             </Head>
             <section className={styles.info_box}>
-                <Image
+                <Imgix
                     className={styles.headshot}
-                    src="/headshot.jpeg"
-                    alt="Headshot of me"
-                    width={250}
-                    height={250}
+                    src={`${projectConfig.repoImageUrl}/headshot.png`}
+                    sizes="16vw"
                 />
                 <div className={styles.info_box_outer}>
                     <div className={styles.info_box_text}>

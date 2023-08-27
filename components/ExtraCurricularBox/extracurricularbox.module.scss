@@ -18,10 +18,15 @@
         margin: 0;
         text-align: left;
     }
+
+    & > p:not(:last-child) {
+        margin-bottom: 15px;
+    }
 }
 
 .image {
     align-self: flex-end;
-    border: 2px solid variables.$accent_color;
+    border: 2px solid transparent;
     border-radius: 50%;
+    max-width: 25%;
 }
