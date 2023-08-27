@@ -1,11 +1,8 @@
-import { Inter } from 'next/font/google'
 import Link from 'next/link'
 import Head from 'next/head'
 import styles from './index.module.scss'
 import SplitText from '@/components/SplitText/splittext'
 import "animate.css"
-
-const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   return (
