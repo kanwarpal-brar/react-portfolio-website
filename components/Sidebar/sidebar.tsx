@@ -25,7 +25,7 @@ export default function SideBar() {
 
     const lowerItems: Array<SideBarIconProps> = [
         {name: 'Email Me', icon: AiTwotoneMail, redirectUrl: 'mailto:kanwarpal.brar@outlook.com'},
-        {name: 'Github', icon: AiFillGithub, redirectUrl: 'https://github.com/kanwarpal-brar'},
+        {name: 'Github', icon: AiFillGithub, redirectUrl: 'https://www.github.com/kanwarpal-brar'},
         {name: 'LinkedIn', icon: AiFillLinkedin, redirectUrl: 'https://www.linkedin.com/in/kanwarpal-brar/' },
     ];
 

@@ -4,63 +4,6 @@ import ExpandingProjectWidget, { ExpandingProjectWidgetProps } from "@/component
 import { useEffect, useState } from "react"
 import projectConfig from "../public/targetProjects.json"
 
-// const projects: ExpandingProjectWidgetProps[] = [
-//     {
-//         title: "project title",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca",
-//         tags: ["css", "html", "react", "next.js", "ok", "ok", "ok", "ok"]
-//     },
-//     {
-//         title: "project title 2",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca",
-//         tags: ["css", "html", "react", "next.js"]
-//     },
-//     {
-//         title: "project title 3",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca",
-//         tags: ["css", "html", "react", "next.js"]
-//     },
-//     {
-//         title: "project title 4",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca"
-//     },
-//     {
-//         title: "project title 5",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca"
-//     },
-
-//     {
-//         title: "project title 3",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca",
-//         tags: ["css", "html", "react", "next.js"]
-//     },
-//     {
-//         title: "project title 4",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca",
-//         tags: ["css", "html", "react", "next.js"]
-//     },
-//     {
-//         title: "project title 5",
-//         img: "/SMPTE_Color_Bars.svg",
-//         desc: "This is a description",
-//         link: "google.ca"
-//     },
-// ]
-
 export type GithubRepo = {
     id: number;
     name: string;

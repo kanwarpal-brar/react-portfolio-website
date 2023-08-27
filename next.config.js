@@ -9,6 +9,12 @@ const nextConfig = {
         port: '',
         pathname: '/kanwarpal-brar/repo-images/main/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'https://kanwarpal-github-repos.imgix.net',
+        port: '',
+        pathname: '',
+      },
     ],
   },
 }
