@@ -1,4 +1,4 @@
-@use 'variables';
+@use "variables";
 @import "animate.css";
 @tailwind base;
 
@@ -32,16 +32,16 @@ button {
   color: variables.$text_color;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.10);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   &:active {
-      background-color: rgba(255, 255, 255, 0.2);;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 }
 
 :root {
-  font-family: 'Chivo Mono', monospace;
+  font-family: "Chivo Mono", monospace;
   background-color: variables.$base_color;
   background-image: variables.$base_gradient;
   background-attachment: fixed;

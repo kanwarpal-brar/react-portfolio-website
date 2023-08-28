@@ -1,42 +1,42 @@
-@use '~/styles/variables';
+@use "~/styles/variables";
 
 .sidebar_container {
-    transition: width 80ms ease-in-out;
-    height: 100vh;
-    background-color: variables.$secondary_color;
-    overflow: visible;
-    position: -webkit-sticky;
-    position: sticky;
-    // top: 0;
-    z-index: 99;
+  transition: width 80ms ease-in-out;
+  height: 100vh;
+  background-color: variables.$secondary_color;
+  overflow: visible;
+  position: -webkit-sticky;
+  position: sticky;
+  // top: 0;
+  z-index: 99;
 }
 
 .sidebar {
-    transition: width 80ms ease-in-out;
-    height: 100vh;
-    background-color: variables.$secondary_color;
-    background-image: variables.$secondary_gradient;
-    z-index: 3;
-    overflow: hidden;
-    position: fixed;
+  transition: width 80ms ease-in-out;
+  height: 100vh;
+  background-color: variables.$secondary_color;
+  background-image: variables.$secondary_gradient;
+  z-index: 3;
+  overflow: hidden;
+  position: fixed;
 }
 
 .sidebar_button {
-    position: fixed;
-    top: 20px;
-    color: black;
-    transition: left 150ms ease-in-out;
-    transform: scale(2, 3);
-    height: 20px;
-    
-    &_active {
-        @extend .sidebar_button;
-        z-index: -1;
-    }
+  position: fixed;
+  top: 20px;
+  color: black;
+  transition: left 150ms ease-in-out;
+  transform: scale(2, 3);
+  height: 20px;
+
+  &_active {
+    @extend .sidebar_button;
+    z-index: -1;
+  }
 }
 
 .sidebar_lower_icons {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
 }

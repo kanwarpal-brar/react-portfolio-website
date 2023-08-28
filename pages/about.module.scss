@@ -1,95 +1,96 @@
-@use '~/styles/variables';
+@use "~/styles/variables";
 @import "animate.css/source/fading_entrances/fadeInRight";
 @import "animate.css/source/fading_entrances/fadeInLeft";
 
 .info_box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+  position: relative;
+  max-width: 65%;
+  scroll-snap-align: start;
+  animation: fadeInRight 1s 0s ease-in-out;
+  animation-fill-mode: forwards;
+
+  &::after {
+    background-color: variables.$secondary_color_focus;
+    padding: 10px 10px;
+  }
+
+  &_text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    flex-wrap: nowrap;
-    position: relative;
-    max-width: 65%;
-    scroll-snap-align: start;
-    animation: fadeInRight 1s 0s ease-in-out;
-    animation-fill-mode: forwards;
+    gap: 25px;
+    background-color: variables.$secondary_color_focus;
+    border-radius: 5px;
+    padding: 10px 20px;
+  }
 
+  &_outer {
+    background-color: variables.$secondary_color;
+    border-radius: 10px;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+    padding: 15px 15px;
+    padding-top: 20px;
+    border: 1px solid variables.$accent_color;
+  }
 
-    &::after {
-        background-color: variables.$secondary_color_focus;
-        padding: 10px 10px;
+  button {
+    margin-top: 10px;
+    padding: 8px 20px;
+    border-radius: 5px;
+    box-shadow:
+      0 2px 5px 0 rgba(0, 0, 0, 0.2),
+      0 6px 5px 0 rgba(0, 0, 0, 0.19);
+    text-transform: uppercase;
+    outline: none;
+    background-color: variables.$secondary_color;
+
+    &:hover {
+      outline: 2px solid variables.$accent_color;
     }
-
-    &_text {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 25px;
-        background-color: variables.$secondary_color_focus;
-        border-radius: 5px;
-        padding: 10px 20px;
-    }
-
-    &_outer {
-        background-color: variables.$secondary_color;
-        border-radius: 10px;
-        box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
-        padding: 15px 15px;
-        padding-top: 20px;
-        border: 1px solid variables.$accent_color;
-    }
-
-    button {
-        margin-top: 10px;
-        padding: 8px 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 6px 5px 0 rgba(0,0,0,0.19);
-        text-transform: uppercase;
-        outline: none;
-        background-color: variables.$secondary_color;
-
-        &:hover {
-            outline: 2px solid variables.$accent_color;
-        }
-    }
+  }
 }
 
 .resume_blurb {
-    text-align: center;
+  text-align: center;
 }
 
 .headshot {
-    border: 2px solid variables.$accent_color;
-    border-radius: 50%;
-    position: relative;
-    animation: fadeInRight 1s 0s ease-in-out;
-    animation-fill-mode: forwards;
-    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+  border: 2px solid variables.$accent_color;
+  border-radius: 50%;
+  position: relative;
+  animation: fadeInRight 1s 0s ease-in-out;
+  animation-fill-mode: forwards;
+  box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
 .work_info_box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 60vw;
-    gap: 50px;
-    padding: 10px 10px;
-    border-radius: 10px;
-    scroll-snap-align: start;
-    opacity: 0;
-    animation: fadeInLeft 1s 500ms ease-in-out;
-    animation-fill-mode: forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60vw;
+  gap: 50px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  scroll-snap-align: start;
+  opacity: 0;
+  animation: fadeInLeft 1s 500ms ease-in-out;
+  animation-fill-mode: forwards;
 }
 
 .about_container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15vh;
-    overflow: auto;
-    scroll-snap-type: y mandatory;
-    padding-top: 12vh;
-    padding-bottom: 12vh;
-    // animation: fadeInRight 2s 0s ease-in-out;
-    // animation-fill-mode: forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15vh;
+  overflow: auto;
+  scroll-snap-type: y mandatory;
+  padding-top: 12vh;
+  padding-bottom: 12vh;
+  // animation: fadeInRight 2s 0s ease-in-out;
+  // animation-fill-mode: forwards;
 }
