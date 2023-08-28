@@ -51,4 +51,6 @@ body {
   margin: 0;
   height: 100vh;
   overscroll-behavior: none;
+  max-width: 100%;
+  overflow-x: hidden;
 }
