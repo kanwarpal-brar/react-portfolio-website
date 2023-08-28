@@ -41,9 +41,9 @@
     bottom: -3vw;
     left: -0.45vw;
     display: inline-block;
-    animation: fadeIn 2s;
+
 
     &:hover {
-        animation: rubberBand 1s, fadeIn 2s;
+        transform: scale(1.025);
     }
 }
