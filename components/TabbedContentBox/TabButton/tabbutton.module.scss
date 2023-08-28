@@ -1,21 +1,20 @@
-@use '~/styles/variables';
+@use "~/styles/variables";
 
 .tab_button {
-    height: 100%;
-    width: 100%;
-    padding: 5px 0px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    font-weight: 500;
-    user-select: none;
+  height: 100%;
+  width: 100%;
+  padding: 5px 0px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  font-weight: 500;
+  user-select: none;
 
-    &_active {
-        @extend .tab_button;
-        background-color: variables.$secondary_color_focus;
+  &_active {
+    @extend .tab_button;
+    background-color: variables.$secondary_color_focus;
 
-        &:hover {
-            background-color: variables.$secondary_color_focus;
-        }
+    &:hover {
+      background-color: variables.$secondary_color_focus;
     }
-
+  }
 }

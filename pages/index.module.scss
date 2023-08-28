@@ -1,49 +1,55 @@
-@use '~/styles/variables';
+@use "~/styles/variables";
 @import "animate.css/source/attention_seekers/rubberBand";
 @import "animate.css/source/fading_entrances/fadeIn";
 
 .intro_box {
-    position: relative;
-    bottom: 4vh;
-    width: 68vw;
-
-    h3 {
-        animation: fadeIn 4s;
-}
+  position: relative;
+  bottom: 4vh;
+  width: 68vw;
 }
 
 .blurb_box {
-    margin-top: 50px;
-    p {
-        margin-bottom: 20px;
-        animation: fadeIn 6s;
-    }
+  margin-top: 50px;
 
-    button {
-        padding: 8px 20px;
-        margin-right: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 6px 5px 0 rgba(0,0,0,0.19);
-        text-transform: uppercase;
-        outline: none;
-        animation: fadeIn 6s;
+  p {
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeIn 6s;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+  }
 
-        &:hover {
-            outline: 2px solid variables.$accent_color;
-            animation: fadeIn 6s;
-        }
+  button {
+    padding: 8px 20px;
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow:
+      0 2px 5px 0 rgba(0, 0, 0, 0.2),
+      0 6px 5px 0 rgba(0, 0, 0, 0.19);
+    text-transform: uppercase;
+    outline: none;
+    opacity: 0;
+    animation: fadeIn 6s;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+
+    &:hover {
+      outline: 2px solid variables.$accent_color;
+      animation: fadeIn 6s;
+      animation-delay: 2s;
+      animation-fill-mode: forwards;
     }
+  }
 }
 
 .title_name {
-    vertical-align: middle;
-    position: relative;
-    bottom: -3vw;
-    left: -0.45vw;
-    display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  bottom: -3vw;
+  left: -0.45vw;
+  display: inline-block;
 
-
-    &:hover {
-        transform: scale(1.025);
-    }
+  &:hover {
+    transform: scale(1.025);
+  }
 }

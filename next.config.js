@@ -4,19 +4,19 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'raw.githubusercontent.com',
-        port: '',
-        pathname: '/kanwarpal-brar/repo-images/main/**',
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        port: "",
+        pathname: "/kanwarpal-brar/repo-images/main/**",
       },
       {
-        protocol: 'https',
-        hostname: 'https://kanwarpal-github-repos.imgix.net',
-        port: '',
-        pathname: '/',
+        protocol: "https",
+        hostname: "https://kanwarpal-github-repos.imgix.net",
+        port: "",
+        pathname: "/",
       },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

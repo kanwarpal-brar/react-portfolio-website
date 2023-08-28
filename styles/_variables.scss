@@ -1,6 +1,12 @@
 // Global Style Variables
 $base_color: rgb(193, 193, 193);
-$base_gradient: radial-gradient(circle at bottom left,#a01bff 5%,#4b48ff 70%,rgba(75,72,255,0) 100%),radial-gradient(circle at top right,#a01bff 25%,rgba(75,72,255,0) 100%);
+$base_gradient: radial-gradient(
+    circle at bottom left,
+    #a01bff 5%,
+    #4b48ff 70%,
+    rgba(75, 72, 255, 0) 100%
+  ),
+  radial-gradient(circle at top right, #a01bff 25%, rgba(75, 72, 255, 0) 100%);
 $base_color_hover: rgb(226, 226, 226);
 
 $secondary_color: black;
