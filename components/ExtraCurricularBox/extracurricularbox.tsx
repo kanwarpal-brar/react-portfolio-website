@@ -1,6 +1,7 @@
 import styles from "./extracurricularbox.module.scss";
 import Imgix from "react-imgix";
 import projectConfig from "../../public/targetProjects.json";
+import { useState, useEffect } from "react";
 
 export type ExtraCurricularBoxProps = {
     name: string;
@@ -9,6 +10,20 @@ export type ExtraCurricularBoxProps = {
 }
 
 export default function ExtraCurricularBox({ name, img, desc }: ExtraCurricularBoxProps) {
+  const [ImgComp, setImgComp] = useState<React.ReactElement>()
+
+  useEffect(() => {
+    setImgComp(<Imgix
+      className={styles.image} src={`${projectConfig.repoImageUrl}/logos/${img}`}
+      sizes="calc(25%)"
+      htmlAttributes={{ // These are ignored by Imgix but passed through to the <img> element
+        width: 200,
+        height: 200,
+      }}
+    />)
+  }, [img])
+
+
   return (
     <div className={styles.box}>
         <div className={styles.text_box}>
@@ -18,14 +33,7 @@ export default function ExtraCurricularBox({ name, img, desc }: ExtraCurricularB
             })
             : <p>{desc}</p> }
         </div>
-        <Imgix
-          className={styles.image} src={`${projectConfig.repoImageUrl}/logos/${img}`}
-          sizes="calc(25%)"
-          htmlAttributes={{ // These are ignored by Imgix but passed through to the <img> element
-            width: 200,
-            height: 200,
-          }}
-        />
+        {ImgComp}
     </div>
   )
 }
