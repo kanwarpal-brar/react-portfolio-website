@@ -11,6 +11,11 @@ const parablurb =
 export default function Home() {
   return (
     <div>
+      <Head>
+        <title>Home - Kanwarpal Brar Portfolio</title>
+        <meta name="description" content={`Kanwarpal Brar: ${parablurb}`} />
+      </Head>
+
       <main className={styles.intro_box}>
         <Head>
           <title>Kanwarpal Brar</title>

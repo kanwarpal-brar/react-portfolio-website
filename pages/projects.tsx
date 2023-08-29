@@ -58,7 +58,8 @@ export default function Project() {
   return (
     <div>
       <Head>
-        <title>Projects</title>
+        <title>Projects - Kanwarpal Brar Portfolio</title>
+        <meta name="description" content="Kanwarpal Brar Github Projects" />
       </Head>
       <main className={styles.projects_box}>
         <div className={styles.widgets_box}>{projectWidgets}</div>

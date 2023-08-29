@@ -80,7 +80,8 @@ export default function AboutMe() {
   return (
     <div className={styles.about_container}>
       <Head>
-        <title>About: Kanwarpal Brar</title>
+        <title>About - Kanwarpal Brar Portfolio</title>
+        <meta name="description" content={`${aboutBlurb}`} />
       </Head>
       <section className={styles.info_box}>
         <Imgix
