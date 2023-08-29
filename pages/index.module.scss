@@ -6,6 +6,13 @@
   position: relative;
   bottom: 4vh;
   width: 68vw;
+
+  @media (orientation: portrait) {
+    h3 {
+      font-size: 1em;
+      padding-top: 5px;
+    }
+  }
 }
 
 .blurb_box {

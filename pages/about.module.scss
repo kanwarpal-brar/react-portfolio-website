@@ -10,6 +10,9 @@
   flex-wrap: nowrap;
   position: relative;
   max-width: 65%;
+  @media (orientation: portrait) {
+    max-width: 95%;
+  }
   scroll-snap-align: start;
   animation: fadeInRight 1s 0s ease-in-out;
   animation-fill-mode: forwards;
@@ -27,6 +30,15 @@
     background-color: variables.$secondary_color_focus;
     border-radius: 5px;
     padding: 10px 20px;
+    @media (orientation: portrait) {
+      h2 {
+        font-size: 1.5em;
+      }
+
+      p {
+        font-size: 0.8em;
+      }
+    }
   }
 
   &_outer {
@@ -66,13 +78,13 @@
   animation: fadeInRight 1s 0s ease-in-out;
   animation-fill-mode: forwards;
   box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+  overflow:hidden;
 }
 
 .work_info_box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60vw;
   gap: 50px;
   padding: 10px 10px;
   border-radius: 10px;
@@ -80,6 +92,11 @@
   opacity: 0;
   animation: fadeInLeft 1s 500ms ease-in-out;
   animation-fill-mode: forwards;
+  max-width: 65%;
+
+  @media (orientation: portrait) {
+    max-width: 95%;
+  }
 }
 
 .about_container {
@@ -91,6 +108,4 @@
   scroll-snap-type: y mandatory;
   padding-top: 12vh;
   padding-bottom: 12vh;
-  // animation: fadeInRight 2s 0s ease-in-out;
-  // animation-fill-mode: forwards;
 }

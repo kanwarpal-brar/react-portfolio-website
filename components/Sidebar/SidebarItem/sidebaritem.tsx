@@ -1,6 +1,8 @@
-import { IconType } from "react-icons/lib";
 import styles from "./sidebaritem.module.scss";
 import Link from "next/link";
+import { Chivo_Mono } from "next/font/google";
+
+const chivoMono = Chivo_Mono({ subsets: ["latin"] });
 
 export type SideBarIconProps = {
   name: string;
@@ -25,7 +27,7 @@ export default function SideBarIcon({
       target={newTab ? "_blank" : undefined}
     >
       <Icon className={styles.sidebar_item_icon} />
-      <span className={styles.sidebar_item_text}>{name}</span>
+      <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>{name}</span>
     </Link>
   );
 }

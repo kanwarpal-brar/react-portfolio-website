@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
 import styles from "./index.module.scss";
-import SplitText from "@/components/SplitText/splittext";
 import "animate.css";
 import ScrambledTextIntro from "@/components/ScrambledTextIntro/scrambledtextintro";
 
@@ -34,10 +33,10 @@ export default function Home() {
           <Link href="/Kanwarpal_Brar_Resume.pdf" target="_blank">
             <button>Resume</button>
           </Link>
-          <Link href="/about">
+          <Link rel="preload" href="/about">
             <button>About Me</button>
           </Link>
-          <Link href="/projects">
+          <Link rel="preload" href="/projects">
             <button>Projects</button>
           </Link>
         </div>

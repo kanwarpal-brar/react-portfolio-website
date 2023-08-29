@@ -1,4 +1,4 @@
-$font-scaling: 1.28vw;
+$font-scaling: 1.15vw;
 
 .expbox_container {
   display: flex;
@@ -13,15 +13,16 @@ $font-scaling: 1.28vw;
     padding: 0 2%;
     list-style-type: square;
 
-    li:not(:last-child) {
-      margin-bottom: 10px;
-    }
-
     li {
+      margin-top: 15px;
       font-weight: 200;
       $font-scaling-offset: 0.35vw;
       font-size: calc($font-scaling - $font-scaling-offset);
     }
+  }
+
+  hr {
+    padding-bottom: 1%;
   }
 }
 
