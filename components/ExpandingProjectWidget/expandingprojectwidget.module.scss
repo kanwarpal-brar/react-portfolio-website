@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  gap: 10px;
   border: 1px solid variables.$accent_color;
   border-radius: 15px;
   background-color: variables.$secondary_color;
@@ -23,7 +23,8 @@
   }
 
   h3 {
-    @container (max-width: 400px) {
+    padding-bottom: 2%;
+    @container (max-width: 300px) {
       font-size: 1em
     }
   }
@@ -39,17 +40,18 @@
 
 .desc_box {
   overflow: hidden;
-  max-height:35%;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 2;
+  flex-grow: 2;
 
   p {
-    font-size: 100%;
+    font-size: 90%;
   }
 
   @container (max-height: 200px) {
     p {
-      font-size: 0.55em;
+      font-size: 0.7em;
     }
   }
 
@@ -96,6 +98,7 @@
 }
 
 .tag_block {
+  flex-shrink: 2;
   display: flex;
   flex-direction: row-reverse;
   flex-wrap: wrap;
