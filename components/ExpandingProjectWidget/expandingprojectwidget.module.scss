@@ -21,6 +21,12 @@
     height: 28vh;
     width: 70vw;
   }
+
+  h3 {
+    @container (max-width: 400px) {
+      font-size: 1em
+    }
+  }
   
   box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
   animation: fadeInLeft 500ms 0s ease-in-out;
@@ -34,16 +40,20 @@
 .desc_box {
   overflow: hidden;
   max-height:35%;
-
-  // @container (max-width: 200px) {
-  //   p {
-  //     font-size: 0.5em;
-  //   }
-  // }
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   p {
-    font-size: 0.8em;
+    font-size: 100%;
   }
+
+  @container (max-height: 200px) {
+    p {
+      font-size: 0.55em;
+    }
+  }
+
+  
 }
 
 .img_box {

@@ -12,6 +12,10 @@
       font-size: 1em;
       padding-top: 5px;
     }
+
+    h1 {
+      font-size: 1.8em;
+    }
   }
 }
 
@@ -24,6 +28,10 @@
     animation: fadeIn 6s;
     animation-delay: 2s;
     animation-fill-mode: forwards;
+
+    @media (orientation: portrait) {
+      font-size: 0.8em;
+    }
   }
 
   button {

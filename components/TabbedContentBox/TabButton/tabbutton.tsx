@@ -11,6 +11,7 @@ export default function TabButton({
   active,
   activateCallback,
 }: TabButtonProps) {
+
   return (
     <button
       className={active ? styles.tab_button_active : styles.tab_button}
