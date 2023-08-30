@@ -17,10 +17,20 @@
   h2 {
     margin: 0;
     text-align: left;
+
+    @media (orientation: portrait) {
+      font-size: 1.2em;
+    }
   }
 
   & > p:not(:last-child) {
     margin-bottom: 15px;
+  }
+
+  p {
+    @media (orientation: portrait) {
+      font-size: 0.8em;
+    }
   }
 }
 
@@ -29,4 +39,8 @@
   border: 2px solid transparent;
   border-radius: 50%;
   max-width: 25%;
+
+  @media (orientation: portrait) {
+    align-self: flex-start;
+  }
 }
