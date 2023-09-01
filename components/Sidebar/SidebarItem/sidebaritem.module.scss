@@ -1,13 +1,16 @@
 @use "~/styles/variables";
 
+
 .sidebar_item {
-  display: flex;
-  align-items: center;
-  padding: 12px 22px;
-  cursor: pointer;
-  color: variables.$accent_color;
-  text-decoration: none;
-  white-space: nowrap;
+  @media (orientation: landscape) {
+    display: flex;
+    align-items: center;
+    padding: 12px 22px;
+    cursor: pointer;
+    color: variables.$accent_color;
+    text-decoration: none;
+    white-space: nowrap;
+  }
 
   &_active {
     @extend .sidebar_item;
@@ -17,6 +20,11 @@
   &:hover {
     background-color: variables.$secondary_color_hover;
   }
+
+  @media (orientation: portrait) {
+    
+  }
+  
 }
 
 .sidebar_item_icon {

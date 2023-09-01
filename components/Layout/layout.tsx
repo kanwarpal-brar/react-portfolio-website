@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isMobile = useMediaQuery("(orientation: portrait") ? true : false
   return (
     <div className={styles.layout_container}>
-      { isMobile ? undefined : <SideBar />}
+      <SideBar />
       <main className={styles.content_container}>{children}</main>
     </div>
   );

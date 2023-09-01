@@ -3,6 +3,11 @@
   flex-direction: row;
   flex-wrap: nowrap;
   z-index: 0;
+
+  @media (orientation: portrait) {
+    flex-direction: column;
+    flex-wrap: unset;
+  }
 }
 
 .content_container {

@@ -5,8 +5,10 @@ import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from "react-icons/ai";
 import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { usePathname } from "next/navigation";
+import { useMediaQuery } from "@mui/material";
 
 export default function SideBar() {
+  const [isMobile, setIsMobile] = useState(useMediaQuery("(orientation: portrait") ? true : false)
   const barSize = { base: 60, expanded: 200 };
   const btnOffset = { base: 70, minimized: 10 };
 
@@ -52,43 +54,46 @@ export default function SideBar() {
         key={item.name}
         {...item}
         active={pathname === item.redirectUrl ? true : false}
+        noName={isMobile ? true : false}
       />
     );
   });
 
   const sideBarLowerIcons = lowerItems.map((item) => {
-    return <SideBarIcon key={item.name} {...item} newTab={true} />;
+    return <SideBarIcon key={item.name} {...item} newTab={true} noName={isMobile ? true : false} />;
   });
 
   function expandBar() {
     setMouseInBar(true);
-    if (active) {
+    if (active && !isMobile) {
       setWidth(barSize.expanded);
     }
   }
 
   function shrinkBar() {
     setMouseInBar(false);
-    if (active) {
+    if (active && !isMobile) {
       setWidth(barSize.base);
     }
   }
 
   function toggleBarActive() {
-    setWidth(active ? 0 : barSize.base);
-    setBtnLeft(active ? btnOffset.minimized : btnOffset.base);
-    setActive(!active);
+    if (!isMobile) {
+      setWidth(active ? 0 : barSize.base);
+      setBtnLeft(active ? btnOffset.minimized : btnOffset.base);
+      setActive(!active);
+    }
   }
 
   return (
     <>
       <div
         className={styles.sidebar_container}
-        style={{ width: `${active ? barSize.base : 0}px` }}
+        style={!isMobile ? { width: `${active ? barSize.base : 0}px` } : {}}
       >
         <div
           className={styles.sidebar}
-          style={{ width: `${width}px` }}
+          style={!isMobile ? { width: `${width}px` } : {}}
           onMouseEnter={expandBar}
           onMouseLeave={shrinkBar}
         >
@@ -96,17 +101,20 @@ export default function SideBar() {
           <div className={styles.sidebar_lower_icons}>{sideBarLowerIcons}</div>
         </div>
       </div>
-      <button
-        className={
-          width == barSize.expanded
-            ? styles.sidebar_button_active
-            : styles.sidebar_button
-        }
-        onClick={toggleBarActive}
-        style={{ left: btnLeft }}
-      >
-        {active ? <BsChevronLeft /> : <BsChevronRight />}
-      </button>
+      {!isMobile ?
+        <button
+          className={
+            width == barSize.expanded
+              ? styles.sidebar_button_active
+              : styles.sidebar_button
+          }
+          onClick={toggleBarActive}
+          style={{ left: btnLeft }}
+        >
+          {active ? <BsChevronLeft /> : <BsChevronRight />}
+        </button>
+      : undefined
+      }
     </>
   );
 }

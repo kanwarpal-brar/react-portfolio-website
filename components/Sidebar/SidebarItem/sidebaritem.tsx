@@ -10,6 +10,7 @@ export type SideBarIconProps = {
   redirectUrl: string;
   active?: boolean;
   newTab?: boolean;
+  noName?: boolean;
 };
 
 export default function SideBarIcon({
@@ -18,6 +19,7 @@ export default function SideBarIcon({
   redirectUrl,
   active,
   newTab,
+  noName,
 }: SideBarIconProps) {
   const Icon = icon;
   return (
@@ -27,7 +29,7 @@ export default function SideBarIcon({
       target={newTab ? "_blank" : undefined}
     >
       <Icon className={styles.sidebar_item_icon} />
-      <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>{name}</span>
+      { noName ? undefined : <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>{name}</span>}
     </Link>
   );
 }

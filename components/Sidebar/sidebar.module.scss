@@ -1,5 +1,6 @@
 @use "~/styles/variables";
 
+$mobile_sidebar_height: 40px;
 .sidebar_container {
   transition: width 80ms ease-in-out;
   height: 100vh;
@@ -7,8 +8,13 @@
   overflow: visible;
   position: -webkit-sticky;
   position: sticky;
-  // top: 0;
   z-index: 99;
+
+  @media (orientation: portrait) {
+    height: $mobile_sidebar_height;
+    width: 100vw;
+    overflow: visible;
+  }
 }
 
 .sidebar {
@@ -19,6 +25,13 @@
   z-index: 3;
   overflow: hidden;
   position: fixed;
+
+  @media (orientation: portrait) {
+    height: $mobile_sidebar_height;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 .sidebar_button {
@@ -41,4 +54,9 @@
   position: absolute;
   bottom: 10px;
   width: 100%;
+
+  @media (orientation: portrait) {
+    bottom: unset;
+    width: unset;
+  }
 }
