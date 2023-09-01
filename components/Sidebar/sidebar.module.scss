@@ -35,6 +35,11 @@
     @extend .sidebar_button;
     z-index: -1;
   }
+
+  @media (orientation: portrait) {
+    z-index: 5;
+    color: variables.$base_color
+  }
 }
 
 .sidebar_lower_icons {
