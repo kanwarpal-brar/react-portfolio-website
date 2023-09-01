@@ -12,4 +12,9 @@
   align-items: center;
   vertical-align: center;
   margin: auto;
+
+  @media (orientation: portrait) {
+    margin: unset;
+    
+  }
 }

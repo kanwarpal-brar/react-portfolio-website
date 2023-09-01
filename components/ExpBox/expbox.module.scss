@@ -54,7 +54,7 @@ $font-scaling: 1.15vw;
     float: right;
     font-size: calc($font-scaling - $font-offset);
     @media (orientation: portrait) {
-      font-size: 10%;
+      font-size: 45%;
     }
   }
 }
