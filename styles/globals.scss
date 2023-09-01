@@ -71,14 +71,12 @@ button {
   background-image: variables.$base_gradient;
   background-attachment: fixed;
 
-  @media (orientation: portrait) {
-    height: 200vh;
-  }
+  // @media (orientation: portrait) {
+  //   height: 100vh;
+  // }
 }
 
 body {
   margin: 0;
-  height: 100%;
   overscroll-behavior: none;
-  max-width: 100%;
 }

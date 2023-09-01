@@ -2,7 +2,7 @@ import styles from "./sidebar.module.scss";
 import SideBarIcon, { SideBarIconProps } from "./SidebarItem/sidebaritem";
 import { useEffect, useState } from "react";
 import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from "react-icons/ai";
-import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
+import { MdHomeFilled, MdPerson, MdOutlineCode, MdScience } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { usePathname } from "next/navigation";
 
@@ -31,6 +31,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
     { name: "Home", icon: MdHomeFilled, redirectUrl: "/" },
     { name: "About", icon: MdPerson, redirectUrl: "/about" },
     { name: "Projects", icon: MdOutlineCode, redirectUrl: "/projects" },
+    { name: "Demos", icon: MdScience, redirectUrl: "/demos"}
   ];
 
   const lowerItems: Array<SideBarIconProps> = [
