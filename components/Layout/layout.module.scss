@@ -10,7 +10,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2vh 2vw;
   vertical-align: center;
   margin: auto;
+
+  @media (orientation: portrait) {
+    
+  }
 }

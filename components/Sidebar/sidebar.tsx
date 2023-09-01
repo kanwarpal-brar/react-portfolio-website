@@ -6,7 +6,12 @@ import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { usePathname } from "next/navigation";
 
-export default function SideBar() {
+export type SideBarProps = {
+  isMobile?: boolean
+}
+
+export default function SideBar({ isMobile }: SideBarProps) {
+  console.log(`Got Mobile: ${isMobile}`);
   const barSize = { base: 60, expanded: 200 };
   const btnOffset = { base: 70, minimized: 10 };
 
@@ -18,9 +23,9 @@ export default function SideBar() {
 
   useEffect(() => {
     setTimeout(() => {
-      toggleBarActive();
+      if (!isMobile) { console.log(`Calling cause ${isMobile}`); toggleBarActive() } ;
     }, 4000);
-  }, []);
+  }, [isMobile]);
 
   const items: Array<SideBarIconProps> = [
     { name: "Home", icon: MdHomeFilled, redirectUrl: "/" },
@@ -52,31 +57,32 @@ export default function SideBar() {
         key={item.name}
         {...item}
         active={pathname === item.redirectUrl ? true : false}
+        clickCallback={isMobile ? () => { toggleBarActive() } : undefined}
       />
     );
   });
 
   const sideBarLowerIcons = lowerItems.map((item) => {
-    return <SideBarIcon key={item.name} {...item} newTab={true} />;
+    return <SideBarIcon key={item.name} {...item} newTab={true} clickCallback={isMobile ? () => { toggleBarActive() } : undefined}/>;
   });
 
   function expandBar() {
     setMouseInBar(true);
-    if (active) {
+    if (active && !isMobile) {
       setWidth(barSize.expanded);
     }
   }
 
   function shrinkBar() {
     setMouseInBar(false);
-    if (active) {
+    if (active && !isMobile) {
       setWidth(barSize.base);
     }
   }
 
   function toggleBarActive() {
     setWidth(active ? 0 : barSize.base);
-    setBtnLeft(active ? btnOffset.minimized : btnOffset.base);
+    setBtnLeft(active || isMobile ? btnOffset.minimized : btnOffset.base);
     setActive(!active);
   }
 
@@ -84,7 +90,7 @@ export default function SideBar() {
     <>
       <div
         className={styles.sidebar_container}
-        style={{ width: `${active ? barSize.base : 0}px` }}
+        style={isMobile ? {} : { width: `${active ? barSize.base : 0}px` }}
       >
         <div
           className={styles.sidebar}

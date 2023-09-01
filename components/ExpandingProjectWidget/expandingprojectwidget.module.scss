@@ -5,13 +5,30 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  gap: 10px;
   border: 1px solid variables.$accent_color;
   border-radius: 15px;
   background-color: variables.$secondary_color;
   padding: 15px 20px;
-  height: 28vh;
-  width: 24vw;
+  max-width: 500px;
+  container-type: size;
+
+  @media (orientation: landscape) {
+    height: 28vh;
+    width: 24vw;
+  }
+  @media (orientation: portrait) {
+    height: 28vh;
+    width: 70vw;
+  }
+
+  h3 {
+    padding-bottom: 2%;
+    @container (max-width: 300px) {
+      font-size: 1em
+    }
+  }
+  
   box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
   animation: fadeInLeft 500ms 0s ease-in-out;
 
@@ -22,8 +39,23 @@
 }
 
 .desc_box {
-  text-overflow: clip;
-  max-height: 33%;
+  overflow: hidden;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 2;
+  flex-grow: 2;
+
+  p {
+    font-size: 90%;
+  }
+
+  @container (max-height: 200px) {
+    p {
+      font-size: 0.7em;
+    }
+  }
+
+  
 }
 
 .img_box {
@@ -66,18 +98,23 @@
 }
 
 .tag_block {
+  flex-shrink: 2;
   display: flex;
   flex-direction: row-reverse;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 10px;
-  width: 80%;
+  gap: 3%;
+  width: 85%;
 
   .tag {
     color: variables.$text_color;
     padding: 1px 5px;
     border: 1px solid white;
     background-color: rgba(255, 255, 255, 0.03);
+
+    @container (max-width: 300px) {
+      font-size: 0.8em;
+    }
   }
 }
 

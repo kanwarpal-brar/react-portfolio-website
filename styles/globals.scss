@@ -5,30 +5,55 @@
 h1 {
   font-weight: 600;
   color: variables.$text_color;
-  font-size: 8vw;
+  @media (orientation: landscape) {
+    font-size: 8vw;
+  }
+  @media (orientation: portrait) {
+    font-size: 2.3em;
+  }
 }
 
 h2 {
   font-weight: 200;
   color: variables.$text_color;
-  font-size: 2vw;
+  @media (orientation: landscape) {
+    font-size: 2vw;
+  }
+  @media (orientation: portrait) {
+    font-size: 1em;
+  }
 }
 
 h3 {
   font-weight: 200;
   color: variables.$text_color;
-  font-size: 1.5vw;
+  @media (orientation: landscape) {
+    font-size: 1.5vw;
+  }
+  @media (orientation: portrait) {
+    font-size: 1.4em;
+  }
 }
 
 p {
   font-weight: 100;
   color: variables.$text_color;
-  font-size: 0.9vw;
+  @media (orientation: landscape) {
+    font-size: 0.9vw;
+  }
+  @media (orientation: portrait) {
+    font-size: 1em;
+  }
 }
 
 button {
   font-weight: 200;
-  font-size: 0.9vw;
+  @media (orientation: landscape) {
+    font-size: 0.9vw;
+  }
+  @media (orientation: portrait) {
+    font-size: 0.8em;
+  }
   color: variables.$text_color;
 
   &:hover {
@@ -45,12 +70,15 @@ button {
   background-color: variables.$base_color;
   background-image: variables.$base_gradient;
   background-attachment: fixed;
+
+  @media (orientation: portrait) {
+    height: 200vh;
+  }
 }
 
 body {
   margin: 0;
-  height: 100vh;
+  height: 100%;
   overscroll-behavior: none;
   max-width: 100%;
-  overflow-x: hidden;
 }

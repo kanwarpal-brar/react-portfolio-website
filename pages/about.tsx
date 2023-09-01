@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Imgix from "react-imgix";
+import Imgix, { Picture, Source } from "react-imgix";
 import Head from "next/head";
 import styles from "./about.module.scss";
 import TabbedContentBox from "@/components/TabbedContentBox/tabbedcontentbox";
@@ -84,11 +84,24 @@ export default function AboutMe() {
         <meta name="description" content={`${aboutBlurb}`} />
       </Head>
       <section className={styles.info_box}>
-        <Imgix
-          className={styles.headshot}
-          src={`${projectConfig.repoImageUrl}/headshot.png`}
-          sizes="16vw"
-        />
+        <div className={styles.headshot}>
+          <Picture>
+            <Source
+                src={`${projectConfig.repoImageUrl}/headshot.png`}
+                width={250}
+                htmlAttributes={{ media: "(min-width: 768px)" }}
+            />
+            <Source
+                src={`${projectConfig.repoImageUrl}/headshot.png`}
+                width={180}
+                htmlAttributes={{ media: "(min-width: 350px)" }}
+            />
+            <Imgix
+                src={`${projectConfig.repoImageUrl}/headshot.png`}
+                imgixParams={{ w: 100 }}
+            />
+            </Picture>
+          </div>
         <div className={styles.info_box_outer}>
           <div className={styles.info_box_text}>
             <h2>Kanwarpal Brar</h2>

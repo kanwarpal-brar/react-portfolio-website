@@ -1,4 +1,4 @@
-$font-scaling: 1.28vw;
+$font-scaling: 1.15vw;
 
 .expbox_container {
   display: flex;
@@ -13,30 +13,48 @@ $font-scaling: 1.28vw;
     padding: 0 2%;
     list-style-type: square;
 
-    li:not(:last-child) {
-      margin-bottom: 10px;
-    }
-
     li {
+      margin-top: 15px;
       font-weight: 200;
       $font-scaling-offset: 0.35vw;
       font-size: calc($font-scaling - $font-scaling-offset);
+
+      @media (orientation: portrait) {
+        margin-top: 2%;
+        font-size: 40%;
+      }
     }
+  }
+
+  hr {
+    padding-bottom: 1%;
   }
 }
 
 .inline_title {
   display: inline-block;
+  $font-offset: 0.2vw;
+
+  @media (orientation: portrait) {
+    padding-top: 0px;
+  }
 
   h2 {
     display: inline-block;
     text-align: left;
     font-size: $font-scaling;
     font-weight: 500;
+
+    @media (orientation: portrait) {
+      font-size: 55%;
+    }
   }
 
   h3 {
     float: right;
-    font-size: $font-scaling;
+    font-size: calc($font-scaling - $font-offset);
+    @media (orientation: portrait) {
+      font-size: 45%;
+    }
   }
 }
