@@ -23,6 +23,10 @@
     gap: 5px;
     padding: 0px 15px;
     height: 100%;
+
+    @media (orientation: portrait) {
+      max-height: min-content;
+    }
   }
 
   .tab_content_container {
