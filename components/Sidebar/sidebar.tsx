@@ -82,7 +82,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
 
   function toggleBarActive() {
     setWidth(active ? 0 : barSize.base);
-    setBtnLeft(active ? btnOffset.minimized : btnOffset.base);
+    setBtnLeft(active || isMobile ? btnOffset.minimized : btnOffset.base);
     setActive(!active);
   }
 
@@ -90,7 +90,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
     <>
       <div
         className={styles.sidebar_container}
-        style={{ width: `${active ? barSize.base : 0}px` }}
+        style={isMobile ? {} : { width: `${active ? barSize.base : 0}px` }}
       >
         <div
           className={styles.sidebar}
