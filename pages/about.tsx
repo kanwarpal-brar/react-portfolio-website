@@ -17,6 +17,18 @@ const resumeBlurb =
 
 const workExperience: ExpBoxProps[] = [
   {
+    title: "Software Developer",
+    company: "Arctic Wolf Networks",
+    date: "May - Aug 2023",
+    bullets: [
+      "Developed a concurrency-safe Prometheus metrics monitoring system in Go for a custom Apache Kafka wrapper",
+      "Played a pivotal role in the v1.0.0 release of a Golang Apache Kafka wrapper, decoupling systems organization-wide",
+      "Led ground-up design & development of subscriber & deserialization systems for new Python Kafka wrapper",
+      "Implemented custom Subscriber & Deserializer interface logic based on Apache Avro Schema versions",
+      "Developed REST APIs for numerous AWS microservices in Python and Go, adhering to OpenAPI specification",
+    ],
+  },
+  {
     title: "Full Stack Software Developer",
     company: "Genesys Laboratories",
     date: "Sept - Dec 2022",
