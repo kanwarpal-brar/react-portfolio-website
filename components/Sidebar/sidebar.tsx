@@ -11,7 +11,6 @@ export type SideBarProps = {
 }
 
 export default function SideBar({ isMobile }: SideBarProps) {
-  console.log(`Got Mobile: ${isMobile}`);
   const barSize = { base: 60, expanded: 200 };
   const btnOffset = { base: 70, minimized: 10 };
 
@@ -23,7 +22,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!isMobile) { console.log(`Calling cause ${isMobile}`); toggleBarActive() } ;
+      if (!isMobile) { toggleBarActive() } ;
     }, 4000);
   }, [isMobile]);
 
