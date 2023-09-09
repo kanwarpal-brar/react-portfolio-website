@@ -11,7 +11,7 @@ import ExtraCurricularBox, {
 import projectConfig from "../public/targetProjects.json";
 
 const aboutBlurb =
-  "Hi, I'm Kanwarpal, welcome to my portfolio website. I'm a a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with a of industry standard technologies, but I'm always looking for more to learn.";
+"Hi, I'm Kanwarpal, Welcome to my portfolio website. I'm a lifetime learner and aspiring software developer in my 3rd year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with many industry-standard technologies, but I'm always looking for more to learn."
 const resumeBlurb =
   "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.";
 
@@ -66,8 +66,8 @@ const extraCurriculer: ExtraCurricularBoxProps[] = [
     name: "Humans vs. Zombies",
     img: "uwhvz.svg",
     desc: [
-      "UWaterloo Humans vs. Zombies (UWHVZ) is a club that runs week-long campus-wide games of nerf tag between two teams: the Humans and the Zombies. It is my favourite club, combining good exercise with teamwork and strategy. ",
-      "As 3x Webmaster of UWHVZ I have a hand in the development of the club website using Django, Python, HTML, CSS, and Javascript",
+      "UWaterloo Humans vs. Zombies (UWHVZ) is a club that runs week-long campus-wide games of Nerf tag between two teams: the Humans and the Zombies. It is my favorite club, combining good exercise with teamwork and strategy.",
+      "As 3x Webmaster of UWHVZ, I have a hand in the development of the club website using Django, Python, HTML, CSS, and Javascript"
     ],
   },
   {
@@ -83,7 +83,7 @@ const extraCurriculer: ExtraCurricularBoxProps[] = [
     img: "teaclub.png",
     desc: [
       "UWaterloo Tea Club is a laid-back gathering of games, socialization, and, of course, tea. They run weekly meetings in the evenings with new tea flavors every week.",
-      'I love tea, so tea club was a "must attend" for me. Socializing and destroying people in UNO are great bonuses.',
+      "I love tea, and I love socializing, so Tea Club is a \"must attend\" for me. Destroying people in UNO is just a bonus."
     ],
   },
 ];
