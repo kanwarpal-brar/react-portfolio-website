@@ -10,7 +10,7 @@
   @media (orientation: portrait) {
     h3 {
       font-size: 1em;
-      padding-top: 5px;
+      padding-top: 3%;
     }
 
     h1 {
@@ -19,14 +19,18 @@
   }
 }
 
+$anim-len: 4s;
+$anim-delay: 2.3s;
+
+
 .blurb_box {
   margin-top: 50px;
 
   p {
     margin-bottom: 20px;
     opacity: 0;
-    animation: fadeIn 6s;
-    animation-delay: 2s;
+    animation: fadeIn $anim-len;
+    animation-delay: $anim-delay;
     animation-fill-mode: forwards;
 
     @media (orientation: portrait) {
@@ -44,14 +48,14 @@
     text-transform: uppercase;
     outline: none;
     opacity: 0;
-    animation: fadeIn 6s;
-    animation-delay: 2s;
+    animation: fadeIn $anim-len;
+    animation-delay: $anim-delay;
     animation-fill-mode: forwards;
 
     &:hover {
       outline: 2px solid variables.$accent_color;
-      animation: fadeIn 6s;
-      animation-delay: 2s;
+      animation: fadeIn $anim-len;
+      animation-delay: $anim-delay;
       animation-fill-mode: forwards;
     }
   }

@@ -16,6 +16,8 @@
   }
   @media (orientation: portrait) {
     grid-template-columns: 1fr;
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
   
   row-gap: 50px;
