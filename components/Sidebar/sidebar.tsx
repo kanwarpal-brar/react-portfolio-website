@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from "react-icons/ai";
 import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { IoDocumentTextSharp } from 'react-icons/io5'
 import { usePathname } from "next/navigation";
 
 export type SideBarProps = {
@@ -30,6 +31,12 @@ export default function SideBar({ isMobile }: SideBarProps) {
     { name: "Home", icon: MdHomeFilled, redirectUrl: "/" },
     { name: "About", icon: MdPerson, redirectUrl: "/about" },
     { name: "Projects", icon: MdOutlineCode, redirectUrl: "/projects" },
+    {
+      name: "Resume",
+      icon: IoDocumentTextSharp,
+      redirectUrl: "/Kanwarpal_Brar_Resume.pdf",
+      newTab: true,
+    }
   ];
 
   const lowerItems: Array<SideBarIconProps> = [
