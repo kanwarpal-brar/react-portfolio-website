@@ -11,7 +11,7 @@ export default function TabButton({
   active,
   activateCallback,
 }: TabButtonProps) {
-  const isMobile = useMediaQuery("(orientation: portrait") ? true : false
+  const isMobile = useMediaQuery("(orientation: portrait") ? true : false;
   return (
     <button
       className={active ? styles.tab_button_active : styles.tab_button}

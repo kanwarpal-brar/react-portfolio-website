@@ -19,7 +19,7 @@ export default function SideBarIcon({
   redirectUrl,
   active,
   newTab,
-  clickCallback
+  clickCallback,
 }: SideBarIconProps) {
   const Icon = icon;
   return (
@@ -30,7 +30,9 @@ export default function SideBarIcon({
       onClick={clickCallback}
     >
       <Icon className={styles.sidebar_item_icon} />
-      <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>{name}</span>
+      <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>
+        {name}
+      </span>
     </Link>
   );
 }

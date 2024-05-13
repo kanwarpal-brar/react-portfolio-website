@@ -7,7 +7,12 @@ import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentbo
 import ExpBox from "@/components/ExpBox/expbox";
 import ExtraCurricularBox from "@/components/ExtraCurricularBox/extracurricularbox";
 import projectConfig from "../public/targetProjects.json";
-import {aboutBlurb, resumeBlurb, extraCurriculer, workExperience} from "@/data/about";
+import {
+  aboutBlurb,
+  resumeBlurb,
+  extraCurriculer,
+  workExperience,
+} from "@/data/about";
 
 export default function AboutMe() {
   return (
@@ -20,21 +25,21 @@ export default function AboutMe() {
         <div className={styles.headshot}>
           <Picture>
             <Source
-                src={`${projectConfig.repoImageUrl}/headshot.png`}
-                width={250}
-                htmlAttributes={{ media: "(min-width: 768px)" }}
+              src={`${projectConfig.repoImageUrl}/headshot.png`}
+              width={250}
+              htmlAttributes={{ media: "(min-width: 768px)" }}
             />
             <Source
-                src={`${projectConfig.repoImageUrl}/headshot.png`}
-                width={180}
-                htmlAttributes={{ media: "(min-width: 350px)" }}
+              src={`${projectConfig.repoImageUrl}/headshot.png`}
+              width={180}
+              htmlAttributes={{ media: "(min-width: 350px)" }}
             />
             <Imgix
-                src={`${projectConfig.repoImageUrl}/headshot.png`}
-                imgixParams={{ w: 100 }}
+              src={`${projectConfig.repoImageUrl}/headshot.png`}
+              imgixParams={{ w: 100 }}
             />
-            </Picture>
-          </div>
+          </Picture>
+        </div>
         <div className={styles.info_box_outer}>
           <div className={styles.info_box_text}>
             <h2>Kanwarpal Brar</h2>

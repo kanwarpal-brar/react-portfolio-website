@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from "react-icons/ai";
 import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
-import { IoDocumentTextSharp } from 'react-icons/io5'
+import { IoDocumentTextSharp } from "react-icons/io5";
 import { usePathname } from "next/navigation";
 
 export type SideBarProps = {
-  isMobile?: boolean
-}
+  isMobile?: boolean;
+};
 
 export default function SideBar({ isMobile }: SideBarProps) {
   const barSize = { base: 60, expanded: 200 };
@@ -23,7 +23,9 @@ export default function SideBar({ isMobile }: SideBarProps) {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!isMobile) { toggleBarActive() } ;
+      if (!isMobile) {
+        toggleBarActive();
+      }
     }, 4000);
   }, [isMobile]);
 
@@ -36,7 +38,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
       icon: IoDocumentTextSharp,
       redirectUrl: "/Kanwarpal_Brar_Resume.pdf",
       newTab: true,
-    }
+    },
   ];
 
   const lowerItems: Array<SideBarIconProps> = [
@@ -63,13 +65,32 @@ export default function SideBar({ isMobile }: SideBarProps) {
         key={item.name}
         {...item}
         active={pathname === item.redirectUrl ? true : false}
-        clickCallback={isMobile ? () => { toggleBarActive() } : undefined}
+        clickCallback={
+          isMobile
+            ? () => {
+                toggleBarActive();
+              }
+            : undefined
+        }
       />
     );
   });
 
   const sideBarLowerIcons = lowerItems.map((item) => {
-    return <SideBarIcon key={item.name} {...item} newTab={true} clickCallback={isMobile ? () => { toggleBarActive() } : undefined}/>;
+    return (
+      <SideBarIcon
+        key={item.name}
+        {...item}
+        newTab={true}
+        clickCallback={
+          isMobile
+            ? () => {
+                toggleBarActive();
+              }
+            : undefined
+        }
+      />
+    );
   });
 
   function expandBar() {

@@ -4,7 +4,9 @@ import styles from "./layout.module.scss";
 import { useMediaQuery } from "@mui/material";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const isMobile = useMediaQuery("(orientation: portrait", {noSsr: true}) ? true : false
+  const isMobile = useMediaQuery("(orientation: portrait", { noSsr: true })
+    ? true
+    : false;
   return (
     <div className={styles.layout_container}>
       <Script
@@ -20,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
            gtag('config', 'G-6Y5ES8TQ3X',{ 'debug_mode':true });
         `}
       </Script>
-      <SideBar isMobile={isMobile}/>
+      <SideBar isMobile={isMobile} />
       <main className={styles.content_container}>{children}</main>
     </div>
   );

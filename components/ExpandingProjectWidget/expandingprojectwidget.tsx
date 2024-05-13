@@ -77,7 +77,7 @@ export default function ExpandingProjectWidget({
             );
           })}
         </div>
-        
+
         <Modal open={open} onClose={handleClose} className={styles.modal}>
           <div className={styles.modal_container}>
             <div className={styles.modal_content}>

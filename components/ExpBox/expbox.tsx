@@ -8,7 +8,13 @@ export type ExpBoxProps = {
   paragraph?: string;
 };
 
-export default function ExpBox({ title, company, date, bullets, paragraph }: ExpBoxProps) {
+export default function ExpBox({
+  title,
+  company,
+  date,
+  bullets,
+  paragraph,
+}: ExpBoxProps) {
   return (
     <div className={styles.expbox_container}>
       <span className={styles.inline_title}>
@@ -16,15 +22,15 @@ export default function ExpBox({ title, company, date, bullets, paragraph }: Exp
         <h3>{date}</h3>
       </span>
       <hr />
-      {bullets ?
+      {bullets ? (
         <ul>
           {bullets.map((point, i) => {
             return <li key={i}>{point}</li>;
           })}
         </ul>
-        :
+      ) : (
         <p>{paragraph}</p>
-      }
+      )}
     </div>
   );
 }
