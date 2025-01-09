@@ -38,7 +38,7 @@ export const workExperience: ExpBoxProps[] = [
   {
     title: "Payments Software Engineering Co-op",
     company: "Carta",
-    date: "Sept 2024 - Present",
+    date: "Sept — Dec 2024",
     paragraph:
       "Prevented $5000+ in potential audit fines by designing and shipping a critical permissions feature using Python, Django and React within first 2 weeks. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Collaborated with banking partners on payment integrations processing $5M+ monthly, leveraging Domain Driven Design, gRPC and Protocol Buffers.",
   },
@@ -72,7 +72,7 @@ export const workExperience: ExpBoxProps[] = [
   },
   {
     title: "Software Engineering Intern",
-    company: "Cloudspark Labs",
+    company: "Cloudspark",
     date: "Jan - Apr 2022",
     paragraph:
       "Designed & Implemented scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure. Led the development of Licensing, Notification, and Auth microservices for a start-up MVP, utilizing TypeScript, Nest.JS, CosmosDB, Dependency Injection, and Azure Service Bus.",
