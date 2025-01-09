@@ -36,32 +36,46 @@ export const extraCurriculer: ExtraCurricularBoxProps[] = [
 
 export const workExperience: ExpBoxProps[] = [
   {
+    title: "Payments Software Engineering Co-op",
+    company: "Carta",
+    date: "Sept 2024 - Present",
+    paragraph:
+      "Prevented $5000+ in potential audit fines by designing and shipping a critical permissions feature using Python, Django and React within first 2 weeks. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Collaborated with banking partners on payment integrations processing $5M+ monthly, leveraging Domain Driven Design, gRPC and Protocol Buffers.",
+  },
+  {
+    title: "Distributed Systems Research Assistant",
+    company: "UWaterloo",
+    date: "May - Aug 2024",
+    paragraph:
+      "Conducted comprehensive benchmarking of Serverless frameworks to inform the design of a new high-performance Serverless platform. Deployed & Optimized Kubernetes clusters achieving 200+ requests/second per node with KNative Serving. Reduced cold-start latency 20% through analysis and tuning of autoscaling, node configuration, and container runtime. Authored a comprehensive technical report proposing architectural changes, improving resource utilization 15%.",
+  },
+  {
     title: "Backend Software Engineering Co-op",
     company: "Carta",
     date: "Jan - April 2024",
     paragraph:
-      "Spearheaded several pivotal projects to enhance reporting functionalities within the Carta Web application on Carta's Capitalization and Reporting team. Notable achievements include optimizing the OCX report by integrating voting power information and refining cell relationships for faster Excel formula generation. Additionally, I contributed to the development of an AI-powered search bar, elevating search accuracy through prompt engineering. Collaborated closely with business leaders to revamp report visibility, empowering Portfolio Holders to access critical information seamlessly. I thrived in navigating complex systems, demonstrating adeptness in problem-solving and agile adaptation to evolving project scopes.",
+      "Improved OCX report generation speed 10% by implementing an O(n) complexity cell management system with Apache POI + Java. Enhanced AI powered search accuracy 6% through prompt engineering of report questions & use-cases. Resolved 3000+ support tickets by streamlining Ownership Report access permissions in Carta Web's Django codebase. Optimized ownership report query complexity in Spring framework, resulting in a 5% decrease in user wait times.",
   },
   {
     title: "Software Developer",
-    company: "Arctic Wolf Networks",
+    company: "Arctic Wolf",
     date: "May - Aug 2023",
     paragraph:
-      "Worked as a Software Developer Co-op across two vital teams: the Constructicons and the Transporters. Honed skills in Python and Go, crafting core client-facing services and integrating with OpenAPI 3.0 standard RestAPI's. Spearheaded the completion of a crucial internal Apache Kafka service in Go and initiated work on a Python Kafka wrapper. Notably, revamped the metrics monitoring system for the Go Kafka Wrapper, leveraging concurrency techniques to enhance response times. Additionally, designed a forward and backward-compatible Serialization System for Apache Avro schemas, reducing lead times.",
+      "Reduced response times 25% by developing a concurrent Prometheus metrics monitoring system in Go for an Apache Kafka Wrapper. Developed a reflection-based Golang unit test verifier, identifying missing/broken metrics tests with 100% accuracy. Reduced lead times by designing a forward/backwards compatible Kafka Serialization system using SchemaVer and Avro.",
   },
   {
     title: "Full Stack Software Developer",
-    company: "Genesys Laboratories",
+    company: "Genesys",
     date: "Sept - Dec 2022",
     paragraph:
-      "Worked on the Agent Development team, focusing on client-facing software for agent training and scheduling. Spearheaded the transition of the scheduling API to a serverless architecture using Python, Flask, and AWS Lambda, optimizing scalability and efficiency. Revamped the schedule state management REST API with Python, Flask, and RESTX, significantly reducing the codebase size. Implemented standardized unit and integration tests in Python, ensuring robustness and accelerating future development cycles.",
+      "Reduced hosting costs 5% by transitioning scheduling API to serverless architecture using Python, Flask, and Lambda. Shrunk codebase size 30% by rewriting schedule statement management REST API in Python + Flask + RESTX.",
   },
   {
     title: "Software Engineering Intern",
     company: "Cloudspark Labs",
     date: "Jan - Apr 2022",
     paragraph:
-      "Engineered and implemented scalable microservices for an innovative suite of HR web applications. Led the development of essential licensing, notification, and authentication microservices for a startup MVP, seamlessly integrating with Microsoft Teams. Proficiently utilized TypeScript, Nest.js, CosmosDB, and Azure Service Bus to deliver robust backend solutions. Specialized in Event-Driven Architecture, adeptly leveraging Azure Service Bus and event sourcing patterns for optimal performance. Demonstrated expertise in dependency injection to optimize resource consumption.",
+      "Designed & Implemented scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure. Led the development of Licensing, Notification, and Auth microservices for a start-up MVP, utilizing TypeScript, Nest.JS, CosmosDB, Dependency Injection, and Azure Service Bus.",
   },
   {
     title: "DevOps Specialist",
