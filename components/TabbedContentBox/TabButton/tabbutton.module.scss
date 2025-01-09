@@ -3,14 +3,17 @@
 .tab_button {
   height: 100%;
   width: 100%;
+  transition: all 0.2s ease-in-out;
+  background-color: variables.$secondary_color_alt;
+  opacity: 0.7;
+  box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.2);
 
   @media (orientation: portrait) {
     width: 10%;
     font-size: 0.65em;
     overflow: hidden;
     text-overflow: clip;
-    color: variables.$secondary_color_alt;
-    background-color: variables.$secondary_color_alt;
+    color: variables.$text_color;
     flex-shrink: 1;
     margin: 0;
     height: 100%;
@@ -18,16 +21,24 @@
     -ms-user-select: none;
     user-select: none;
   }
-  padding: 5px 0px;
+  padding: 8px 0px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   font-weight: 500;
   -webkit-user-select: none;
   user-select: none;
 
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
   &_active {
     @extend .tab_button;
     background-color: variables.$secondary_color_focus;
+    opacity: 1;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 
     @media (orientation: portrait) {
       font-size: 0.65em;
