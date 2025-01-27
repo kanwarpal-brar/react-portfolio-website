@@ -20,7 +20,7 @@ export default function Home() {
           <title>Kanwarpal Brar</title>
         </Head>
         <h1 className={styles.title_name}>
-          <ScrambledTextIntro data="Kanwarpal Brar" delayms={150} />
+          <ScrambledTextIntro data="Kanwarpal Brar" delayms={140} />
         </h1>
         <h3 className={styles.title_tagline}>
           <ScrambledTextIntro
