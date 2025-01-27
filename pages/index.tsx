@@ -24,7 +24,7 @@ export default function Home() {
         </h1>
         <h3 className={styles.title_tagline}>
           <ScrambledTextIntro
-            data="Developer, Student, Innovator"
+            data="Developer, Researcher, Innovator"
             delayms={125}
           />
         </h3>
