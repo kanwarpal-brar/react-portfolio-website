@@ -8,13 +8,8 @@
   width: 68vw;
 
   @media (orientation: portrait) {
-    h3 {
-      font-size: 1em;
-      padding-top: 3%;
-    }
-
     h1 {
-      font-size: 1.8em;
+      font-size: 2em;
     }
   }
 }
@@ -69,5 +64,14 @@ $anim-delay: 2.3s;
 
   &:hover {
     transform: scale(1.025);
+  }
+}
+
+.title_tagline {
+  margin-left: -2px;  // Add negative margin to shift left
+  
+  @media (orientation: portrait) {
+    font-size: 0.5em;
+    padding-top: 3%;
   }
 }
