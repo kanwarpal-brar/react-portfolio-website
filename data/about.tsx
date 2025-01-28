@@ -40,7 +40,7 @@ export const workExperience: ExpBoxProps[] = [
     company: "Carta",
     date: "Sept — Dec 2024",
     paragraph:
-      "Prevented $5000+ in potential audit fines by designing and shipping a critical permissions feature using Python, Django and React within first 2 weeks. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Collaborated with banking partners on payment integrations processing $5M+ monthly, leveraging Domain Driven Design, gRPC and Protocol Buffers.",
+      "Shipped critical fund impersonation controls within first 2 weeks of joining, preventing $5000+ in potential audit penalties using Django + React. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Led multi-service banking integration expansion processing $5M+ monthly, implementing international account workflows using Python, gRPC, Protocol Buffers, and Domain Driven Design.",
   },
   {
     title: "Distributed Systems Research Assistant",
