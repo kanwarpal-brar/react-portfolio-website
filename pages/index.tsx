@@ -5,7 +5,7 @@ import "animate.css";
 import ScrambledTextIntro from "@/components/ScrambledTextIntro/scrambledtextintro";
 
 const parablurb =
-  "Experienced full-stack developer and student with a focus on backend, specializing in designing and implementing RESTful and Event-Driven Microservices. Committed to continuous learning and expanding my expertise.";
+  "Software Engineer specializing in distributed systems and backend architecture. Interested in designing scalable microservices, RESTful APIs, and concurrent systems. Passionate about solving complex networking challenges and building reliable distributed applications.";
 
 export default function Home() {
   return (
