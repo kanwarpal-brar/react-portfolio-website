@@ -2,7 +2,7 @@ import { ExpBoxProps } from "@/components/ExpBox/expbox";
 import { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox";
 
 export const aboutBlurb =
-  "Hi, I'm Kanwarpal, Welcome to my portfolio website. I'm a lifetime learner and aspiring software developer in my 4th year of an undergraduate Computer Science degree from the University of Waterloo. I have had the opportunity to intern at numerous software companies and interact with many industry-standard technologies, but I'm always looking for more to learn.";
+  "Hi, I'm Kanwarpal, Welcome to my portfolio website. I'm a software engineer with a Computer Science degree from the University of Waterloo, specializing in distributed systems and backend development. My experience spans fintech, cloud infrastructure, and microservices architecture, with expertise in technologies like Python, Java, Go, and cloud platforms including AWS and Azure. I'm passionate about building scalable solutions and continuously expanding my technical expertise.";
 
 export const resumeBlurb =
   "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.";
