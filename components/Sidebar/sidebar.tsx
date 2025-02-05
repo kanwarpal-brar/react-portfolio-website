@@ -23,11 +23,12 @@ export default function SideBar({ isMobile }: SideBarProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!isMobile) {
+    // Only run auto-hide timer in landscape mode
+    if (!isMobile && window.matchMedia("(orientation: landscape)").matches) {
+      setTimeout(() => {
         toggleBarActive();
-      }
-    }, 4000);
+      }, 4000);
+    }
   }, [isMobile]);
 
   const items: Array<SideBarIconProps> = [
@@ -99,7 +100,9 @@ export default function SideBar({ isMobile }: SideBarProps) {
     );
   });
 
+  // Prevent expand/shrink behavior in portrait mode
   function expandBar() {
+    if (window.matchMedia("(orientation: portrait)").matches) return;
     setMouseInBar(true);
     if (active && !isMobile) {
       setWidth(barSize.expanded);
@@ -107,6 +110,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
   }
 
   function shrinkBar() {
+    if (window.matchMedia("(orientation: portrait)").matches) return;
     setMouseInBar(false);
     if (active && !isMobile) {
       setWidth(barSize.base);

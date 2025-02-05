@@ -17,11 +17,25 @@
   &:hover {
     background-color: variables.$secondary_color_hover;
   }
+
+  @media (orientation: portrait) {
+    padding: 8px 12px;
+    
+    &:hover {
+      background-color: transparent;
+      opacity: 0.8;
+    }
+  }
 }
 
 .sidebar_item_icon {
   transform: scale(1.4);
   position: absolute;
+
+  @media (orientation: portrait) {
+    position: relative;
+    transform: scale(1.2);
+  }
 }
 
 .sidebar_icon_container {
@@ -37,4 +51,9 @@
   display: inline-block;
   margin-left: 60px;
   font-weight: 100;
+
+  @media (orientation: portrait) {
+    display: none; // Hide text on mobile
+    margin-left: 0;
+  }
 }

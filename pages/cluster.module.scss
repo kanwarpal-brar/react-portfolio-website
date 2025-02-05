@@ -21,6 +21,11 @@
     overflow-x: hidden;
     padding: 0 1rem;
   }
+
+  @media (orientation: portrait) {
+    padding-bottom: 3.5rem; // Changed from padding-top
+    padding-inline: 1rem;
+  }
 }
 
 .main {
@@ -38,6 +43,10 @@
   
   @media (max-width: 768px) {
     padding: 2rem 0.5rem;
+  }
+  
+  @media (orientation: portrait) {
+    padding: max(5vh, 2rem) 1rem max(8vh, 5rem) 1rem; // Added bottom padding to account for bottom bar
   }
   
   &::before {
