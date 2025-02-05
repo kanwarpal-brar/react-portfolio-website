@@ -39,6 +39,9 @@ export default function Home() {
           <Link rel="preload" href="/projects">
             <button>Projects</button>
           </Link>
+          <Link rel="preload" href="/cluster">
+            <button>Cluster</button>
+          </Link>
         </div>
       </main>
     </div>

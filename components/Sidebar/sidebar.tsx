@@ -6,6 +6,7 @@ import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { IoDocumentTextSharp } from "react-icons/io5";
 import { usePathname } from "next/navigation";
+import { SiKubernetes } from "react-icons/si";
 
 export type SideBarProps = {
   isMobile?: boolean;
@@ -38,6 +39,11 @@ export default function SideBar({ isMobile }: SideBarProps) {
       icon: IoDocumentTextSharp,
       redirectUrl: "/Kanwarpal_Brar_Resume.pdf",
       newTab: true,
+    },
+    {
+      name: "Cluster",
+      icon: SiKubernetes,
+      redirectUrl: "/cluster"
     },
   ];
 
@@ -143,3 +149,4 @@ export default function SideBar({ isMobile }: SideBarProps) {
     </>
   );
 }
+
