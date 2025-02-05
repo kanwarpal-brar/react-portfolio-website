@@ -2,23 +2,22 @@
 
 .sidebar_container {
   transition: width 80ms ease-in-out;
-  height: 100vh;
+  height: 100vh; // Change from 100% to 100vh
   background-color: variables.$secondary_color;
   overflow: visible;
-  position: -webkit-sticky;
-  position: sticky;
-  // top: 0;
+  position: sticky; // Change from fixed to sticky
+  top: 0; // Add this line
   z-index: 99;
 }
 
 .sidebar {
   transition: width 80ms ease-in-out;
-  height: 100vh;
+  height: 100vh; // Change from 100% to 100vh
   background-color: variables.$secondary_color;
   background-image: variables.$secondary_gradient;
   z-index: 3;
   overflow: hidden;
-  position: fixed;
+  position: absolute; // Change from fixed to absolute
 }
 
 .sidebar_button {

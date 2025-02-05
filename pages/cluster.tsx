@@ -26,8 +26,8 @@ export default function Cluster() {
             <BsShieldLock size={40} />
           </div>
           <p>
-            Welcome to the secure access portal for the private Kubernetes cluster at
-            <strong> cluster-ssh.kanwarpal.com</strong>
+            Welcome to the secure access portal for the private Kubernetes cluster at{' '}
+            <strong><span className={styles.redactedText}>[REDACTED]</span></strong>
           </p>
           <p>
             Access to this infrastructure is strictly controlled and requires prior authorization.
