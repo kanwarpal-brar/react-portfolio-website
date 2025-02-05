@@ -1,4 +1,6 @@
 @use "~/styles/_variables";
+@import "animate.css/source/fading_entrances/fadeInRight";
+@import "animate.css/source/fading_entrances/fadeInLeft";
 
 .container {
   min-height: 100vh; // Changed from height: 100%
@@ -77,6 +79,9 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  opacity: 0;
+  animation: fadeInRight 1s 0s ease-in-out;
+  animation-fill-mode: forwards;
   
   @media (max-width: 768px) {
     font-size: 2.2rem;
@@ -126,6 +131,9 @@
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  animation: fadeInLeft 1s 500ms ease-in-out;
+  animation-fill-mode: forwards;
   
   @media (max-width: 768px) {
     padding: 1.25rem;
