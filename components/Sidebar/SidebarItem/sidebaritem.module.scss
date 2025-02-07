@@ -19,7 +19,7 @@
   }
 
   @media (orientation: portrait) {
-    padding: 8px 12px;
+    padding: 8px 8px;  // Reduced horizontal padding
     
     &:hover {
       background-color: transparent;
@@ -34,7 +34,7 @@
 
   @media (orientation: portrait) {
     position: relative;
-    transform: scale(1.2);
+    transform: scale(1);  // Reduced icon scale
   }
 }
 
