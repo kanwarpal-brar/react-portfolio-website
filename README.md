@@ -1,38 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# kanwarpal.com
 
-## Getting Started
+A minimal, terminal-inspired (TUI) portfolio for Kanwarpal Brar. Single-page,
+plain HTML + CSS + vanilla JavaScript (ES modules). No build step, no
+`node_modules`, no framework.
 
-First, run the development server:
+Live at https://kanwarpal.com.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+## Layout
+
+Central pane is a graph of six nodes (home, work, projects, resume, socials,
+cluster). Click a node to expand it in place; click outside or press `Esc` to
+return home. A shell-style command input at the bottom supports `cd <node>`,
+`ls`, `help`, `pwd`, `whoami`, `cat bio`, `open resume`, and `clear`, plus
+history (↑/↓), Tab completion, and Ctrl+L.
+
+State is driven by `location.hash` (`#/home`, `#/work`, ...) so back/forward
+and deep-links work.
+
+## Project structure
+
+```
+assets/    Resume PDF, headshot (webp), favicon (svg)
+css/       theme.css (tokens) + style.css (layout/components/animations)
+js/        data.js, graph.js, terminal.js, main.js  (all ES modules)
+index.html Single-page app; every node's content is pre-rendered for SEO and no-JS fallback.
+.github/workflows/deploy.yml  Static deploy to GitHub Pages.
+CNAME, robots.txt, sitemap.xml, .nojekyll
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000/
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Any static server works. No dependencies to install.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Updating content
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+All text content lives in `js/data.js`. Edit that file to change bio, work
+experience, projects, etc. The rendered `index.html` also contains the same
+content inline (for SEO + no-JS fallback) — keep them in sync when making
+substantial edits, or regenerate them from `data.js` by hand.
 
-## Learn More
+To add a project: append an entry to the `projects` array in `js/data.js` and
+mirror it inside the `<!-- PROJECTS -->` section of `index.html`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which stages the site
+files into `_site/` (excluding `.git`, `.github`, `README.md`, `LICENSE`) and
+uploads them as a GitHub Pages artifact. The `CNAME` file at the repo root
+keeps the `kanwarpal.com` custom domain.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Note: the first deploy after switching DNS/workflow may serve stale content
+from the GitHub Pages CDN for a few minutes — that's normal.
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+See `LICENSE`.

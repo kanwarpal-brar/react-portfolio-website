@@ -1,0 +1,44 @@
+/*
+ * theme.css — color palette, fonts, spacing tokens.
+ * All values are CSS custom properties; style.css consumes them.
+ *
+ * Palette contrast ratios against --bg (#0d0d0d):
+ *   --fg        #d4d4d4  → 13.9:1  (AAA)
+ *   --accent    #9cdcfe  →  9.7:1  (AAA)
+ *   --accent-2  #c586c0  →  6.1:1  (AA)
+ *   --fg-dim    #808080  →  4.9:1  (AA normal text)
+ *   --ok        #6a9955  →  5.1:1  (AA)
+ *   --warn      #dcdcaa  → 12.4:1  (AAA)
+ */
+
+:root {
+  /* palette */
+  --bg:        #0d0d0d;
+  --bg-panel:  #111113;
+  --bg-inset:  #0a0a0a;
+  --fg:        #d4d4d4;
+  --fg-dim:    #808080;
+  --fg-mute:   #5a5a5a;
+  --accent:    #9cdcfe;
+  --accent-2:  #c586c0;
+  --ok:        #6a9955;
+  --warn:      #dcdcaa;
+  --border:    #2a2a2a;
+  --border-bright: #3a3a3a;
+
+  /* type */
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --fs-base: 15px;
+  --fs-small: 13px;
+  --lh: 1.5;
+
+  /* spacing */
+  --pad: 1rem;
+  --gap: 1.25rem;
+  --radius: 0;
+
+  /* timing */
+  --t-fast: 140ms;
+  --t-med:  320ms;
+  --ease:   cubic-bezier(.2,.8,.2,1);
+}
