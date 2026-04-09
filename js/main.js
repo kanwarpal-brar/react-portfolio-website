@@ -6,6 +6,7 @@ import {
   handleGraphClick,
   drawLines,
   setTrigger,
+  navigate,
 } from './graph.js';
 import { initTerminal, printWelcome } from './terminal.js';
 
@@ -27,15 +28,16 @@ function boot() {
     graph.addEventListener('click', handleGraphClick);
   }
 
-  // 5. Record trigger when a user focuses a node via keyboard before activating,
-  //    so focus can restore to the same element on collapse.
+  // 5. Keyboard activation: Enter or Space on a focused .node navigates to it.
+  //    Nodes are <article role="link"> so we implement the activation semantics
+  //    here. Also records the trigger for focus restoration on collapse.
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      const active = document.activeElement;
-      if (active && active.classList && active.classList.contains('node')) {
-        setTrigger(active);
-      }
-    }
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const active = document.activeElement;
+    if (!active || !active.classList || !active.classList.contains('node')) return;
+    e.preventDefault();
+    setTrigger(active);
+    if (active.dataset.name) navigate(active.dataset.name);
   });
 
   // 6. Redraw SVG lines on resize

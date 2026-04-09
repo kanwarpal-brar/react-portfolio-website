@@ -137,32 +137,37 @@ export function drawLines() {
 }
 
 /** Single delegated click handler for the graph pane.
+ *  Nodes are <article role="link"> (not <a>, because we nest real links
+ *  inside them and <a><a> is invalid HTML). So we navigate explicitly here.
  *  Rules:
- *   - Click inside the expanded node: let default behavior run (follow links, scroll, etc.)
- *   - Click on a peripheral node: navigate to it (default <a href> navigation handles it)
- *   - Click on background/SVG overlay: collapse to home (only if not already home)
+ *   - Click on a real <a> link anywhere: let it run (repo link, mailto, pdf).
+ *   - Click inside the expanded node (not on a link): do nothing.
+ *   - Click on a peripheral node: navigate to it.
+ *   - Click on background / SVG overlay: collapse to home.
  */
 export function handleGraphClick(e) {
   const graph = document.getElementById('graph');
   if (!graph) return;
 
+  // Let real anchors (nested inside expanded nodes) do their thing.
+  if (e.target.closest('a')) return;
+
   const clickedNode = e.target.closest('.node');
   const expandedName = currentNode();
 
   if (clickedNode) {
-    // Clicked on a node element.
     if (clickedNode.dataset.name === expandedName) {
-      // Click inside expanded node: allow links/etc to work normally.
+      // Click inside expanded node (not on a link): no-op.
       return;
     }
-    // Clicked a peripheral node: record trigger, let the <a href> navigate naturally.
+    // Peripheral node: navigate to it.
     setTrigger(clickedNode);
+    navigate(clickedNode.dataset.name);
     return;
   }
 
   // Clicked graph background / SVG overlay.
   if (expandedName !== 'home') {
-    e.preventDefault();
     setTrigger(null);
     navigate('home');
   }
