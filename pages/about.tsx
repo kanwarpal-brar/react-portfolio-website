@@ -6,12 +6,14 @@ import TabbedContentBox from "@/components/TabbedContentBox/tabbedcontentbox";
 import ContentBoxTab from "@/components/TabbedContentBox/ContentBoxTab/contentboxtab";
 import ExpBox from "@/components/ExpBox/expbox";
 import ExtraCurricularBox from "@/components/ExtraCurricularBox/extracurricularbox";
+import EducationBox from "@/components/EducationBox/educationbox";
 import projectConfig from "../public/targetProjects.json";
 import {
   aboutBlurb,
   resumeBlurb,
   extraCurriculer,
   workExperience,
+  education,
 } from "@/data/about";
 
 export default function AboutMe() {
@@ -52,6 +54,10 @@ export default function AboutMe() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className={styles.education_box}>
+        <EducationBox {...education} />
       </section>
 
       <section className={styles.work_info_box}>

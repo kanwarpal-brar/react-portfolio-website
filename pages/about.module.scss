@@ -79,6 +79,24 @@
   overflow: hidden;
 }
 
+.education_box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  scroll-snap-align: start;
+  opacity: 0;
+  animation: fadeInLeft 1s 500ms ease-in-out;
+  animation-fill-mode: forwards;
+  max-width: 65%;
+
+  @media (orientation: portrait) {
+    max-width: 90%;
+  }
+}
+
 .work_info_box {
   display: flex;
   flex-direction: column;

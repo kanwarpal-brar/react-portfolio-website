@@ -1,5 +1,32 @@
 import { ExpBoxProps } from "@/components/ExpBox/expbox";
 import { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox";
+import { EducationBoxProps } from "@/components/EducationBox/educationbox";
+
+export const education: EducationBoxProps = {
+  school: "University of Waterloo",
+  degree: "Bachelor of Computer Science (BCS)",
+  gpa: "3.84/4.0",
+  date: "Sept 2020 - Apr 2025",
+  courses: [
+    "Data Structures & Algorithms",
+    "Operating Systems",
+    "Object-Oriented Programming",
+    "Distributed Systems",
+    "Concurrency",
+    "Databases",
+  ],
+  research: {
+    title: "Distributed Systems Research Assistant",
+    institution: "University of Waterloo",
+    date: "May 2024 - Aug 2024",
+    summary:
+      "Benchmarked serverless frameworks and designed architectural changes for a high-performance serverless platform built on KNative Serving + Istio ingress. Contributed a comprehensive technical report proposing autoscaling, runtime, and networking changes that improved resource utilization by 15%.",
+    bullets: [
+      "Delivered 200+ requests/second per node by deploying & optimizing Kubernetes clusters with KNative Serving and Istio ingress controls",
+      "Cut cold-start latency 20% through targeted autoscaling and TCP/IP network optimization",
+    ],
+  },
+};
 
 export const aboutBlurb =
   "Hi, I'm Kanwarpal — a Production Engineer at Meta and a 2025 Computer Science graduate from the University of Waterloo. I work on infrastructure-as-code, storage systems, and distributed platforms that support AI training at scale. My background spans fintech, cloud infrastructure, microservices, and concurrency, with hands-on experience in Python, Go, Java, C++, Kubernetes, and AWS/Azure.";
