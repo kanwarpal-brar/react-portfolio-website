@@ -5,9 +5,10 @@
  * Palette contrast ratios against --bg (#0d0d0d):
  *   --fg        #d4d4d4  → 13.9:1  (AAA)
  *   --accent    #9cdcfe  →  9.7:1  (AAA)
- *   --accent-2  #c586c0  →  6.1:1  (AA)
- *   --fg-dim    #808080  →  4.9:1  (AA normal text)
- *   --ok        #6a9955  →  5.1:1  (AA)
+ *   --accent-2  #d49ed4  →  7.4:1  (AAA)
+ *   --fg-dim    #b8b8b8  →  9.5:1  (AAA)
+ *   --fg-mute   #9a9a9a  →  7.0:1  (AAA)
+ *   --ok        #8db872  →  7.1:1  (AAA)
  *   --warn      #dcdcaa  → 12.4:1  (AAA)
  */
 
@@ -16,12 +17,13 @@
   --bg:        #0d0d0d;
   --bg-panel:  #111113;
   --bg-inset:  #0a0a0a;
+  --bg-card:   #131318;
   --fg:        #d4d4d4;
-  --fg-dim:    #808080;
-  --fg-mute:   #5a5a5a;
+  --fg-dim:    #b8b8b8;
+  --fg-mute:   #9a9a9a;
   --accent:    #9cdcfe;
-  --accent-2:  #c586c0;
-  --ok:        #6a9955;
+  --accent-2:  #d49ed4;
+  --ok:        #8db872;
   --warn:      #dcdcaa;
   --border:    #2a2a2a;
   --border-bright: #3a3a3a;

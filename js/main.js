@@ -4,57 +4,91 @@ import {
   applyState,
   normalizeHash,
   handleGraphClick,
-  drawLines,
+  scheduleDrawLines,
   setTrigger,
   navigate,
 } from './graph.js';
-import { initTerminal, printWelcome } from './terminal.js';
+import { initTerminal, printWelcome, updatePromptLabel } from './terminal.js';
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
 
 function boot() {
-  // 1. Normalize hash (empty → #/home) so direct deep links work
   normalizeHash();
-
-  // 2. Initial render of state
   applyState();
+  requestAnimationFrame(() => scheduleDrawLines());
 
-  // 3. Wire hashchange so back/forward updates the graph
   window.addEventListener('hashchange', () => {
     applyState();
+    updatePromptLabel();
   });
 
-  // 4. Delegated click on the graph pane
   const graph = document.getElementById('graph');
   if (graph) {
     graph.addEventListener('click', handleGraphClick);
   }
 
-  // 5. Keyboard activation: Enter or Space on a focused .node navigates to it.
-  //    Nodes are <article role="link"> so we implement the activation semantics
-  //    here. Also records the trigger for focus restoration on collapse.
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const active = document.activeElement;
-    if (!active || !active.classList || !active.classList.contains('node')) return;
-    e.preventDefault();
-    setTrigger(active);
-    if (active.dataset.name) navigate(active.dataset.name);
+    if (!active || !active.classList) return;
+    if (active.classList.contains('node')) {
+      e.preventDefault();
+      setTrigger(active);
+      if (active.dataset.name) navigate(active.dataset.name);
+    } else if (active.classList.contains('home-tile') && active.dataset.nav) {
+      e.preventDefault();
+      navigate(active.dataset.nav);
+    }
   });
 
-  // 6. Redraw SVG lines on resize
-  const ro = new ResizeObserver(() => drawLines());
-  if (graph) ro.observe(graph);
-  window.addEventListener('orientationchange', () => drawLines());
+  // Home tile clicks
+  const homeTiles = document.getElementById('home-tiles');
+  if (homeTiles) {
+    homeTiles.addEventListener('click', (e) => {
+      const tile = e.target.closest('.home-tile');
+      if (tile && tile.dataset.nav) navigate(tile.dataset.nav);
+    });
+  }
 
-  // 7. Wire up the terminal
+  // Redraw SVG lines on resize — feature-detect ResizeObserver, fall back to window resize.
+  if (typeof ResizeObserver !== 'undefined' && graph) {
+    const ro = new ResizeObserver(() => scheduleDrawLines());
+    ro.observe(graph);
+  } else {
+    window.addEventListener('resize', () => scheduleDrawLines());
+  }
+  window.addEventListener('orientationchange', () => scheduleDrawLines());
+
   initTerminal();
   printWelcome();
+  updatePromptLabel();
 
-  // 8. Small QoL: allow clicking anywhere in #bottom to focus the input
+  const updateDims = debounce(function () {
+    const meta = document.getElementById('meta-dims');
+    if (!meta) return;
+    const probe = document.createElement('pre');
+    probe.style.cssText =
+      'position:fixed;top:-9999px;visibility:hidden;font:inherit;line-height:inherit;margin:0;padding:0;';
+    probe.textContent = 'x';
+    document.body.appendChild(probe);
+    const r = probe.getBoundingClientRect();
+    document.body.removeChild(probe);
+    const cw = r.width  || 9;
+    const ch = r.height || 23;
+    meta.textContent =
+      `${Math.floor(window.innerWidth / cw)}\u00d7${Math.floor(window.innerHeight / ch)}`;
+  }, 80);
+
+  updateDims();
+  window.addEventListener('resize', updateDims);
+
   const bottom = document.getElementById('bottom');
   const cmd = document.getElementById('cmd');
   if (bottom && cmd) {
     bottom.addEventListener('click', (e) => {
-      // don't steal focus from links the user is clicking
       if (e.target.closest('a')) return;
       cmd.focus();
     });

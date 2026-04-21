@@ -1,7 +1,13 @@
 // terminal.js — shell-style command input. All output via textContent (no innerHTML).
 
-import { navigate, currentNode, NODES } from './graph.js';
-import { parablurb, aboutBlurb, resumePath } from './data.js';
+import { navigate, currentPath, currentNode, NODES } from './graph.js';
+
+function navigateUp() {
+  const path = currentPath();
+  if (path.length > 1) navigate(path[0]); // child → parent
+  else if (path[0] !== 'home') navigate('home'); // parent → home
+}
+import { parablurb, aboutBlurb, resumePath, TREE } from './data.js';
 
 // ---------- command output ----------
 const outEl = () => document.getElementById('cmdout');
@@ -13,7 +19,6 @@ function line(text, cls) {
   if (cls) span.className = cls;
   span.textContent = (text == null ? '' : String(text)) + '\n';
   out.appendChild(span);
-  // keep scrolled to bottom
   const region = out.parentElement;
   if (region) region.scrollTop = region.scrollHeight;
 }
@@ -23,7 +28,7 @@ function echoPrompt(raw) {
   if (!out) return;
   const prefix = document.createElement('span');
   prefix.className = 'cmd-prompt';
-  prefix.textContent = `user@kanwarpal:${pwd()}$ `;
+  prefix.textContent = `user@kanwarpal:${pwdStr()}$ `;
   const cmd = document.createElement('span');
   cmd.className = 'cmd-line';
   cmd.textContent = raw + '\n';
@@ -33,18 +38,84 @@ function echoPrompt(raw) {
   if (region) region.scrollTop = region.scrollHeight;
 }
 
-function pwd() {
-  const n = currentNode();
-  return n === 'home' ? '~' : '~/' + n;
+function pwdStr() {
+  const path = currentPath();
+  const node = path[0] || 'home';
+  if (node === 'home') return '~';
+  return '~/' + path.join('/');
+}
+
+// ---------- hierarchy helpers ----------
+
+function getChildren(nodeName) {
+  const t = TREE[nodeName];
+  return (t && t.children) ? t.children : [];
+}
+
+/** Resolve a cd target relative to current path. Returns new path array or null. */
+function resolvePath(target) {
+  const path = currentPath();
+  const node = path[0] || 'home';
+  const raw = target.trim().toLowerCase();
+
+  // Absolute shortcuts
+  if (raw === '' || raw === '~' || raw === '/') return ['home'];
+  if (raw === '..' || raw === '../') {
+    if (path.length > 1) return [path[0]]; // child → parent
+    if (node !== 'home') return ['home'];   // parent → home
+    return null; // already at home
+  }
+  if (raw === '../..') {
+    if (node !== 'home') return ['home'];
+    return null;
+  }
+
+  // Strip leading ~/
+  const stripped = raw.replace(/^~\//, '');
+  // Strip leading ./
+  const clean = stripped.replace(/^\.\//, '').replace(/\/$/, '');
+
+  // Absolute top-level path
+  if (NODES.includes(clean)) return [clean];
+
+  // Multi-segment like projects/hive or work/carta-2024-payments
+  const parts = clean.split('/');
+  if (parts.length === 2) {
+    const [parent, child] = parts;
+    if (NODES.includes(parent)) {
+      const children = getChildren(parent);
+      if (children.includes(child)) return [parent, child];
+      return null;
+    }
+  }
+
+  // Single segment — try as child of current node first, then as top-level
+  if (parts.length === 1) {
+    const id = parts[0];
+    // Child of current context?
+    if (path.length === 1 && node !== 'home') {
+      const children = getChildren(node);
+      if (children.includes(id)) return [node, id];
+    }
+    if (path.length === 2) {
+      // Sibling of current child?
+      const siblings = getChildren(path[0]);
+      if (siblings.includes(id)) return [path[0], id];
+    }
+    // Top-level node?
+    if (NODES.includes(id)) return [id];
+  }
+
+  return null;
 }
 
 // ---------- command implementations ----------
 const HELP_TEXT =
 `commands:
-  cd <dir>      enter a directory (try: cd projects)
+  cd <dir>      enter a directory (try: cd projects or cd projects/hive)
   cd ~, cd /    return to home
   cd ..         go up a level
-  ls            list directories
+  ls            list current directory
   pwd           print working directory
   whoami        print current user
   cat bio       show bio
@@ -60,27 +131,37 @@ keybindings:
   Esc             return to home (cd ~)
   Ctrl+L          clear output`;
 
-const LS_TEXT =
-`drwxr-xr-x  home/
-drwxr-xr-x  work/
-drwxr-xr-x  projects/
-drwxr-xr-x  resume/
-drwxr-xr-x  socials/
-drwxr-xr-x  cluster/`;
+function cmdLs() {
+  const path = currentPath();
+  const node = path[0] || 'home';
+  if (path.length === 1) {
+    const children = getChildren(node);
+    if (node === 'home' || children.length === 0) {
+      // Show top-level nodes
+      const dirs = NODES.map(n => `drwxr-xr-x  ${n}/`).join('\n');
+      line(dirs);
+    } else {
+      line(children.map(c => `drwxr-xr-x  ${c}/`).join('\n'));
+    }
+  } else {
+    // At child level — no sub-children
+    line('(no entries)');
+  }
+}
 
 function cmdCd(args) {
   if (args.length === 0) { navigate('home'); return; }
   const raw = args.join(' ').trim().toLowerCase();
-  if (raw === '~' || raw === '/' || raw === '') { navigate('home'); return; }
-  if (raw === '..' || raw === '../' || raw === '../../') {
-    if (currentNode() === 'home') { line('already at ~', 'cmd-err'); return; }
-    navigate('home');
+  const newPath = resolvePath(raw);
+  if (newPath === null) {
+    if (raw === '..' || raw === '../') {
+      line('already at ~', 'cmd-err');
+    } else {
+      line(`cd: no such directory: ${raw}`, 'cmd-err');
+    }
     return;
   }
-  // strip leading ./ or / for convenience
-  const target = raw.replace(/^\.?\//, '').replace(/\/$/, '');
-  if (NODES.includes(target)) { navigate(target); return; }
-  line(`cd: no such directory: ${target}`, 'cmd-err');
+  navigate(newPath.join('/'));
 }
 
 function cmdCat(args) {
@@ -102,7 +183,6 @@ function cmdCat(args) {
 function cmdOpen(args) {
   const target = (args[0] || '').toLowerCase();
   if (target === 'resume' || target === 'resume.pdf') {
-    // URL is hard-coded, never built from user input
     window.open(resumePath, '_blank', 'noopener');
     line('opening resume in a new tab…');
     return;
@@ -112,14 +192,14 @@ function cmdOpen(args) {
 }
 
 const COMMANDS = {
-  cd: cmdCd,
-  ls: () => line(LS_TEXT),
-  help: () => line(HELP_TEXT),
-  clear: () => { const o = outEl(); if (o) o.textContent = ''; },
-  pwd: () => line(pwd()),
+  cd:     cmdCd,
+  ls:     cmdLs,
+  help:   () => line(HELP_TEXT),
+  clear:  () => { const o = outEl(); if (o) o.textContent = ''; },
+  pwd:    () => line(pwdStr()),
   whoami: () => line('kanwarpal'),
-  cat: cmdCat,
-  open: cmdOpen,
+  cat:    cmdCat,
+  open:   cmdOpen,
 };
 
 // ---------- parser ----------
@@ -141,20 +221,31 @@ function run(raw) {
 
 // ---------- history & tab completion ----------
 const history = [];
-let historyIdx = -1; // -1 = not browsing; 0..n = position from end
+let historyIdx = -1;
+let savedInput = '';
 
-const ALL_COMPLETIONS = [
-  'cd', 'cd ~', 'cd ..', 'ls', 'help', 'clear', 'pwd', 'whoami',
-  'cat bio', 'open resume',
-  ...NODES.map(n => `cd ${n}`),
-];
+function getCompletions() {
+  const path = currentPath();
+  const node = path[0] || 'home';
+  const children = getChildren(node);
+  const base = [
+    'cd', 'cd ~', 'cd ..', 'ls', 'help', 'clear', 'pwd', 'whoami',
+    'cat bio', 'open resume',
+    ...NODES.map(n => `cd ${n}`),
+  ];
+  if (children.length > 0) {
+    base.push(...children.map(c => `cd ${c}`));
+    base.push(...children.map(c => `cd ${node}/${c}`));
+  }
+  return base;
+}
 
 function complete(input) {
   const lowered = input.toLowerCase();
-  const matches = ALL_COMPLETIONS.filter(c => c.startsWith(lowered));
+  const completions = getCompletions();
+  const matches = completions.filter(c => c.startsWith(lowered));
   if (matches.length === 0) return null;
   if (matches.length === 1) return matches[0];
-  // longest common prefix
   let prefix = matches[0];
   for (const m of matches) {
     let i = 0;
@@ -162,7 +253,6 @@ function complete(input) {
     prefix = prefix.slice(0, i);
   }
   if (prefix.length > lowered.length) return prefix;
-  // show options
   line(matches.join('  '));
   return null;
 }
@@ -181,6 +271,7 @@ export function initTerminal() {
       if (history.length > 100) history.shift();
     }
     historyIdx = -1;
+    savedInput = '';
     run(raw);
     input.value = '';
   });
@@ -189,10 +280,13 @@ export function initTerminal() {
     if (e.key === 'ArrowUp') {
       if (history.length === 0) return;
       e.preventDefault();
-      if (historyIdx === -1) historyIdx = history.length - 1;
-      else if (historyIdx > 0) historyIdx--;
+      if (historyIdx === -1) {
+        savedInput = input.value;
+        historyIdx = history.length - 1;
+      } else if (historyIdx > 0) {
+        historyIdx--;
+      }
       input.value = history[historyIdx] || '';
-      // move caret to end
       setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
     } else if (e.key === 'ArrowDown') {
       if (historyIdx === -1) return;
@@ -202,36 +296,39 @@ export function initTerminal() {
         input.value = history[historyIdx] || '';
       } else {
         historyIdx = -1;
-        input.value = '';
+        input.value = savedInput;
+        savedInput = '';
       }
+      setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const completed = complete(input.value);
       if (completed) input.value = completed;
-    } else if (e.key === 'l' && e.ctrlKey) {
-      e.preventDefault();
-      const o = outEl(); if (o) o.textContent = '';
     } else if (e.key === 'Escape') {
       e.preventDefault();
       input.value = '';
       historyIdx = -1;
-      navigate('home');
+      savedInput = '';
+      navigateUp();
     }
   });
 
-  // Global shortcuts: `/` focuses input, Esc collapses from anywhere
+  // Global shortcuts — Ctrl+L, /, Esc (single handler on document)
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement !== input && !e.ctrlKey && !e.metaKey) {
-      // don't hijack if user is typing in another input (there aren't any, but be safe)
       const tag = (document.activeElement?.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea') return;
       e.preventDefault();
       input.focus();
     } else if (e.key === 'Escape' && document.activeElement !== input) {
-      if (currentNode() !== 'home') {
+      const path = currentPath();
+      if (path.length > 1 || path[0] !== 'home') {
         e.preventDefault();
-        navigate('home');
+        navigateUp();
       }
+    } else if (e.key === 'l' && e.ctrlKey) {
+      e.preventDefault();
+      const o = outEl(); if (o) o.textContent = '';
     }
   });
 }
@@ -240,4 +337,9 @@ export function printWelcome() {
   line('kanwarpal@portfolio — welcome.');
   line("type 'help' to see commands, or click a node above.");
   line('');
+}
+
+export function updatePromptLabel() {
+  const label = document.getElementById('cmd-label');
+  if (label) label.textContent = `user@kanwarpal:${pwdStr()}$ `;
 }

@@ -1,0 +1,94 @@
+- generic [ref=e2]:
+  - banner "terminal header" [ref=e3]:
+    - generic [ref=e8]: kanwarpal@portfolio:~ — bash
+    - generic [ref=e9]: 132×40
+  - navigation "portfolio sections" [ref=e10]:
+    - img
+    - link "Open home section" [ref=e11] [cursor=pointer]:
+      - heading "── home ──" [level=2] [ref=e12]
+      - paragraph [ref=e49]: Kanwarpal Brar · Developer, Researcher, Innovator
+      - text: ── ── ── ──
+    - link "Open work experience section" [ref=e26] [cursor=pointer]:
+      - heading "── work ──" [level=2] [ref=e27]
+      - paragraph [ref=e28]: 7 roles · Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post
+      - text: ── ── ── ──
+    - link "Open projects section" [active] [ref=e29]:
+      - heading "── projects ──" [level=2] [ref=e30]
+      - generic [ref=e50]:
+        - heading "── projects ──" [level=3] [ref=e51]
+        - generic [ref=e52]:
+          - article [ref=e53]:
+            - generic [ref=e54]: concurrent-hashmap
+            - generic [ref=e55]: Highly concurrent, lock-free, probing hashmap implementation in C++.
+            - generic [ref=e56]: "[c++] [concurrency] [lock-free]"
+            - link "→ github.com/kanwarpal-brar/concurrent-hashmap" [ref=e57] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/concurrent-hashmap
+          - article [ref=e58]:
+            - generic [ref=e59]: simple-event-bus
+            - generic [ref=e60]: Lightweight C++ event bus for event-based applications using websockets.
+            - generic [ref=e61]: "[c++] [websocket] [boost-asio]"
+            - link "→ github.com/kanwarpal-brar/simple-event-bus" [ref=e62] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/simple-event-bus
+          - article [ref=e63]:
+            - generic [ref=e64]: simple-coroutine
+            - generic [ref=e65]: Basic coroutine library in C++ built on context switching.
+            - generic [ref=e66]: "[c++] [coroutines] [systems]"
+            - link "→ github.com/kanwarpal-brar/simple-coroutine" [ref=e67] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/simple-coroutine
+          - article [ref=e68]:
+            - generic [ref=e69]: thread-music
+            - generic [ref=e70]: Thread scheduling as conductor — threads play MIDI notes on cue.
+            - generic [ref=e71]: "[c++] [threading] [midi]"
+            - link "→ github.com/kanwarpal-brar/thread-music" [ref=e72] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/thread-music
+          - article [ref=e73]:
+            - generic [ref=e74]: minecraft-helm
+            - generic [ref=e75]: Helm charts for deploying Minecraft servers on a Kubernetes cluster.
+            - generic [ref=e76]: "[kubernetes] [helm] [devops]"
+            - link "→ github.com/kanwarpal-brar/minecraft-helm" [ref=e77] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/minecraft-helm
+          - article [ref=e78]:
+            - generic [ref=e79]: friend-point-service
+            - generic [ref=e80]: HTTP service to quantify friendships, running on a personal K8s cluster.
+            - generic [ref=e81]: "[python] [http] [kubernetes]"
+            - link "→ github.com/kanwarpal-brar/friend-point-service" [ref=e82] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/friend-point-service
+          - article [ref=e83]:
+            - generic [ref=e84]: flex-schedule
+            - generic [ref=e85]: Time-blocking flexible scheduling application for adaptive day management.
+            - generic [ref=e86]: "[typescript] [scheduling]"
+            - link "→ github.com/kanwarpal-brar/flex-schedule" [ref=e87] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/flex-schedule
+          - article [ref=e88]:
+            - generic [ref=e89]: hive
+            - generic [ref=e90]: Streamlined ML data collection platform powered by the Dropbase API.
+            - generic [ref=e91]: "[django] [machine-learning]"
+            - link "→ github.com/kanwarpal-brar/hive" [ref=e92] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/hive
+          - article [ref=e93]:
+            - generic [ref=e94]: NYABot
+            - generic [ref=e95]: Discord bot written in Python using discord.py, YTDL, and ffmpeg.
+            - generic [ref=e96]: "[python] [discord] [ffmpeg]"
+            - link "→ github.com/kanwarpal-brar/NYABot" [ref=e97] [cursor=pointer]:
+              - /url: https://github.com/kanwarpal-brar/NYABot
+    - link "Open resume section" [ref=e32] [cursor=pointer]:
+      - /url: assets/Kanwarpal_Brar_Resume.pdf
+      - heading "── resume ──" [level=2] [ref=e33]
+      - paragraph [ref=e34]: Kanwarpal_Brar_Resume.pdf · open to view
+      - text: ── ──
+    - link "Open socials section" [ref=e35] [cursor=pointer]:
+      - /url: mailto:kanwarpal.brar@outlook.com
+      - heading "── socials ──" [level=2] [ref=e36]
+      - paragraph [ref=e37]: github · linkedin · email
+      - text: ── ──
+    - link "Open cluster access section" [ref=e38] [cursor=pointer]:
+      - /url: mailto:kanwarpal.brar@outlook.com
+      - heading "── cluster ──" [level=2] [ref=e39]
+      - paragraph [ref=e40]: Private Kubernetes cluster · access by request
+      - text: ── ──
+  - contentinfo [ref=e41]:
+    - generic [ref=e42]: "hint: click a node, or type help below · / focuses input · Esc returns home"
+    - generic [ref=e44]: kanwarpal@portfolio — welcome. type 'help' to see commands, or click a node above.
+    - generic [ref=e45]:
+      - generic [ref=e46]: user@kanwarpal:~/projects$
+      - textbox "terminal command input" [ref=e47]

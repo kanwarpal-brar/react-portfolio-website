@@ -1,0 +1,53 @@
+- generic [ref=e2]:
+  - banner "terminal header" [ref=e3]:
+    - generic [ref=e8]: kanwarpal@portfolio:~ — bash
+    - generic [ref=e9]: 146×40
+  - navigation "portfolio sections" [ref=e10]:
+    - img
+    - link "Open home section" [ref=e11] [cursor=pointer]:
+      - heading "── home ──" [level=2] [ref=e12]
+      - paragraph [ref=e48]: Kanwarpal Brar · Developer, Researcher, Innovator
+      - text: ── ── ── ──
+    - link "Open work experience section" [ref=e26] [cursor=pointer]:
+      - heading "── work ──" [level=2] [ref=e27]
+      - paragraph [ref=e28]: 7 roles · Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post
+      - text: ── ── ── ──
+    - link "Open projects section" [ref=e29] [cursor=pointer]:
+      - /url: https://github.com/kanwarpal-brar/NYABot
+      - heading "── projects ──" [level=2] [ref=e30]
+      - paragraph [ref=e31]: 9 curated projects · systems, concurrency, devops
+      - text: ── ──
+    - link "Open resume section" [ref=e32] [cursor=pointer]:
+      - /url: assets/Kanwarpal_Brar_Resume.pdf
+      - heading "── resume ──" [level=2] [ref=e33]
+      - paragraph [ref=e34]: Kanwarpal_Brar_Resume.pdf · open to view
+      - text: ── ──
+    - link "Open socials section" [ref=e35] [cursor=pointer]:
+      - /url: mailto:kanwarpal.brar@outlook.com
+      - heading "── socials ──" [level=2] [ref=e36]
+      - paragraph [ref=e37]: github · linkedin · email
+      - text: ── ──
+    - link "Open cluster access section" [ref=e38]:
+      - heading "── cluster ──" [level=2] [ref=e39]
+      - generic [ref=e103]:
+        - heading "── private kubernetes cluster ──" [level=3] [ref=e104]
+        - paragraph [ref=e105]: "[!] Access to this infrastructure is strictly controlled."
+        - paragraph [ref=e106]:
+          - text: Welcome to the secure access portal for the private Kubernetes cluster at
+          - strong [ref=e107]: "[REDACTED]"
+          - text: . Access requires prior authorization.
+        - paragraph [ref=e108]:
+          - text: To request access, email
+          - link "kanwarpal.brar@outlook.com" [ref=e109] [cursor=pointer]:
+            - /url: mailto:kanwarpal.brar@outlook.com
+          - text: "with:"
+        - list [ref=e110]:
+          - listitem [ref=e111]: Your full name and organization
+          - listitem [ref=e112]: Intended use case and project scope
+          - listitem [ref=e113]: Required access level and duration
+          - listitem [ref=e114]: Any relevant technical requirements
+  - contentinfo [ref=e41]:
+    - generic [ref=e42]: "hint: click a node, or type help below · / focuses input · Esc returns home"
+    - generic [ref=e45]:
+      - generic [ref=e46]: user@kanwarpal:~/cluster$
+      - textbox "terminal command input" [active] [ref=e47]

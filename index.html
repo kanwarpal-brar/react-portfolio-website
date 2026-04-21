@@ -16,6 +16,8 @@
   <meta property="og:title" content="Kanwarpal Brar — Developer, Researcher, Innovator">
   <meta property="og:description" content="Software engineer specializing in distributed systems and backend architecture.">
   <meta property="og:image" content="https://kanwarpal.com/assets/headshot.webp">
+  <meta property="og:locale" content="en_CA">
+  <meta property="og:site_name" content="Kanwarpal Brar">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary">
@@ -50,7 +52,7 @@
       "https://github.com/kanwarpal-brar",
       "https://linkedin.com/in/kanwarpal-brar"
     ],
-    "email": "mailto:kanwarpal.brar@outlook.com"
+    "email": "kanwarpal.brar@outlook.com"
   }
   </script>
 
@@ -68,23 +70,26 @@
         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
       </span>
       <span class="title">kanwarpal@portfolio:~ — bash</span>
-      <span class="meta">80×24</span>
+      <span class="meta" id="meta-dims">80×24</span>
     </header>
 
     <!-- ====== central graph pane ====== -->
-    <main id="graph" class="frame" data-expanded="home"
-          role="navigation" aria-label="portfolio sections">
+    <main id="graph" class="frame" data-expanded="home">
+      <h1 class="visually-hidden">Kanwarpal Brar — portfolio</h1>
 
       <svg id="graph-lines" aria-hidden="true" preserveAspectRatio="none">
         <!-- lines injected/updated by js/graph.js -->
       </svg>
 
+      <nav aria-label="portfolio sections">
+
       <!-- ========== HOME ========== -->
-      <article class="node" id="node-home" data-name="home" data-href="#/home"
-               tabindex="0" role="link" aria-label="Open home section">
+      <article class="node expanded" id="node-home" data-name="home"
+               tabindex="0" role="button" aria-expanded="true" aria-controls="node-home-body"
+               aria-label="home section">
         <h2 class="node-title">── home ──</h2>
         <p class="node-lede">Kanwarpal Brar · Developer, Researcher, Innovator</p>
-        <div class="node-body">
+        <div id="node-home-body" class="node-body">
           <div class="bio-grid">
             <img class="headshot" src="assets/headshot.webp"
                  alt="Kanwarpal Brar" width="120" height="120"
@@ -94,19 +99,44 @@
               <p>Software Engineer specializing in distributed systems and backend architecture. Interested in designing scalable microservices, RESTful APIs, and concurrent systems. Passionate about solving complex networking challenges and building reliable distributed applications.</p>
             </div>
           </div>
+          <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">[ view resume ]</a>
           <h3>about</h3>
           <p>Hi, I'm Kanwarpal, Welcome to my portfolio website. I'm a software engineer with a Computer Science degree from the University of Waterloo, specializing in distributed systems and backend development. My experience spans fintech, cloud infrastructure, and microservices architecture, with expertise in technologies like Python, Java, Go, and cloud platforms including AWS and Azure. I'm passionate about building scalable solutions and continuously expanding my technical expertise.</p>
+          <h3>sections</h3>
+          <div class="home-tiles" id="home-tiles">
+            <div class="home-tile" tabindex="0" role="button" data-nav="work">
+              <div class="ht-name">work</div>
+              <div class="ht-lede">7 roles · Carta, UWaterloo, Arctic Wolf…</div>
+            </div>
+            <div class="home-tile" tabindex="0" role="button" data-nav="projects">
+              <div class="ht-name">projects</div>
+              <div class="ht-lede">9 curated · systems, concurrency, devops</div>
+            </div>
+            <div class="home-tile" tabindex="0" role="button" data-nav="resume">
+              <div class="ht-name">resume</div>
+              <div class="ht-lede">PDF · open to view</div>
+            </div>
+            <div class="home-tile" tabindex="0" role="button" data-nav="socials">
+              <div class="ht-name">socials</div>
+              <div class="ht-lede">github · linkedin · email</div>
+            </div>
+            <div class="home-tile" tabindex="0" role="button" data-nav="cluster">
+              <div class="ht-name">cluster</div>
+              <div class="ht-lede">private K8s · access by request</div>
+            </div>
+          </div>
           <h3>getting around</h3>
-          <p>Click any node, or use the terminal below. Try <code>help</code>, <code>ls</code>, or <code>cd projects</code>.</p>
+          <p>Click any node or tile, or use the terminal below. Try <code>help</code>, <code>ls</code>, or <code>cd projects</code>.</p>
         </div>
       </article>
 
       <!-- ========== WORK ========== -->
-      <article class="node" id="node-work" data-name="work" data-href="#/work"
-               tabindex="0" role="link" aria-label="Open work experience section">
+      <article class="node" id="node-work" data-name="work"
+               tabindex="0" role="button" aria-expanded="false" aria-controls="node-work-body"
+               aria-label="work experience section">
         <h2 class="node-title">── work ──</h2>
         <p class="node-lede">7 roles · Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post</p>
-        <div class="node-body">
+        <div id="node-work-body" class="node-body">
           <h3>work experience</h3>
 
           <article class="exp-box">
@@ -185,11 +215,12 @@
       </article>
 
       <!-- ========== PROJECTS ========== -->
-      <article class="node" id="node-projects" data-name="projects" data-href="#/projects"
-               tabindex="0" role="link" aria-label="Open projects section">
+      <article class="node" id="node-projects" data-name="projects"
+               tabindex="0" role="button" aria-expanded="false" aria-controls="node-projects-body"
+               aria-label="projects section">
         <h2 class="node-title">── projects ──</h2>
         <p class="node-lede">9 curated projects · systems, concurrency, devops</p>
-        <div class="node-body">
+        <div id="node-projects-body" class="node-body">
           <h3>projects</h3>
           <div class="proj-grid">
             <article class="proj">
@@ -251,11 +282,12 @@
       </article>
 
       <!-- ========== RESUME ========== -->
-      <article class="node" id="node-resume" data-name="resume" data-href="#/resume"
-               tabindex="0" role="link" aria-label="Open resume section">
+      <article class="node" id="node-resume" data-name="resume"
+               tabindex="0" role="button" aria-expanded="false" aria-controls="node-resume-body"
+               aria-label="resume section">
         <h2 class="node-title">── resume ──</h2>
         <p class="node-lede">Kanwarpal_Brar_Resume.pdf · open to view</p>
-        <div class="node-body">
+        <div id="node-resume-body" class="node-body">
           <h3>resume</h3>
           <p>Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.</p>
           <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">
@@ -266,11 +298,12 @@
       </article>
 
       <!-- ========== SOCIALS ========== -->
-      <article class="node" id="node-socials" data-name="socials" data-href="#/socials"
-               tabindex="0" role="link" aria-label="Open socials section">
+      <article class="node" id="node-socials" data-name="socials"
+               tabindex="0" role="button" aria-expanded="false" aria-controls="node-socials-body"
+               aria-label="socials section">
         <h2 class="node-title">── socials ──</h2>
         <p class="node-lede">github · linkedin · email</p>
-        <div class="node-body">
+        <div id="node-socials-body" class="node-body">
           <h3>connect</h3>
           <ul class="social-list">
             <li><span class="k">github</span><a href="https://github.com/kanwarpal-brar" target="_blank" rel="noopener">github.com/kanwarpal-brar</a></li>
@@ -281,14 +314,15 @@
       </article>
 
       <!-- ========== CLUSTER ========== -->
-      <article class="node" id="node-cluster" data-name="cluster" data-href="#/cluster"
-               tabindex="0" role="link" aria-label="Open cluster access section">
+      <article class="node" id="node-cluster" data-name="cluster"
+               tabindex="0" role="button" aria-expanded="false" aria-controls="node-cluster-body"
+               aria-label="cluster section">
         <h2 class="node-title">── cluster ──</h2>
         <p class="node-lede">Private Kubernetes cluster · access by request</p>
-        <div class="node-body">
+        <div id="node-cluster-body" class="node-body">
           <h3>private kubernetes cluster</h3>
           <p class="warning">[!] Access to this infrastructure is strictly controlled.</p>
-          <p>Welcome to the secure access portal for the private Kubernetes cluster at <strong><span class="redacted">[REDACTED]</span></strong>. Access requires prior authorization.</p>
+          <p>Welcome to the secure access portal for the private Kubernetes cluster at <strong><span class="redacted" aria-hidden="true">[REDACTED]</span></strong>. Access requires prior authorization.</p>
           <p>To request access, email <a href="mailto:kanwarpal.brar@outlook.com">kanwarpal.brar@outlook.com</a> with:</p>
           <ul>
             <li>Your full name and organization</li>
@@ -298,6 +332,7 @@
           </ul>
         </div>
       </article>
+      </nav>
     </main>
 
     <!-- ====== bottom: hint + cmd output + cmd input ====== -->
@@ -305,14 +340,14 @@
       <div id="hint">
         hint: click a node, or type <kbd>help</kbd> below · <kbd>/</kbd> focuses input · <kbd>Esc</kbd> returns home
       </div>
-      <div id="cmdout-region" aria-live="polite" aria-atomic="false">
+      <div id="cmdout-region" role="log" aria-atomic="false">
         <pre id="cmdout"></pre>
       </div>
       <form id="cmdform" autocomplete="off" spellcheck="false">
-        <label for="cmd">user@kanwarpal:~$</label>
+        <label id="cmd-label" for="cmd" aria-hidden="true">user@kanwarpal:~$</label>
+        <span class="visually-hidden">terminal command input</span>
         <input id="cmd" type="text" autocapitalize="off" autocorrect="off"
                aria-label="terminal command input">
-        <span id="cursor" aria-hidden="true">▉</span>
       </form>
     </footer>
   </div>
