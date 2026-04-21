@@ -2,7 +2,7 @@ import { ExpBoxProps } from "@/components/ExpBox/expbox";
 import { ExtraCurricularBoxProps } from "@/components/ExtraCurricularBox/extracurricularbox";
 
 export const aboutBlurb =
-  "Hi, I'm Kanwarpal, Welcome to my portfolio website. I'm a software engineer with a Computer Science degree from the University of Waterloo, specializing in distributed systems and backend development. My experience spans fintech, cloud infrastructure, and microservices architecture, with expertise in technologies like Python, Java, Go, and cloud platforms including AWS and Azure. I'm passionate about building scalable solutions and continuously expanding my technical expertise.";
+  "Hi, I'm Kanwarpal — a Production Engineer at Meta and a 2025 Computer Science graduate from the University of Waterloo. I work on infrastructure-as-code, storage systems, and distributed platforms that support AI training at scale. My background spans fintech, cloud infrastructure, microservices, and concurrency, with hands-on experience in Python, Go, Java, C++, Kubernetes, and AWS/Azure.";
 
 export const resumeBlurb =
   "Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.";
@@ -36,52 +36,67 @@ export const extraCurriculer: ExtraCurricularBoxProps[] = [
 
 export const workExperience: ExpBoxProps[] = [
   {
+    title: "Production Engineer",
+    company: "Meta",
+    date: "Sept 2025 - Present",
+    bullets: [
+      "Accelerated Meta Blob Storage turnup 95% via typed schema automation, unblocking rapid capacity delivery for AI training fleets",
+      "Saved 100+ engineering hours by shipping key-value state layer atop Infrastructure-as-Code definitions, onboarding legacy systems",
+      "Restored cluster capacity in 24 hours by diagnosing cross-stack garbage collection SEV, unblocking environments for 6 downstream services",
+      "Safeguarded 95% SLO across 7 MBS services as primary oncall, protecting AI training pipelines for Meta Superintelligence Labs",
+    ],
+  },
+  {
     title: "Payments Software Engineering Co-op",
     company: "Carta",
-    date: "Sept — Dec 2024",
-    paragraph:
-      "Shipped critical fund impersonation controls within first 2 weeks of joining, preventing $5000+ in potential audit penalties using Django + React. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Led multi-service banking integration expansion processing $5M+ monthly, implementing international account workflows using Python, gRPC, Protocol Buffers, and Domain Driven Design.",
+    date: "Sept 2024 - Dec 2024",
+    bullets: [
+      "Averted $5000+ in regulatory penalties within first 2 weeks by implementing financial compliance controls with Django + React",
+      "Managed $5M+ monthly leading international banking integration expansion, leveraging Python, gRPC, and Domain Driven Design",
+      "Architected fault-tolerant microservices on AWS with Docker and Kubernetes, achieving 99.99% uptime for robust fintech operations",
+      "Slashed network overhead 50% by implementing centralized money movement controls with RBAC in a Java Microservice",
+      "Accelerated feature development 40% through flexible Django permission system using YAML-templated definitions",
+    ],
   },
   {
     title: "Distributed Systems Research Assistant",
-    company: "UWaterloo",
-    date: "May - Aug 2024",
-    paragraph:
-      "Conducted comprehensive benchmarking of Serverless frameworks to inform the design of a new high-performance Serverless platform. Deployed & Optimized Kubernetes clusters achieving 200+ requests/second per node with KNative Serving. Reduced cold-start latency 20% through analysis and tuning of autoscaling, node configuration, and container runtime. Authored a comprehensive technical report proposing architectural changes, improving resource utilization 15%.",
+    company: "University of Waterloo",
+    date: "May 2024 - Aug 2024",
+    bullets: [
+      "Benchmarked serverless frameworks with WRK and custom Bash scripts, informing design decisions for high-performance system architecture",
+      "Delivered 200+ requests/second per node by deploying & optimizing Kubernetes clusters with KNative Serving and Istio ingress controls",
+      "Cut cold-start latency 20% through targeted autoscaling and TCP/IP network optimization, increasing platform responsiveness",
+      "Designed architectural changes improving resource utilization 15%, validated with monitoring scripts in a comprehensive technical report",
+    ],
   },
   {
     title: "Backend Software Engineering Co-op",
     company: "Carta",
-    date: "Jan - April 2024",
-    paragraph:
-      "Improved OCX report generation speed 10% by implementing an O(n) complexity cell management system with Apache POI + Java. Enhanced AI powered search accuracy 6% through prompt engineering of report questions & use-cases. Resolved 3000+ support tickets by streamlining Ownership Report access permissions in Carta Web's Django codebase. Optimized ownership report query complexity in Spring framework, resulting in a 5% decrease in user wait times.",
+    date: "Jan 2024 - Apr 2024",
+    bullets: [
+      "Accelerated OCX report generation speed 10% using an O(n) complexity cell management system with Apache POI + Java, streamlining results",
+      "Improved semantic search relevance by 6% via refined prompt engineering for report queries & real-world use-cases",
+      "Eliminated 3000+ tickets by streamlining Ownership Report permissions in Django, collaborating cross-functionally with product leaders",
+      "Slashed user wait times by 10% through optimizing ownership report queries in Spring, enhancing system responsiveness",
+    ],
   },
   {
-    title: "Software Developer",
-    company: "Arctic Wolf",
-    date: "May - Aug 2023",
-    paragraph:
-      "Reduced response times 25% by developing a concurrent Prometheus metrics monitoring system in Go for an Apache Kafka Wrapper. Developed a reflection-based Golang unit test verifier, identifying missing/broken metrics tests with 100% accuracy. Reduced lead times by designing a forward/backwards compatible Kafka Serialization system using SchemaVer and Avro.",
+    title: "Software Developer Co-op",
+    company: "Arctic Wolf Networks",
+    date: "May 2023 - Aug 2023",
+    bullets: [
+      "Slashed response times by 25% by implementing a concurrent Go monitoring system for Prometheus metrics on an Apache Kafka wrapper",
+      "Attained 100% accuracy in identifying test gaps with a reflection-based Golang unit test verifier for an Apache Kafka wrapper",
+      "Expedited development by creating a forward/backward compatible Kafka Serialization system using SchemaVer and Avro",
+    ],
   },
   {
-    title: "Full Stack Software Developer",
-    company: "Genesys",
-    date: "Sept - Dec 2022",
-    paragraph:
-      "Reduced hosting costs 5% by transitioning scheduling API to serverless architecture using Python, Flask, and Lambda. Shrunk codebase size 30% by rewriting schedule statement management REST API in Python + Flask + RESTX.",
-  },
-  {
-    title: "Software Engineering Intern",
-    company: "Cloudspark",
-    date: "Jan - Apr 2022",
-    paragraph:
-      "Designed & Implemented scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure. Led the development of Licensing, Notification, and Auth microservices for a start-up MVP, utilizing TypeScript, Nest.JS, CosmosDB, Dependency Injection, and Azure Service Bus.",
-  },
-  {
-    title: "DevOps Specialist",
-    company: "Pillar To Post",
-    date: "May - Aug 2021",
-    paragraph:
-      "Designed and Developed an Automated Web Software Testing Framework in Selenium using Python and JavaScript, eliminating manual testing and saving 100+ company hours.",
+    title: "Full Stack Software Developer Co-op",
+    company: "Genesys Cloud Services",
+    date: "Sept 2022 - Dec 2022",
+    bullets: [
+      "Slashed hosting costs by 5% by migrating a monolithic scheduling API to an end-to-end serverless architecture with Python + Flask + Lambda",
+      "Compressed codebase size by 30% and enhanced maintainability through a documented Python + Flask + OpenAPI service for scheduling",
+    ],
   },
 ];
