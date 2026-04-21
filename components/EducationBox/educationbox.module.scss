@@ -39,9 +39,9 @@ $font-scaling: 1.15vw;
 }
 
 .inline_title {
-  display: inline-block;
+  display: block;
+  width: 100%;
   $font-offset: 0.2vw;
-  overflow: hidden;
 
   @media (orientation: portrait) {
     padding-top: 0px;

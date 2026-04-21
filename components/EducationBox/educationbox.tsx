@@ -6,6 +6,7 @@ export type ResearchSubsection = {
   date: string;
   summary: string;
   bullets?: string[];
+  sectionHeading?: string;
 };
 
 export type EducationBoxProps = {
@@ -28,9 +29,9 @@ export default function EducationBox({
   return (
     <div className={styles.educationbox_container}>
       <div className={styles.inline_title}>
+        <span className={styles.date}>{date}</span>
         <h2>{school}</h2>
         <h3>{`${degree}${gpa ? ` | CGPA ${gpa}` : ""}`}</h3>
-        <span className={styles.date}>{date}</span>
       </div>
       <hr />
       {courses && courses.length > 0 && (
@@ -38,10 +39,12 @@ export default function EducationBox({
       )}
       {research && (
         <div className={styles.research_block}>
-          <h3 className={styles.research_heading}>Undergraduate Research</h3>
-          <div className={styles.research_meta}>
+          <h3 className={styles.research_heading}>
+            {research.sectionHeading ?? "Undergraduate Research"}
+          </h3>
+          <p className={styles.research_meta}>
             {`${research.title}${research.institution ? ` — ${research.institution}` : ""} — ${research.date}`}
-          </div>
+          </p>
           <p>{research.summary}</p>
           {research.bullets && research.bullets.length > 0 && (
             <ul>
