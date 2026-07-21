@@ -17,10 +17,10 @@ export default function ExpBox({
 }: ExpBoxProps) {
   return (
     <div className={styles.expbox_container}>
-      <span className={styles.inline_title}>
+      <div className={styles.inline_title}>
         <h2>{`${title} | ${company}`}</h2>
         <h3>{date}</h3>
-      </span>
+      </div>
       <hr />
       {bullets ? (
         <ul>

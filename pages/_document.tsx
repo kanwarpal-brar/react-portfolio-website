@@ -5,6 +5,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <meta name="theme-color" content="#0B0E0C" />
         {/* Global Site Tag (gtag.js) - Google Analytics */}
         <script
           async

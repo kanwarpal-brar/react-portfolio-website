@@ -7,6 +7,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        bg: "var(--color-bg)",
+        surface: "var(--color-surface)",
+        surface2: "var(--color-surface-2)",
+        accent: "var(--color-accent)",
+        hot: "var(--color-hot)",
+        muted: "var(--color-text-muted)",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

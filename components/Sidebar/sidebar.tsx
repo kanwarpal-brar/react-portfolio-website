@@ -1,6 +1,6 @@
 import styles from "./sidebar.module.scss";
 import SideBarIcon, { SideBarIconProps } from "./SidebarItem/sidebaritem";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiFillGithub, AiFillLinkedin, AiTwotoneMail } from "react-icons/ai";
 import { MdHomeFilled, MdPerson, MdOutlineCode } from "react-icons/md";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
@@ -12,23 +12,36 @@ export type SideBarProps = {
   isMobile?: boolean;
 };
 
-export default function SideBar({ isMobile }: SideBarProps) {
-  const barSize = { base: 60, expanded: 200 };
-  const btnOffset = { base: 70, minimized: 10 };
+const barSize = { base: 60, expanded: 200 };
+const btnOffset = { base: 70, minimized: 10 };
 
+export default function SideBar({ isMobile }: SideBarProps) {
   const [width, setWidth] = useState(0);
   const [btnLeft, setBtnLeft] = useState(btnOffset.minimized);
   const [active, setActive] = useState(false);
   const [mouseInBar, setMouseInBar] = useState(false);
+  const autoHideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
+    if (autoHideTimeout.current) {
+      clearTimeout(autoHideTimeout.current);
+    }
+
     // Only run auto-hide timer in landscape mode
     if (!isMobile && window.matchMedia("(orientation: landscape)").matches) {
-      setTimeout(() => {
-        toggleBarActive();
+      autoHideTimeout.current = setTimeout(() => {
+        setWidth(barSize.base);
+        setBtnLeft(btnOffset.base);
+        setActive(true);
       }, 4000);
     }
+
+    return () => {
+      if (autoHideTimeout.current) {
+        clearTimeout(autoHideTimeout.current);
+      }
+    };
   }, [isMobile]);
 
   const items: Array<SideBarIconProps> = [
@@ -44,7 +57,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
     {
       name: "Cluster",
       icon: SiKubernetes,
-      redirectUrl: "/cluster"
+      redirectUrl: "/cluster",
     },
   ];
 
@@ -71,7 +84,7 @@ export default function SideBar({ isMobile }: SideBarProps) {
       <SideBarIcon
         key={item.name}
         {...item}
-        active={pathname === item.redirectUrl ? true : false}
+        active={pathname === item.redirectUrl}
         clickCallback={
           isMobile
             ? () => {
@@ -153,4 +166,3 @@ export default function SideBar({ isMobile }: SideBarProps) {
     </>
   );
 }
-

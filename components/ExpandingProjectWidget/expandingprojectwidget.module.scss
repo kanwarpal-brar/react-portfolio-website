@@ -107,7 +107,7 @@
   .tag {
     color: variables.$text_color;
     padding: 1px 5px;
-    border: 1px solid white;
+    border: 1px solid variables.$accent_color;
     background-color: rgba(255, 255, 255, 0.03);
 
     @container (max-width: 300px) {

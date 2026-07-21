@@ -1,38 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Kanwarpal Brar Portfolio
+
+Personal portfolio for `kanwarpal.com`, built with the Next.js pages router, TypeScript, SCSS modules, Tailwind, Imgix-backed assets, and a small amount of GitHub API data.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and start the local development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
-# or
-pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- `pages/` contains the route entry points for home, about, projects, and cluster pages.
+- `components/` contains reusable UI pieces such as the sidebar, tabbed content boxes, experience cards, and project widgets.
+- `data/about.tsx` is the source of truth for the about page biography, education, work experience, and extracurricular entries.
+- `public/targetProjects.json` defines the GitHub repositories and asset endpoints used by the projects page.
+- `styles/_variables.scss` and `styles/globals.scss` define the shared palette and global type scale.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Data And Content
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Experience and education copy should track the current resume. Update `data/about.tsx` when resume content changes, then verify `/about` against `public/Kanwarpal_Brar_Resume.pdf`.
 
-## Learn More
+The projects page is statically generated from the configured GitHub repositories at build time. Repository images are served through the Imgix endpoint in `public/targetProjects.json`.
 
-To learn more about Next.js, take a look at the following resources:
+## Useful Commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn dev
+yarn lint
+yarn build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The production site is deployed for `kanwarpal.com`. Before deploying, run `yarn lint` and `yarn build`, then manually check `/`, `/about`, `/projects`, and `/cluster` in both desktop and mobile layouts.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The `CNAME` file keeps the custom domain configured for static hosting workflows that read it.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

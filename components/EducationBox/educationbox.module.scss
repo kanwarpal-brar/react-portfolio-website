@@ -4,27 +4,37 @@ $font-scaling: 1.15vw;
 
 .educationbox_container {
   display: flex;
-  align-self: flex-start;
   flex-direction: column;
+  background-color: variables.$secondary_color;
+  border: 1px solid variables.$accent_color;
+  box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 10px 10px;
   width: 100%;
   height: 100%;
-  padding: 0px 2%;
-  gap: 0px;
+  box-sizing: border-box;
+  color: variables.$text_color;
 
   p {
+    color: variables.$text_color;
     line-height: 200%;
     font-weight: 200;
   }
 
   hr {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid variables.$text_color;
     padding-bottom: 1%;
   }
 
   ul {
     padding: 0 2%;
     list-style-type: square;
+    color: variables.$accent_color;
 
     li {
+      color: variables.$accent_color;
       margin-top: 15px;
       font-weight: 200;
       $font-scaling-offset: 0.35vw;
@@ -38,6 +48,28 @@ $font-scaling: 1.15vw;
   }
 }
 
+.educationbox_title {
+  color: variables.$text_color;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+.education_content_container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(
+    to bottom,
+    variables.$secondary_color_focus,
+    variables.$secondary_color_focus 95%,
+    variables.$secondary_color
+  );
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px black;
+  padding: 15px 2%;
+}
+
 .inline_title {
   display: block;
   width: 100%;
@@ -48,6 +80,7 @@ $font-scaling: 1.15vw;
   }
 
   h2 {
+    color: variables.$text_color;
     display: inline-block;
     text-align: left;
     font-size: $font-scaling;
@@ -59,6 +92,7 @@ $font-scaling: 1.15vw;
   }
 
   h3 {
+    color: variables.$text_color;
     display: inline-block;
     text-align: left;
     font-size: calc($font-scaling - $font-offset);
@@ -71,6 +105,7 @@ $font-scaling: 1.15vw;
 
 .date {
   float: right;
+  color: variables.$muted_color;
   font-size: calc($font-scaling - 0.2vw);
   font-weight: 300;
 
@@ -80,6 +115,7 @@ $font-scaling: 1.15vw;
 }
 
 .courses {
+  color: variables.$text_color;
   font-size: calc($font-scaling - 0.2vw);
   margin-top: 0.5rem;
   margin-bottom: 0.75rem;
@@ -96,6 +132,7 @@ $font-scaling: 1.15vw;
 }
 
 .research_heading {
+  color: variables.$accent_color;
   font-size: $font-scaling;
   font-weight: 500;
   margin-bottom: 0.4rem;
@@ -106,6 +143,7 @@ $font-scaling: 1.15vw;
 }
 
 .research_meta {
+  color: variables.$muted_color;
   font-size: calc($font-scaling - 0.2vw);
   font-weight: 300;
   margin-bottom: 0.5rem;

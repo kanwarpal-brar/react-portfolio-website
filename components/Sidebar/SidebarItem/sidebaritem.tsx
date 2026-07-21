@@ -1,12 +1,10 @@
 import styles from "./sidebaritem.module.scss";
 import Link from "next/link";
-import { Chivo_Mono } from "next/font/google";
-
-const chivoMono = Chivo_Mono({ subsets: ["latin"] });
+import { IconType } from "react-icons";
 
 export type SideBarIconProps = {
   name: string;
-  icon: any;
+  icon: IconType;
   redirectUrl: string;
   active?: boolean;
   newTab?: boolean;
@@ -30,9 +28,7 @@ export default function SideBarIcon({
       onClick={clickCallback}
     >
       <Icon className={styles.sidebar_item_icon} />
-      <span className={`${styles.sidebar_item_text} ${chivoMono.className}`}>
-        {name}
-      </span>
+      <span className={styles.sidebar_item_text}>{name}</span>
     </Link>
   );
 }

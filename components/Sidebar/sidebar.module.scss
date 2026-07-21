@@ -50,12 +50,28 @@
 .sidebar_button {
   position: fixed;
   top: 20px;
-  color: black;
-  transition: left 150ms ease-in-out;
+  color: variables.$text_color;
+  background-color: variables.$secondary_color_focus;
+  border: 1px solid variables.$accent_color;
+  border-radius: 3px;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out,
+    left 150ms ease-in-out;
   transform: scale(2, 3);
   height: 20px;
   padding-left: 10px;
   padding-right: 9px;
+
+  &:hover {
+    color: variables.$accent_color;
+    background-color: variables.$secondary_color_hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid variables.$accent_color;
+    outline-offset: 2px;
+  }
 
   &_active {
     @extend .sidebar_button;

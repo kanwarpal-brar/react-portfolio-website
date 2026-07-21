@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
 import styles from "./index.module.scss";
-import "animate.css";
 import ScrambledTextIntro from "@/components/ScrambledTextIntro/scrambledtextintro";
 
 const parablurb =
@@ -16,9 +15,6 @@ export default function Home() {
       </Head>
 
       <main className={styles.intro_box}>
-        <Head>
-          <title>Kanwarpal Brar</title>
-        </Head>
         <h1 className={styles.title_name}>
           <ScrambledTextIntro data="Kanwarpal Brar" delayms={140} />
         </h1>
@@ -33,13 +29,13 @@ export default function Home() {
           <Link href="/Kanwarpal_Brar_Resume.pdf" target="_blank">
             <button>Resume</button>
           </Link>
-          <Link rel="preload" href="/about">
+          <Link href="/about">
             <button>About Me</button>
           </Link>
-          <Link rel="preload" href="/projects">
+          <Link href="/projects">
             <button>Projects</button>
           </Link>
-          <Link rel="preload" href="/cluster">
+          <Link href="/cluster">
             <button>Cluster</button>
           </Link>
         </div>

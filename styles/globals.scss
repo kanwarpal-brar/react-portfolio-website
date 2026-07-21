@@ -1,71 +1,73 @@
 @use "variables";
-@import "animate.css";
 @tailwind base;
 
 h1 {
   font-weight: 600;
   color: variables.$text_color;
-  @media (orientation: landscape) {
-    font-size: 8vw;
-  }
-  @media (orientation: portrait) {
-    font-size: 2.3em;
-  }
+  font-size: clamp(2.3rem, 8vw, 8rem);
 }
 
 h2 {
   font-weight: 200;
   color: variables.$text_color;
-  @media (orientation: landscape) {
-    font-size: 2vw;
-  }
-  @media (orientation: portrait) {
-    font-size: 1em;
-  }
+  font-size: clamp(1rem, 2vw, 2rem);
 }
 
 h3 {
   font-weight: 200;
   color: variables.$text_color;
-  @media (orientation: landscape) {
-    font-size: 1.5vw;
-  }
-  @media (orientation: portrait) {
-    font-size: 1.4em;
-  }
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
 }
 
 p {
   font-weight: 100;
   color: variables.$text_color;
-  @media (orientation: landscape) {
-    font-size: 0.9vw;
-  }
-  @media (orientation: portrait) {
-    font-size: 1em;
-  }
+  font-size: clamp(0.9rem, 0.9vw, 1rem);
 }
 
 button {
   font-weight: 200;
-  @media (orientation: landscape) {
-    font-size: 0.9vw;
-  }
-  @media (orientation: portrait) {
-    font-size: 0.8em;
-  }
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
   color: variables.$text_color;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: variables.$secondary_color_hover;
   }
 
   &:active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(102, 255, 153, 0.16);
+  }
+
+  &:focus-visible {
+    outline: 2px solid variables.$accent_color;
+    outline-offset: 2px;
   }
 }
 
 :root {
+  --color-bg: #0b0e0c;
+  --bg-gradient:
+    radial-gradient(
+      circle at bottom left,
+      rgba(102, 255, 153, 0.1) 0%,
+      rgba(11, 14, 12, 0) 60%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(255, 180, 84, 0.06) 0%,
+      rgba(11, 14, 12, 0) 60%
+    );
+  --color-bg-hover: #0f1511;
+  --color-surface: #12161a;
+  --color-surface-2: #1f2a24;
+  --color-surface-3: #161b18;
+  --color-hover: rgba(102, 255, 153, 0.08);
+  --color-accent: #66ff99;
+  --color-accent-hover: #86ffb0;
+  --color-text: #e6ede8;
+  --color-text-muted: #9aa39c;
+  --color-hot: #ffb454;
+
   font-family: "Chivo Mono", monospace;
   background-color: variables.$base_color;
   background-image: variables.$base_gradient;

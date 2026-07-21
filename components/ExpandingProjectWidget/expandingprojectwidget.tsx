@@ -1,6 +1,6 @@
 import { Modal } from "@mui/material";
 import styles from "./expandingprojectwidget.module.scss";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import projectConfig from "../../public/targetProjects.json";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -25,17 +25,17 @@ export default function ExpandingProjectWidget({
   useModal,
 }: ExpandingProjectWidgetProps) {
   const [open, setOpen] = useState(false);
-  let debounce = false;
-  const displayTags = tags ? tags : [];
+  const debounce = useRef(false);
+  const displayTags = tags ?? [];
   const [modelDesc, setModelDesc] = useState("");
   const imgUrl = `${
     projectConfig.repoImageUrl
   }/repo-logos/${title.toLowerCase()}.png`;
-  const expanding = useModal ? useModal : false;
+  const expanding = !!useModal;
 
   function extractDesc(rawText: string): string {
     const results = rawText.match(/<!--start-->(.*?)<!--end-->/s);
-    return results ? results[0] : "";
+    return results?.[1] ?? "";
   }
 
   async function fetchReadme() {
@@ -44,17 +44,17 @@ export default function ExpandingProjectWidget({
   }
 
   async function handleOpenByContainer() {
-    if (!debounce) {
+    if (!debounce.current) {
       setOpen(true);
       await fetchReadme();
     }
   }
 
   function handleClose() {
-    debounce = true;
+    debounce.current = true;
     setOpen(false);
     setTimeout(() => {
-      debounce = false;
+      debounce.current = false;
     }, 50);
   }
 
