@@ -14,3 +14,17 @@ node_modules/
 .next/
 next-env.d.ts
 .env.local
+
+# OpenCode
+.opencode/plans/
+opencode.json
+
+# Playwright MCP output
+.playwright-mcp/
+playwright-mcp.config.json
+
+# Claude Code local settings (contains sensitive permissions)
+.claude/settings.local.json
+
+# pi subagent run artifacts
+.pi-subagents/
