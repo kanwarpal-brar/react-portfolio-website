@@ -16,8 +16,8 @@ function debounce(fn, ms) {
 /**
  * Navigate + render synchronously, with focus handling and a card entrance
  * animation. Every in-app navigation runs through here (ring/tile/breadcrumb
- * clicks, background-click-home, and the terminal/Esc via the `go` callback),
- * so returning home animates the same as entering a section. When the trigger
+ * clicks, background-click-home, and Esc, via the `goTo` callback), so
+ * returning home animates the same as entering a section. When the trigger
  * element is still on-screen the card grows from it (FLIP); otherwise it plays
  * the generic settle-in. The follow-up hashchange re-renders but does not
  * re-animate, so there's no double entrance.
