@@ -34,13 +34,9 @@
   --fs-small: 13px;
   --lh: 1.5;
 
-  /* spacing */
-  --pad: 1rem;
-  --gap: 1.25rem;
-  --radius: 0;
-
   /* timing */
   --t-fast: 140ms;
   --t-med:  320ms;
   --ease:   cubic-bezier(.2,.8,.2,1);
+  --tr-fast: var(--t-fast) linear; /* shorthand for the common linear color/border fade */
 }
