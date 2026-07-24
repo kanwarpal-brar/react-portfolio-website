@@ -98,7 +98,7 @@ p { margin: 0 0 .8em; }
   stroke: var(--border-bright);
   stroke-dasharray: none;
   stroke-width: 1;
-  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--t-fast) linear;
+  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--tr-fast);
 }
 #graph-lines line.line-ring-active {
   stroke: var(--accent);
@@ -110,7 +110,7 @@ p { margin: 0 0 .8em; }
   stroke-dasharray: 2 3;
   stroke-width: 1;
   opacity: 0.85;
-  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--t-fast) linear, opacity var(--t-fast) linear;
+  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--tr-fast), opacity var(--tr-fast);
 }
 #graph-lines line.line-wheel-active {
   stroke: var(--accent);
@@ -145,14 +145,14 @@ p { margin: 0 0 .8em; }
   border: 1px solid var(--border);
   color: var(--fg-mute);
   pointer-events: auto;
-  transition: color var(--t-fast) linear, border-color var(--t-fast) linear, background var(--t-fast) linear;
+  transition: color var(--tr-fast), border-color var(--tr-fast), background var(--tr-fast);
 }
 .snode .sn-idx {
   font-size: .68em;
   font-weight: 400;
   letter-spacing: .2em;
   color: var(--fg-mute);
-  transition: color var(--t-fast) linear;
+  transition: color var(--tr-fast);
 }
 .snode .sn-name {
   font-weight: 700;
@@ -204,9 +204,9 @@ p { margin: 0 0 .8em; }
     left var(--t-med) var(--ease),
     top var(--t-med) var(--ease),
     transform var(--t-fast) var(--ease),
-    opacity var(--t-fast) linear,
-    border-color var(--t-fast) linear,
-    color var(--t-fast) linear;
+    opacity var(--tr-fast),
+    border-color var(--tr-fast),
+    color var(--tr-fast);
 }
 /* Entrance/exit — see render.js updateWheel(). Position is already correct
    when .entering is added (painted once), then removed a frame later so the
@@ -321,7 +321,7 @@ p { margin: 0 0 .8em; }
   color: inherit;
   font: inherit;
 }
-button.exp-box { cursor: pointer; transition: border-color var(--t-fast) linear; }
+button.exp-box { cursor: pointer; transition: border-color var(--tr-fast); }
 button.exp-box:hover, button.exp-box:focus-visible { border-color: var(--accent); }
 .exp-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .35rem; }
 .exp-head .role { color: var(--accent); font-weight: 700; }
@@ -341,7 +341,7 @@ button.exp-box:hover, button.exp-box:focus-visible { border-color: var(--accent)
   padding: .5rem .65rem;
   background: var(--bg-card);
   display: flex; flex-direction: column; gap: .2rem;
-  transition: border-color var(--t-fast) linear;
+  transition: border-color var(--tr-fast);
 }
 .proj:hover { border-color: var(--accent); }
 .pname { color: var(--accent); font-weight: 700; }
