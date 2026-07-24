@@ -12,6 +12,38 @@ function reducedMotion() {
 }
 
 /**
+ * Shared animation core for both entrance styles below: set a starting
+ * transform + opacity, force a paint of that "from" state, then release on
+ * the next frame so the browser transitions to the identity transform, and
+ * clear the inline styles once the transition ends.
+ *
+ * #card is pinned to the board center with translate(-50%,-50%); `from` MUST
+ * preserve that base transform, otherwise the card jumps by half its own
+ * size (down + right) and the entrance appears to fly in from the wrong
+ * direction (e.g. the top `work` node reading as "from the right").
+ */
+function animateCardFrom(cardEl, from, fromOpacity) {
+  cardEl.style.transition = 'none';
+  cardEl.style.transformOrigin = 'center center';
+  cardEl.style.transform = from;
+  cardEl.style.opacity = fromOpacity;
+
+  cardEl.getBoundingClientRect();
+  requestAnimationFrame(() => {
+    cardEl.style.transition = 'transform var(--t-med) var(--ease), opacity var(--t-fast) linear';
+    cardEl.style.transform = 'translate(-50%, -50%) scale(1)';
+    cardEl.style.opacity = '';
+    const clear = () => {
+      cardEl.style.transition = '';
+      cardEl.style.transform = '';
+      cardEl.style.transformOrigin = '';
+      cardEl.removeEventListener('transitionend', clear);
+    };
+    cardEl.addEventListener('transitionend', clear);
+  });
+}
+
+/**
  * Animate `cardEl` growing from `triggerEl`'s on-screen box to its own final
  * box. Call AFTER the card's new content/layout has been applied (so the
  * "final box" measurement is correct); this only touches `transform`/
@@ -30,30 +62,7 @@ export function flipCardFrom(triggerEl, cardEl) {
   const sx = Math.max(0.2, from.width / to.width);
   const sy = Math.max(0.2, from.height / to.height);
 
-  // #card is pinned to the board center with translate(-50%,-50%); that base
-  // MUST be preserved in every transform we set, otherwise the card jumps by
-  // half its own size (down + right) and the entrance appears to fly in from
-  // the wrong direction (e.g. the top `work` node reading as "from the right").
-  cardEl.style.transition = 'none';
-  cardEl.style.transformOrigin = 'center center';
-  cardEl.style.transform = `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
-  cardEl.style.opacity = '0.35';
-
-  // Force the browser to paint the "from" state before animating, then
-  // release on the next frame so it transitions to identity.
-  cardEl.getBoundingClientRect();
-  requestAnimationFrame(() => {
-    cardEl.style.transition = 'transform var(--t-med) var(--ease), opacity var(--t-fast) linear';
-    cardEl.style.transform = 'translate(-50%, -50%) scale(1)';
-    cardEl.style.opacity = '';
-    const clear = () => {
-      cardEl.style.transition = '';
-      cardEl.style.transform = '';
-      cardEl.style.transformOrigin = '';
-      cardEl.removeEventListener('transitionend', clear);
-    };
-    cardEl.addEventListener('transitionend', clear);
-  });
+  animateCardFrom(cardEl, `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, '0.35');
 }
 
 /**
@@ -65,25 +74,5 @@ export function flipCardFrom(triggerEl, cardEl) {
  */
 export function flipCardEnter(cardEl) {
   if (reducedMotion() || !cardEl) return;
-
-  cardEl.style.transition = 'none';
-  cardEl.style.transformOrigin = 'center center';
-  cardEl.style.transform = 'translate(-50%, -50%) scale(.94)';
-  cardEl.style.opacity = '0.4';
-
-  cardEl.getBoundingClientRect();
-  requestAnimationFrame(() => {
-    cardEl.style.transition = 'transform var(--t-med) var(--ease), opacity var(--t-fast) linear';
-    // #card is centered with translate(-50%,-50%); restoring that (not '')
-    // keeps it pinned while the scale settles to 1.
-    cardEl.style.transform = 'translate(-50%, -50%) scale(1)';
-    cardEl.style.opacity = '';
-    const clear = () => {
-      cardEl.style.transition = '';
-      cardEl.style.transform = '';
-      cardEl.style.transformOrigin = '';
-      cardEl.removeEventListener('transitionend', clear);
-    };
-    cardEl.addEventListener('transitionend', clear);
-  });
+  animateCardFrom(cardEl, 'translate(-50%, -50%) scale(.94)', '0.4');
 }
