@@ -99,36 +99,28 @@ export function largestClearRect(nodes, cx, cy, gap, aw, ah) {
   return { halfW: s * aw, halfH: s * ah };
 }
 
+/** One spoke line from `n` (a ring or wheel node) to the card at (cx, cy),
+ * clipped to both boxes' edges. Shared by the ring/wheel loops below, which
+ * differ only in `type` and which state field marks the active node. */
+function spokeLine(n, cx, cy, cardHalf, type, activeId) {
+  const start = rectEdgePoint(n.x, n.y, cx, cy, cardHalf.w, cardHalf.h);
+  const end = rectEdgePoint(cx, cy, n.x, n.y, n.hw, n.hh);
+  return {
+    id: n.id,
+    type,
+    active: n.id === activeId,
+    x1: start.x, y1: start.y,
+    x2: end.x, y2: end.y,
+  };
+}
+
 /**
  * graphLinePoints — spoke endpoints for any view (home, section, child):
  * computes lines from card center/edge to ring nodes and/or wheel nodes.
  */
 export function graphLinePoints({ cx, cy, cardHalf, ringNodes = [], wheelNodes = [], activeSection = null, activeChild = null }) {
   const lines = [];
-
-  for (const n of ringNodes) {
-    const start = rectEdgePoint(n.x, n.y, cx, cy, cardHalf.w, cardHalf.h);
-    const end = rectEdgePoint(cx, cy, n.x, n.y, n.hw, n.hh);
-    lines.push({
-      id: n.id,
-      type: 'ring',
-      active: n.id === activeSection,
-      x1: start.x, y1: start.y,
-      x2: end.x, y2: end.y,
-    });
-  }
-
-  for (const n of wheelNodes) {
-    const start = rectEdgePoint(n.x, n.y, cx, cy, cardHalf.w, cardHalf.h);
-    const end = rectEdgePoint(cx, cy, n.x, n.y, n.hw, n.hh);
-    lines.push({
-      id: n.id,
-      type: 'wheel',
-      active: n.id === activeChild,
-      x1: start.x, y1: start.y,
-      x2: end.x, y2: end.y,
-    });
-  }
-
+  for (const n of ringNodes) lines.push(spokeLine(n, cx, cy, cardHalf, 'ring', activeSection));
+  for (const n of wheelNodes) lines.push(spokeLine(n, cx, cy, cardHalf, 'wheel', activeChild));
   return lines;
 }
