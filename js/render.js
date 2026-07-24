@@ -17,17 +17,22 @@ const GAP_CARD = 16;
 // Card size caps so the card never grows absurdly large on big screens.
 //  - HOME:    a document (bio + about). Wide, so the prose reflows into few
 //             enough lines to fit the ring's limited vertical band (no scroll).
-//  - SECTION: the work/projects hub — just a short lede; the wheel carries the
-//             content, so the hub stays small (it doesn't need to be big).
+//  - SECTION: the work/projects hub — just a title + one-line tagline; the
+//             wheel carries the content, so the hub is a single small node,
+//             about the same size as a ring node, not a scaled-down card.
 //  - LEAF:    resume/socials/cluster section views (no wheel) — a medium card.
 //  - CHILD:   a work/project detail (no wheel) — large, so the full description
 //             is visible without scrolling.
 const HOME_CARD_MAX = { w: 900, h: 480 };
-const SECTION_CARD_MAX = { w: 240, h: 190 };
+const SECTION_CARD_MAX = { w: 150, h: 72 };
 const LEAF_CARD_MAX = { w: 540, h: 400 };
 const CHILD_CARD_MAX = { w: 740, h: 470 };
 // Floor below which we stop shrinking and let the collapse fallback take over.
 const CARD_MIN = { w: 200, h: 130 };
+// The hub node's own (much smaller) floor — its title + tagline content is
+// tiny by design, so it must be allowed to shrink well below CARD_MIN before
+// the composition collapses.
+const SECTION_CARD_MIN = { w: 110, h: 52 };
 
 // Below this height, width, or area, the concentric ring+wheel+card
 // composition collapses to a card-only layout (gated on height/area, not
@@ -260,7 +265,9 @@ export function applyGeometry() {
       }
       // The card must still fit inside the wheel frame (one GAP_CARD + item-half
       // in) even though it's capped small — if even that floor won't nest, the
-      // ring + wheel + card genuinely don't fit, so collapse.
+      // ring + wheel + card genuinely don't fit, so collapse. Uses the hub's
+      // own (smaller) floor, not the shared CARD_MIN — a title + tagline node
+      // stays legible far smaller than a card with a heading and paragraph.
       const availW = 2 * (f.halfW - itemHW - GAP_CARD);
       const availH = 2 * (f.halfH - itemHH - GAP_CARD);
       // If growth maxed out at the ring ceiling and items STILL overlap, the
@@ -268,13 +275,17 @@ export function applyGeometry() {
       // to the scrolling card+list rather than render overlapping, unreadable
       // boxes (this is the same bar the card-fit check above already holds
       // the composition to).
-      if (availW < CARD_MIN.w || availH < CARD_MIN.h || !wheelItemsClear(ids.length, f, cx, cy, itemHW, itemHH)) {
+      if (
+        availW < SECTION_CARD_MIN.w ||
+        availH < SECTION_CARD_MIN.h ||
+        !wheelItemsClear(ids.length, f, cx, cy, itemHW, itemHH)
+      ) {
         collapsed = true;
       } else {
         frame = f;
         cardW = Math.min(SECTION_CARD_MAX.w, availW);
         cardH = Math.min(SECTION_CARD_MAX.h, availH);
-        bandH = cardH; // hub card also hugs its own (short) content, see below
+        bandH = cardH; // hub node also hugs its own (tiny) content, see below
       }
     } else {
       // No wheel: the card fills the ring envelope up to its per-view cap.
@@ -297,7 +308,7 @@ export function applyGeometry() {
 
   graph.classList.toggle('collapsed', collapsed);
   if (!collapsed && cardW && cardH) {
-    if (bandH) cardH = fitCardHeight(card, cardW, bandH);
+    if (bandH) cardH = fitCardHeight(card, cardW, bandH, wheelVisible ? SECTION_CARD_MIN.h : CARD_MIN.h);
     setCardSize(card, Math.round(cardW), Math.round(cardH));
   } else {
     card.style.removeProperty('--card-w');
@@ -355,7 +366,7 @@ function setCardSize(card, w, h) {
  * short detail/leaf views don't leave a tall empty card, and content that would
  * exceed the band is bounded (never scrolls in the non-collapsed layout).
  */
-function fitCardHeight(card, w, bandH) {
+function fitCardHeight(card, w, bandH, minH = CARD_MIN.h) {
   card.style.setProperty('--card-w', w + 'px');
   const prevH = card.style.height;
   const prevMax = card.style.maxHeight;
@@ -364,7 +375,7 @@ function fitCardHeight(card, w, bandH) {
   const contentH = card.offsetHeight; // min(content, bandH), includes padding
   card.style.height = prevH;
   card.style.maxHeight = prevMax;
-  return Math.max(CARD_MIN.h, Math.min(bandH, contentH));
+  return Math.max(minH, Math.min(bandH, contentH));
 }
 
 /** True if no two of `count` items placed on frame {halfW,halfH} would overlap. */

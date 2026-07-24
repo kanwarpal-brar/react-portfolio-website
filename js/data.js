@@ -208,6 +208,15 @@ export const sectionSummary = {
   cluster: "private K8s · access by request",
 };
 
+/**
+ * Short taglines for the small centered work/projects hub node (the wheel
+ * carries the actual content, so this node is just a title + one line).
+ */
+export const hubTagline = {
+  work: "Shipping systems that scale.",
+  projects: "Side builds, real systems.",
+};
+
 export const resumeCopy = {
   tip: "Opens the PDF in a new tab.",
 };

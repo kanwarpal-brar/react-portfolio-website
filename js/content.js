@@ -16,6 +16,7 @@ import {
   projects,
   clusterCopy,
   sectionSummary,
+  hubTagline,
   TREE,
 } from './data.js';
 
@@ -186,14 +187,20 @@ function projBoxHTML(d, { linked = true } = {}) {
 }
 
 function workSectionHTML() {
-  // Lede + wheel hint for the desktop board (wheel supplies the child nodes),
-  // plus a full child list that CSS reveals only in the collapsed/mobile
-  // layout — where the wheel is hidden, so this list is the only way to tap
-  // into a child. Kept in one card so both paths render the same entries.
+  // .hub-mini is the small title+tagline shown on the desktop board (the
+  // wheel supplies the child nodes, so the hub node itself stays minimal).
+  // .sec-full is the fuller heading+count CSS shows instead once collapsed,
+  // above the same child list .sec-list reveals for mobile tapping — both
+  // paths render the same entries, just gated by #graph.collapsed in CSS.
   return `
-    <h3>work experience</h3>
-    <p class="node-lede">${esc(workExperience.length)} roles · ${esc(extraCurricular.length)} extracurriculars</p>
-    <p class="tip sec-hint">Select a node.</p>
+    <div class="hub-mini">
+      <p class="hub-title">work</p>
+      <p class="hub-tagline">${esc(hubTagline.work)}</p>
+    </div>
+    <div class="sec-full">
+      <h3>work experience</h3>
+      <p class="node-lede">${esc(workExperience.length)} roles · ${esc(extraCurricular.length)} extracurriculars</p>
+    </div>
     <div class="sec-list">
       ${workExperience.map((w) => expBoxHTML('work', w)).join('\n')}
       <h3>extra-curriculars</h3>
@@ -213,11 +220,17 @@ function workSectionFullHTML() {
 }
 
 function projectsSectionHTML() {
-  // See workSectionHTML(): .sec-list is the collapsed/mobile tap target list.
+  // See workSectionHTML(): .hub-mini/.sec-full are the desktop/collapsed
+  // heading swap, .sec-list is the collapsed/mobile tap target list.
   return `
-    <h3>projects</h3>
-    <p class="node-lede">${esc(projects.length)} builds · systems, concurrency, devops</p>
-    <p class="tip sec-hint">Select a node.</p>
+    <div class="hub-mini">
+      <p class="hub-title">projects</p>
+      <p class="hub-tagline">${esc(hubTagline.projects)}</p>
+    </div>
+    <div class="sec-full">
+      <h3>projects</h3>
+      <p class="node-lede">${esc(projects.length)} builds · systems, concurrency, devops</p>
+    </div>
     <div class="sec-list proj-grid">${projects.map((p) => projBoxHTML(p)).join('\n')}</div>
   `;
 }
