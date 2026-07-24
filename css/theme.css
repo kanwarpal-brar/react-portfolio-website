@@ -13,30 +13,32 @@
  */
 
 :root {
-  /* palette */
-  --bg:        #0d0d0d;
-  --bg-panel:  #111113;
-  --bg-inset:  #0a0a0a;
-  --bg-card:   #131318;
-  --fg:        #d4d4d4;
-  --fg-dim:    #b8b8b8;
-  --fg-mute:   #a3a3a3;
-  --accent:    #9cdcfe;
-  --accent-2:  #d49ed4;
-  --ok:        #8db872;
-  --warn:      #dcdcaa;
-  --border:    #2a2a2a;
-  --border-bright: #3a3a3a;
+	/* palette */
+	--bg: #0d0d0d;
+	--bg-panel: #111113;
+	--bg-inset: #0a0a0a;
+	--bg-card: #131318;
+	--fg: #d4d4d4;
+	--fg-dim: #b8b8b8;
+	--fg-mute: #a3a3a3;
+	--accent: #9cdcfe;
+	--accent-2: #d49ed4;
+	--ok: #8db872;
+	--warn: #dcdcaa;
+	--border: #2a2a2a;
+	--border-bright: #3a3a3a;
 
-  /* type */
-  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --fs-base: 15px;
-  --fs-small: 13px;
-  --lh: 1.5;
+	/* type */
+	--mono:
+		ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Mono",
+		Menlo, Consolas, "Liberation Mono", monospace;
+	--fs-base: 15px;
+	--fs-small: 13px;
+	--lh: 1.5;
 
-  /* timing */
-  --t-fast: 140ms;
-  --t-med:  320ms;
-  --ease:   cubic-bezier(.2,.8,.2,1);
-  --tr-fast: var(--t-fast) linear; /* shorthand for the common linear color/border fade */
+	/* timing */
+	--t-fast: 140ms;
+	--t-med: 320ms;
+	--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--tr-fast: var(--t-fast) linear; /* shorthand for the common linear color/border fade */
 }

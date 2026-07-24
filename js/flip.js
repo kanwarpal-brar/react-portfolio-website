@@ -4,11 +4,11 @@
 // crossfade via CSS, independent of this module).
 
 function reducedMotion() {
-  try {
-    return matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch (_) {
-    return false;
-  }
+	try {
+		return matchMedia("(prefers-reduced-motion: reduce)").matches;
+	} catch (_) {
+		return false;
+	}
 }
 
 /**
@@ -23,24 +23,25 @@ function reducedMotion() {
  * direction (e.g. the top `work` node reading as "from the right").
  */
 function animateCardFrom(cardEl, from, fromOpacity) {
-  cardEl.style.transition = 'none';
-  cardEl.style.transformOrigin = 'center center';
-  cardEl.style.transform = from;
-  cardEl.style.opacity = fromOpacity;
+	cardEl.style.transition = "none";
+	cardEl.style.transformOrigin = "center center";
+	cardEl.style.transform = from;
+	cardEl.style.opacity = fromOpacity;
 
-  cardEl.getBoundingClientRect();
-  requestAnimationFrame(() => {
-    cardEl.style.transition = 'transform var(--t-med) var(--ease), opacity var(--t-fast) linear';
-    cardEl.style.transform = 'translate(-50%, -50%) scale(1)';
-    cardEl.style.opacity = '';
-    const clear = () => {
-      cardEl.style.transition = '';
-      cardEl.style.transform = '';
-      cardEl.style.transformOrigin = '';
-      cardEl.removeEventListener('transitionend', clear);
-    };
-    cardEl.addEventListener('transitionend', clear);
-  });
+	cardEl.getBoundingClientRect();
+	requestAnimationFrame(() => {
+		cardEl.style.transition =
+			"transform var(--t-med) var(--ease), opacity var(--t-fast) linear";
+		cardEl.style.transform = "translate(-50%, -50%) scale(1)";
+		cardEl.style.opacity = "";
+		const clear = () => {
+			cardEl.style.transition = "";
+			cardEl.style.transform = "";
+			cardEl.style.transformOrigin = "";
+			cardEl.removeEventListener("transitionend", clear);
+		};
+		cardEl.addEventListener("transitionend", clear);
+	});
 }
 
 /**
@@ -50,19 +51,23 @@ function animateCardFrom(cardEl, from, fromOpacity) {
  * `opacity`, never layout properties.
  */
 export function flipCardFrom(triggerEl, cardEl) {
-  if (reducedMotion() || !triggerEl || !cardEl) return;
-  if (!document.contains(triggerEl)) return;
+	if (reducedMotion() || !triggerEl || !cardEl) return;
+	if (!document.contains(triggerEl)) return;
 
-  const from = triggerEl.getBoundingClientRect();
-  const to = cardEl.getBoundingClientRect();
-  if (!from.width || !from.height || !to.width || !to.height) return;
+	const from = triggerEl.getBoundingClientRect();
+	const to = cardEl.getBoundingClientRect();
+	if (!from.width || !from.height || !to.width || !to.height) return;
 
-  const dx = from.left + from.width / 2 - (to.left + to.width / 2);
-  const dy = from.top + from.height / 2 - (to.top + to.height / 2);
-  const sx = Math.max(0.2, from.width / to.width);
-  const sy = Math.max(0.2, from.height / to.height);
+	const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+	const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+	const sx = Math.max(0.2, from.width / to.width);
+	const sy = Math.max(0.2, from.height / to.height);
 
-  animateCardFrom(cardEl, `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, '0.35');
+	animateCardFrom(
+		cardEl,
+		`translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
+		"0.35",
+	);
 }
 
 /**
@@ -73,6 +78,6 @@ export function flipCardFrom(triggerEl, cardEl) {
  * No-op under reduced motion (CSS still crossfades ring/wheel).
  */
 export function flipCardEnter(cardEl) {
-  if (reducedMotion() || !cardEl) return;
-  animateCardFrom(cardEl, 'translate(-50%, -50%) scale(.94)', '0.4');
+	if (reducedMotion() || !cardEl) return;
+	animateCardFrom(cardEl, "translate(-50%, -50%) scale(.94)", "0.4");
 }
