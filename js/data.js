@@ -8,6 +8,16 @@ export const identity = {
   location: "Canada",
 };
 
+/** Metadata for <head> — the build script is the only consumer of this. */
+export const seo = {
+  siteUrl: "https://kanwarpal.com/",
+  description:
+    "Kanwarpal Brar: software engineer specializing in distributed systems and backend architecture. Portfolio, work experience, and projects.",
+  ogImage: "https://kanwarpal.com/assets/headshot.webp",
+  locale: "en_CA",
+  alumniOf: "University of Waterloo",
+};
+
 export const parablurb =
   "Software Engineer specializing in distributed systems and backend architecture. Interested in designing scalable microservices, RESTful APIs, and concurrent systems. Passionate about solving complex networking challenges and building reliable distributed applications.";
 
@@ -173,7 +183,7 @@ export const clusterCopy = {
   title: "Private Kubernetes Cluster",
   redactedUrl: "[REDACTED]",
   intro:
-    "Welcome to the secure access portal for the private Kubernetes cluster. Access to this infrastructure is strictly controlled and requires prior authorization.",
+    "Welcome to the secure access portal for the private Kubernetes cluster. Access requires prior authorization.",
   contactEmail: "kanwarpal.brar@outlook.com",
   requirements: [
     "Your full name and organization",
@@ -184,6 +194,23 @@ export const clusterCopy = {
 };
 
 export const resumePath = "assets/Kanwarpal_Brar_Resume.pdf";
+
+/**
+ * Presentational copy that isn't tied to a specific content array. Counts
+ * ("7 roles", "9 curated") are derived at render time from array lengths —
+ * only the free-text summary lives here, so there is nothing to keep in sync.
+ */
+export const sectionSummary = {
+  work: "Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post",
+  projects: "systems, concurrency, devops",
+  resume: "open to view",
+  socials: "github · linkedin · email",
+  cluster: "private K8s · access by request",
+};
+
+export const resumeCopy = {
+  tip: "Opens the PDF in a new tab.",
+};
 
 /**
  * TREE — content hierarchy for the portfolio.

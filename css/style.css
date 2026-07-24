@@ -1,5 +1,5 @@
 /* ========================================================================
-   style.css — reset, chrome, graph, nodes, terminal, animations, a11y.
+   style.css — reset, chrome, graph (ring/wheel/card), terminal, motion, a11y.
    Consumes custom properties from theme.css.
    ======================================================================== */
 
@@ -43,11 +43,13 @@ p { margin: 0 0 .8em; }
 #shell {
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   height: 100dvh;
   min-height: 100svh;
   padding: .75rem;
   gap: .6rem;
 }
+#topbar, #graph, #hintbar { min-width: 0; }
 
 .frame {
   border: 1px solid var(--border);
@@ -70,11 +72,13 @@ p { margin: 0 0 .8em; }
 #topbar .meta { color: var(--fg-mute); }
 
 /* =================================================================
-   #graph — central pane with 6 nodes in a 2x3 grid
+   #graph — board: three concentric bands (#ring, #wheel, #card) plus
+   the home-view spoke overlay (#graph-lines). See AGENTS.md/SPEC.md.
    ================================================================= */
 #graph {
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 #graph-lines {
   position: absolute;
@@ -88,224 +92,296 @@ p { margin: 0 0 .8em; }
   stroke: var(--fg-mute);
   stroke-width: 1;
   stroke-dasharray: 3 4;
+  transition: stroke-dashoffset var(--t-med) var(--ease);
+}
+#graph-lines line.line-ring {
+  stroke: var(--border-bright);
+  stroke-dasharray: none;
+  stroke-width: 1;
+  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--t-fast) linear;
+}
+#graph-lines line.line-ring-active {
+  stroke: var(--accent);
+  stroke-dasharray: none;
+  stroke-width: 1.5;
+}
+#graph-lines line.line-wheel {
+  stroke: var(--accent-2);
+  stroke-dasharray: 2 3;
+  stroke-width: 1;
+  opacity: 0.85;
+  transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--t-fast) linear, opacity var(--t-fast) linear;
+}
+#graph-lines line.line-wheel-active {
+  stroke: var(--accent);
+  stroke-dasharray: none;
+  stroke-width: 2;
+  opacity: 1;
 }
 
-/*
- * Node default positions (2x3 grid). --x/--y are percentages of #graph.
- * Nodes use transform: translate(-50%,-50%) so --x/--y point to the center.
- * The top row is home/work/projects; bottom row is resume/socials/cluster.
- */
-.node {
+/* ---- #ring: 5 persistent section nodes, fixed pentagon slots -------- */
+#ring {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.snode {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: var(--w, 22ch);
-  height: var(--h, 6.5em);
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%);
+  width: 12ch;
+  min-height: 3.2rem;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: .3rem;
+  padding: .4rem .3rem;
+  text-align: center;
   background: var(--bg-card);
-  border: 1px solid var(--border-bright);
-  padding: .7rem .9rem;
-  color: var(--fg);
-  overflow: hidden;
-  cursor: pointer;
-  transition:
-    transform var(--t-med) var(--ease),
-    color var(--t-med) var(--ease),
-    border-color var(--t-fast) linear,
-    background var(--t-fast) linear;
-  z-index: 1;
+  border: 1px solid var(--border);
+  color: var(--fg-mute);
+  pointer-events: auto;
+  transition: color var(--t-fast) linear, border-color var(--t-fast) linear, background var(--t-fast) linear;
 }
-.node:hover,
-.node:focus-visible {
-  border-color: var(--accent);
-  background: var(--bg-card);
+.snode .sn-idx {
+  font-size: .68em;
+  font-weight: 400;
+  letter-spacing: .2em;
+  color: var(--fg-mute);
+  transition: color var(--t-fast) linear;
 }
-.node .node-title {
-  color: var(--accent);
+.snode .sn-name {
   font-weight: 700;
-  margin: 0 0 .25rem;
-  font-size: var(--fs-base);
+  letter-spacing: .07em;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
-.node .node-lede {
-  color: var(--fg-dim);
+/* Home view: ring is bright + is the primary nav. Section/child view: ring
+   dims (via a muted color token that stays >=7:1 — never opacity) but stays
+   fully interactive so direct section-to-section jumps always work. */
+#graph[data-view="home"] .snode { color: var(--fg); border-color: var(--border-bright); }
+.snode.active { color: var(--fg); border-color: var(--accent); background: var(--bg-inset); }
+.snode:hover, .snode:focus-visible { color: var(--fg); border-color: var(--accent); }
+.snode.active .sn-idx, .snode:hover .sn-idx, .snode:focus-visible .sn-idx { color: var(--accent-2); }
+
+/* ---- #wheel: radial child menu (work/projects only) ------------------ */
+#wheel {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+#wheel[hidden] { display: none; }
+.wheel-item {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  transform: translate(-50%, -50%) scale(1);
+  width: 19ch;
+  height: 5.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .1rem;
+  padding: .4rem .6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--fg-mute);
   font-size: var(--fs-small);
+  line-height: 1.3;
+  text-align: left;
+  overflow: hidden;
+  pointer-events: auto;
+  opacity: 1;
+  transition:
+    left var(--t-med) var(--ease),
+    top var(--t-med) var(--ease),
+    transform var(--t-fast) var(--ease),
+    opacity var(--t-fast) linear,
+    border-color var(--t-fast) linear,
+    color var(--t-fast) linear;
+}
+/* Entrance/exit — see render.js updateWheel(). Position is already correct
+   when .entering is added (painted once), then removed a frame later so the
+   fade+scale-in is a transition, not a jump cut. */
+.wheel-item.entering { opacity: 0; transform: translate(-50%, -50%) scale(.8); transition: none; }
+.wheel-item.leaving { opacity: 0; transform: translate(-50%, -50%) scale(.85); pointer-events: none; }
+.wheel-item:hover, .wheel-item:focus-visible { color: var(--fg); border-color: var(--accent); outline: none; }
+.wheel-item.active { color: var(--fg); border-color: var(--accent); background: var(--bg-inset); }
+.wheel-item .wi-title {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1.15;
 }
-.node .node-body { display: none; }
-
-/* default layout positions (2x3 grid) */
-#node-home     { --x: 25%; --y: 30%; }
-#node-work     { --x: 50%; --y: 30%; }
-#node-projects { --x: 75%; --y: 30%; }
-#node-resume   { --x: 25%; --y: 70%; }
-#node-socials  { --x: 50%; --y: 70%; }
-#node-cluster  { --x: 75%; --y: 70%; }
-
-/* ---- expand state ---- */
-/*
- * When any node is expanded, siblings shrink and dim via color,
- * keeping their solid background so SVG lines can't bleed through.
- */
-#graph[data-expanded] .node {
-  transform: translate(-50%, -50%) scale(.78);
+.wheel-item .wi-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   color: var(--fg-dim);
-  border-color: var(--border);
-  pointer-events: auto;
-  cursor: pointer;
-  z-index: 1;
+  font-size: .9em;
+  line-height: 1.2;
 }
-#graph[data-expanded] .node .node-title { color: var(--fg-mute); }
-#graph[data-expanded] .node:hover,
-#graph[data-expanded] .node:focus-visible {
-  color: var(--fg);
-  border-color: var(--accent);
+.wheel-item .wi-meta,
+.wheel-item .wi-tags {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: .85em;
 }
-#graph[data-expanded] .node:hover .node-title,
-#graph[data-expanded] .node:focus-visible .node-title { color: var(--accent); }
+.wheel-item .wi-meta { color: var(--fg-mute); }
+.wheel-item .wi-tags { color: var(--accent-2); }
 
-/* Hide SVG lines when a non-home node is expanded */
-#graph[data-expanded]:not([data-expanded="home"]) #graph-lines { display: none; }
-
-#graph[data-expanded="home"]     #node-home,
-#graph[data-expanded="work"]     #node-work,
-#graph[data-expanded="projects"] #node-projects,
-#graph[data-expanded="resume"]   #node-resume,
-#graph[data-expanded="socials"]  #node-socials,
-#graph[data-expanded="cluster"]  #node-cluster {
-  --x: 50%;
-  --y: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  filter: none;
-  z-index: 10;
-  overflow-y: auto;
-  overflow-x: hidden;
-  cursor: default;
+/* ---- #card: centered, content-sized, focus content -------- */
+#card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  /* Size is driven by render.js:applyGeometry() (--card-w/--card-h), which
+     derives it from the measured ring so a gap to the ring (and wheel) is
+     always kept. The fallbacks apply only before the first geometry pass. */
+  width: var(--card-w, min(660px, 82%));
+  height: var(--card-h, 62%);
+  max-width: 92%;
+  max-height: 88%;
+  overflow: hidden;
   background: var(--bg-inset);
-  border-color: var(--accent);
+  border: 1px solid var(--accent);
   padding: 1rem 1.4rem;
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  container-type: inline-size;
+  container-name: card;
 }
-/* Default expanded stage dimensions — specificity (1,3,0) matches the responsive
-   overrides below, so those @media rules win by source order as intended. */
-#graph[data-expanded] .node.expanded {
-  --w: min(72ch, 78%);
-  --h: min(78%, 46em);
-}
-#graph[data-expanded] .node.expanded .node-lede { display: none; }
-#graph[data-expanded] .node.expanded .node-body { display: block; }
-#graph[data-expanded] .node.expanded .node-title {
-  font-size: 1.15rem;
-  white-space: normal;
-}
+/* Home + child (detail) views read top-down (document / full description), so
+   they top-align rather than center. They are sized by applyGeometry() to fit
+   their content within the ring band, so no scroll is needed (the collapsed
+   fallback re-enables scrolling for genuinely small screens). */
+#graph[data-view="home"] #card,
+#graph[data-child] #card { justify-content: flex-start; }
 
-/* ---- node body content styling ---- */
-.node-body { color: var(--fg); font-size: var(--fs-base); }
-.node-body h3 {
+/* On home, no ring spoke is "active" (no section selected yet) — every
+   line-ring renders in the dim default color, not the accent. Match the card
+   border to that same dim color there so the card reads as part of the same
+   graph as its spokes; once a section is chosen its spoke turns accent and
+   the card's default accent border already agrees with it (see .line-ring vs
+   .line-ring-active above). */
+#graph[data-view="home"] #card { border-color: var(--border-bright); }
+
+/* ---- card content typography ------------------------------------------ */
+#card .node-lede { color: var(--fg-dim); font-size: var(--fs-small); margin-bottom: .4rem; }
+#card .tip { color: var(--fg-mute); font-size: var(--fs-small); }
+#card .tip.sec-hint { margin: 0; }
+#card h3 {
   color: var(--accent);
   font-size: 1rem;
   margin: 1.1em 0 .3em;
   letter-spacing: .02em;
 }
-.node-body h3::before { content: "── "; color: var(--fg-mute); }
-.node-body h3::after  { content: " ──"; color: var(--fg-mute); }
-.node-body .bio-grid {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 1rem;
-  align-items: start;
-}
-.node-body .headshot {
-  width: 120px; height: 120px;
-  border: 1px solid var(--border-bright);
-  image-rendering: -webkit-optimize-contrast;
-}
-.node-body .tagline { color: var(--accent-2); font-weight: 700; margin-bottom: .3em; }
-.node-body .exp-box {
+/* The hub (wheel-visible) card is capped small by design — the wheel carries
+   the content, so its lede is just a couple of short lines. Tighten the
+   heading's top margin there specifically so that band always has room for
+   its own (short) content without clipping, even on the tightest ring
+   geometry (see SECTION_CARD_MAX in render.js). */
+#graph[data-view="section"]:not(.collapsed) #card { padding: .7rem 1rem; }
+#graph[data-view="section"]:not(.collapsed) #card h3 { margin-top: .3em; margin-bottom: .2em; }
+#graph[data-view="section"]:not(.collapsed) #card .node-lede,
+#graph[data-view="section"]:not(.collapsed) #card .tip { line-height: 1.3; }
+#graph[data-view="section"]:not(.collapsed) #card .node-lede { margin-bottom: .3rem; }
+#card h3::before { content: "── "; color: var(--fg-mute); }
+#card h3::after  { content: " ──"; color: var(--fg-mute); }
+
+.bio-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; }
+.headshot { width: 120px; height: 120px; border: 1px solid var(--border-bright); image-rendering: -webkit-optimize-contrast; }
+.tagline { color: var(--accent-2); font-weight: 700; margin-bottom: .3em; }
+
+.exp-box {
+  display: block;
+  width: 100%;
+  text-align: left;
   border: 1px solid var(--border);
   padding: .75rem .9rem;
   margin: .6rem 0;
   background: var(--bg-card);
+  color: inherit;
+  font: inherit;
 }
-.node-body .exp-box header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: .35rem;
-}
-.node-body .exp-box .role { color: var(--accent); font-weight: 700; }
-.node-body .exp-box .co   { color: var(--fg); }
-.node-body .exp-box .when { color: var(--fg-dim); font-size: var(--fs-small); }
-.node-body .exp-box p { color: var(--fg-dim); font-size: var(--fs-small); margin: 0; }
+button.exp-box { cursor: pointer; transition: border-color var(--t-fast) linear; }
+button.exp-box:hover, button.exp-box:focus-visible { border-color: var(--accent); }
+.exp-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .35rem; }
+.exp-head .role { color: var(--accent); font-weight: 700; }
+.exp-head .co   { color: var(--fg); }
+.exp-head .when { color: var(--fg-dim); font-size: var(--fs-small); }
+.exp-desc { display: block; color: var(--fg-dim); font-size: var(--fs-small); }
 
-.node-body .proj-grid {
+.proj-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: .8rem;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: .5rem;
   margin-top: .5rem;
 }
-.node-body .proj {
+.proj-grid.single { grid-template-columns: 1fr; max-width: 42ch; }
+.proj {
   border: 1px solid var(--border);
-  padding: .7rem .85rem;
+  padding: .5rem .65rem;
   background: var(--bg-card);
-  display: flex; flex-direction: column; gap: .3rem;
+  display: flex; flex-direction: column; gap: .2rem;
   transition: border-color var(--t-fast) linear;
 }
-.node-body .proj:hover { border-color: var(--accent); }
-.node-body .proj .pname { color: var(--accent); font-weight: 700; }
-.node-body .proj .pdesc { color: var(--fg-dim); font-size: var(--fs-small); }
-.node-body .proj .ptags { color: var(--fg-mute); font-size: var(--fs-small); margin-top: auto; }
-.node-body .proj a { display: block; font-size: var(--fs-small); }
+.proj:hover { border-color: var(--accent); }
+.pname { color: var(--accent); font-weight: 700; }
+button.pname-btn { display: block; width: 100%; text-align: left; cursor: pointer; }
+button.pname-btn:hover, button.pname-btn:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+.pdesc { color: var(--fg-dim); font-size: var(--fs-small); }
+.ptags { color: var(--fg-mute); font-size: var(--fs-small); margin-top: auto; }
+.proj a { display: block; font-size: var(--fs-small); overflow-wrap: anywhere; }
 
-.node-body .social-list { list-style: none; padding: 0; }
-.node-body .social-list li { padding: .35rem 0; display: flex; gap: .8rem; }
-.node-body .social-list .k { color: var(--fg-dim); width: 10ch; display: inline-block; }
+.social-list { list-style: none; padding: 0; }
+.social-list li { padding: .35rem 0; display: flex; gap: .8rem; }
+.social-list .k { color: var(--fg-dim); width: 10ch; display: inline-block; }
 
-.node-body .pdf-btn {
+.pdf-btn {
   display: inline-block;
   border: 1px solid var(--accent);
   padding: .5rem 1rem;
   margin: .6rem 0;
   color: var(--accent);
 }
-.node-body .pdf-btn:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+.pdf-btn:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
 
-.node-body .warning { color: var(--warn); }
-.node-body .redacted {
+.warning { color: var(--warn); }
+.redacted {
   background: var(--fg);
   color: var(--fg);
   padding: 0 .4em;
   user-select: none;
 }
-.node-body .redacted:hover { color: var(--bg); }
+.redacted:hover { color: var(--bg); }
 
-/* ---- Orbit nodes (dynamically created children) ---- */
-.orbit-node {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  width: 14ch;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: .4rem .6rem;
-  font-size: var(--fs-small);
-  cursor: pointer;
-  z-index: 3;
-  transition: border-color var(--t-fast) linear;
-  user-select: none;
+/* Card content scales down at narrow card widths (collapsed/mobile), via a
+   container query on #card itself — no viewport media query needed. */
+@container card (max-width: 420px) {
+  .bio-grid { grid-template-columns: 1fr; }
+  .headshot { width: 90px; height: 90px; }
+  .proj-grid { grid-template-columns: 1fr 1fr; }
 }
-.orbit-node:hover,
-.orbit-node:focus-visible { border-color: var(--accent); outline: none; }
-.orbit-node.active { border-color: var(--accent); background: var(--bg-inset); }
-.orbit-node .on-name { color: var(--accent); font-weight: 700; }
-.orbit-node .on-co   { color: var(--fg-mute); font-size: .85em; margin-top: .15em; }
 
-/* ---- Breadcrumb inside child view ---- */
+/* ---- breadcrumb (child/detail view) -------------------------------------- */
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -313,185 +389,118 @@ p { margin: 0 0 .8em; }
   margin-bottom: .9rem;
   font-size: var(--fs-small);
 }
-.breadcrumb .bc-parent {
+.bc-parent {
   color: var(--accent);
-  background: none;
-  border: none;
-  font: inherit;
   font-size: var(--fs-small);
   cursor: pointer;
-  padding: 0;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.breadcrumb .bc-parent:hover { opacity: .75; }
-.breadcrumb .bc-child { color: var(--fg); }
+.bc-parent:hover { opacity: .75; }
+.bc-child { color: var(--fg); }
 
-/* ---- Home tile grid (top-level section tiles) ---- */
-.home-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: .5rem;
-  margin-top: .5rem;
+/* ---- collapsed layout: card-only (gated on board height/area, not width
+   alone — see render.js applyGeometry) ------------------------------------ */
+#graph.collapsed #ring,
+#graph.collapsed #wheel,
+#graph.collapsed #graph-lines {
+  display: none;
 }
-.home-tile {
-  border: 1px solid var(--border);
-  padding: .55rem .75rem;
-  background: var(--bg-card);
-  cursor: pointer;
-  transition: border-color var(--t-fast) linear;
-  user-select: none;
+#graph.collapsed #card {
+  inset: 0;
+  transform: none;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  justify-content: flex-start;
+  overflow-y: auto;
 }
-.home-tile:hover,
-.home-tile:focus-visible { border-color: var(--accent); outline: none; }
-.home-tile .ht-name { color: var(--accent); font-weight: 700; }
-.home-tile .ht-lede { color: var(--fg-mute); font-size: var(--fs-small); margin-top: .2em; }
+/* The in-card child list is the tap target for sections when the wheel is
+   hidden (collapsed/mobile). On the full board the wheel supplies the nodes,
+   so the list stays hidden and the "select a node" hint shows instead. */
+.sec-list { display: none; }
+#graph.collapsed .sec-list { display: block; margin-top: .6rem; }
+#graph.collapsed .sec-list.proj-grid { display: grid; margin-top: .6rem; }
+#graph.collapsed .sec-hint { display: none; }
 
 /* =================================================================
-   bottom pane: hint + cmdout + cmdform
+   bottom: slim one-line navigation hint
    ================================================================= */
-#bottom {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  padding: .55rem .8rem;
-  gap: .3rem;
-}
-#hint {
+#hintbar {
+  padding: .45rem .8rem;
   color: var(--fg-mute);
   font-size: var(--fs-small);
+  text-align: center;
 }
-#hint kbd {
+#hintbar kbd {
   background: var(--bg-inset);
   border: 1px solid var(--border);
   padding: 0 .35em;
   color: var(--accent);
 }
-#cmdout-region {
-  max-height: min(14rem, 24vh);
-  overflow-y: auto;
-}
-#cmdout {
-  margin: 0;
-  color: var(--fg-dim);
-  font-size: var(--fs-small);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-#cmdout .cmd-line { color: var(--fg); }
-#cmdout .cmd-err  { color: var(--accent-2); }
-#cmdout .cmd-ok   { color: var(--ok); }
-#cmdout .cmd-prompt { color: var(--accent); }
-
-#cmdform {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-#cmdform label {
-  color: var(--accent);
-  white-space: nowrap;
-  font-weight: 700;
-}
-#cmd {
-  flex: 1;
-  background: transparent;
-  border: 0;
-  color: var(--fg);
-  font: inherit;
-  padding: .25rem 0;
-  caret-color: var(--accent);
-  min-height: 44px;
-}
-#cmd:focus-visible { outline: none; border-bottom: 1px solid var(--accent); }
-#cursor { display: none; }
-
-/* -------- animations -------- */
-@keyframes blink {
-  to { visibility: hidden; }
-}
 
 /* =================================================================
-   Responsive
+   Responsive chrome (orthogonal to the JS-driven board collapse above)
    ================================================================= */
-@media (max-width: 900px) {
-  .node { --w: 18ch; --h: 5.5em; }
-  #node-home     { --x: 25%; --y: 25%; }
-  #node-work     { --x: 50%; --y: 25%; }
-  #node-projects { --x: 75%; --y: 25%; }
-  #node-resume   { --x: 25%; --y: 72%; }
-  #node-socials  { --x: 50%; --y: 72%; }
-  #node-cluster  { --x: 75%; --y: 72%; }
-  #graph[data-expanded] .node.expanded {
-    --w: 90%; --h: 80%;
-  }
-}
 @media (max-width: 600px) {
   body { font-size: 14px; }
   #shell { padding: .4rem; gap: .4rem; }
   #topbar .meta { display: none; }
-  .node { --w: 12ch; --h: 4.5em; padding: .4rem .5rem; font-size: 12px; }
-  .node .node-lede { display: none; }
-  #node-home     { --x: 20%; --y: 22%; }
-  #node-work     { --x: 50%; --y: 22%; }
-  #node-projects { --x: 80%; --y: 22%; }
-  #node-resume   { --x: 20%; --y: 75%; }
-  #node-socials  { --x: 50%; --y: 75%; }
-  #node-cluster  { --x: 80%; --y: 75%; }
-  #graph[data-expanded] .node.expanded {
-    --w: 95%; --h: 88%;
-  }
-  #graph[data-expanded] .node.expanded .node-body { font-size: 13px; }
-  .node-body .bio-grid { grid-template-columns: 1fr; }
-  .node-body .headshot { width: 90px; height: 90px; }
-  #cmdout-region { max-height: 8rem; }
 }
 
-/* Push peripheral nodes to screen edges when a non-home node is expanded.
-   :not(.expanded) ensures the expanded card itself is excluded. */
-#graph[data-expanded]:not([data-expanded="home"]) #node-home:not(.expanded)     { --x: 8%;  --y: 20%; }
-#graph[data-expanded]:not([data-expanded="home"]) #node-work:not(.expanded)     { --x: 50%; --y: 10%; }
-#graph[data-expanded]:not([data-expanded="home"]) #node-projects:not(.expanded) { --x: 92%; --y: 20%; }
-#graph[data-expanded]:not([data-expanded="home"]) #node-resume:not(.expanded)   { --x: 8%;  --y: 80%; }
-#graph[data-expanded]:not([data-expanded="home"]) #node-socials:not(.expanded)  { --x: 50%; --y: 90%; }
-#graph[data-expanded]:not([data-expanded="home"]) #node-cluster:not(.expanded)  { --x: 92%; --y: 80%; }
-
-/* -------- landscape phone -------- */
 @media (max-height: 500px) and (orientation: landscape) {
   #shell { padding: .3rem; gap: .3rem; }
   #topbar { padding: .25rem .6rem; }
-  #bottom { padding: .3rem .6rem; gap: .2rem; }
-  #cmdout-region { max-height: 6rem; }
-  #graph[data-expanded] .node.expanded { overflow-y: auto; }
-  .node-body .bio-grid { grid-template-columns: auto 1fr; }
-  .node-body .headshot { width: 70px; height: 70px; }
+  #hintbar { padding: .3rem .6rem; }
 }
 
-/* -------- noscript fallback -------- */
-/* When .nojs is on <html> (JS disabled), stack nodes vertically, hide cmd input */
+/* =================================================================
+   No-JS fallback. `html.nojs` is removed synchronously by an inline
+   <script> in <head> the instant JS runs, so JS users never see this;
+   without JS it stacks every section's full prerendered content.
+   ================================================================= */
 html.nojs, html.nojs body { overflow: auto; height: auto; }
-html.nojs #shell { grid-template-rows: auto 1fr; height: auto; min-height: 100dvh; overflow: auto; }
+html.nojs #shell { grid-template-rows: auto 1fr auto; height: auto; min-height: 100dvh; overflow: auto; }
 html.nojs #graph { overflow: visible; height: auto; }
-html.nojs #graph-lines { display: none; }
-html.nojs .node {
+html.nojs #ring, html.nojs #wheel, html.nojs #graph-lines { display: none; }
+html.nojs #card {
   position: static;
   transform: none;
   width: 100%;
-  height: auto;
   max-width: 820px;
-  margin: .8rem auto;
-  padding: 1rem 1.2rem;
-  opacity: 1 !important;
-  filter: none !important;
+  margin: 0 auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
-html.nojs .node .node-lede { display: none; }
-html.nojs .node .node-body { display: block; }
-html.nojs #bottom { display: none; }
+html.nojs #hintbar { display: none; }
+#prerendered { display: none; }
+html.nojs #prerendered {
+  display: block;
+  max-width: 820px;
+  margin: 0 auto;
+}
+html.nojs .prerender-section {
+  margin: 1.2rem 0;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border-bright);
+  background: var(--bg-card);
+}
+html.nojs .prerender-section h2 { color: var(--accent); }
 
-/* -------- reduced motion -------- */
+/* =================================================================
+   Reduced motion — two-tier motion model (plan §8). This disables
+   MOVEMENT only (wheel repositioning, spoke draw-in, FLIP is already a
+   JS no-op); it is intentionally NOT a blanket `transition: none`, so the
+   opacity/color crossfades elsewhere (ring dim/active, wheel enter/leave,
+   hover/focus) still play and views still read as a switch, not a jump cut.
+   ================================================================= */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition: none !important;
-    animation: none !important;
+  .wheel-item {
+    transition-property: opacity, border-color, color, background-color !important;
+    transition-delay: 0s !important;
   }
-  #cursor { visibility: visible; }
+  .wheel-item.entering, .wheel-item.leaving { transform: none !important; }
+  #graph-lines line { transition: none !important; }
 }

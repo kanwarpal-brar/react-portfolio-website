@@ -24,6 +24,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Verify index.html is up to date
+        run: node scripts/build.mjs --check
+
       - name: Stage site
         run: |
           mkdir -p _site
@@ -35,6 +43,15 @@ jobs:
             --exclude='LICENSE' \
             --exclude='.gitignore' \
             --exclude='.prettierrc' \
+            --exclude='.playwright-mcp' \
+            --exclude='.opencode' \
+            --exclude='SPEC.md' \
+            --exclude='AGENTS.md' \
+            --exclude='*.png' \
+            --exclude='index.template.html' \
+            --exclude='scripts' \
+            --exclude='package.json' \
+            --exclude='test' \
             ./ _site/
           ls -la _site/
 

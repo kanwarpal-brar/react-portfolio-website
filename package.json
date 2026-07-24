@@ -1,0 +1,10 @@
+{
+  "name": "kanwarpal-portfolio",
+  "private": true,
+  "type": "module",
+  "description": "Zero-runtime-dependency TUI portfolio. This file exists only so Node treats js/*.js as ES modules for the build script and unit tests — there are no dependencies.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test"
+  }
+}

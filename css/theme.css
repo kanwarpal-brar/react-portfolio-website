@@ -7,7 +7,7 @@
  *   --accent    #9cdcfe  →  9.7:1  (AAA)
  *   --accent-2  #d49ed4  →  7.4:1  (AAA)
  *   --fg-dim    #b8b8b8  →  9.5:1  (AAA)
- *   --fg-mute   #9a9a9a  →  7.0:1  (AAA)
+ *   --fg-mute   #a3a3a3  →  7.3:1  (AAA vs --bg-card #131318, the lightest bg it appears on)
  *   --ok        #8db872  →  7.1:1  (AAA)
  *   --warn      #dcdcaa  → 12.4:1  (AAA)
  */
@@ -20,7 +20,7 @@
   --bg-card:   #131318;
   --fg:        #d4d4d4;
   --fg-dim:    #b8b8b8;
-  --fg-mute:   #9a9a9a;
+  --fg-mute:   #a3a3a3;
   --accent:    #9cdcfe;
   --accent-2:  #d49ed4;
   --ok:        #8db872;

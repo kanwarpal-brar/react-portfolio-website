@@ -1,30 +1,44 @@
 # kanwarpal.com
 
 A minimal, terminal-inspired (TUI) portfolio for Kanwarpal Brar. Single-page,
-plain HTML + CSS + vanilla JavaScript (ES modules). No build step, no
-`node_modules`, no framework.
+plain HTML + CSS + vanilla JavaScript (ES modules). No runtime dependencies —
+`package.json` exists only so Node treats `js/*.js` as ES modules for the
+build script and unit tests.
 
 Live at https://kanwarpal.com.
 
 ## Layout
 
-Central pane is a graph of six nodes (home, work, projects, resume, socials,
-cluster). Click a node to expand it in place; click outside or press `Esc` to
-return home. A shell-style command input at the bottom supports `cd <node>`,
-`ls`, `help`, `pwd`, `whoami`, `cat bio`, `open resume`, and `clear`, plus
-history (↑/↓), Tab completion, and Ctrl+L.
+A five-node ring (work, projects, resume, socials, cluster) sits around a
+centered content card. The work/projects hub views also show a radial
+"wheel" of child nodes (title + short description + tags/dates, capped at
+`WHEEL_CAP`) placed as close to the (small) hub card as it can get without
+crowding the ring or its own neighbors. Click a ring node, wheel item, or
+in-card box to navigate; click the bare board or press `Esc` to climb back
+toward home. Every navigation animates the card entrance, growing from the
+clicked node's on-screen position.
 
-State is driven by `location.hash` (`#/home`, `#/work`, ...) so back/forward
-and deep-links work.
+The card and wheel are sized **inward from the measured ring** each frame
+(`render.js:applyGeometry` + `layout.js:largestClearRect`), so they always
+keep a gap to the ring at any viewport; when the ring + wheel + card can't
+nest, the board collapses to a single scrolling card (sections then list
+their children in-card so touch users can still drill in).
+
+State is driven by `location.hash` (`#/home`, `#/work`, `#/projects/hive`,
+...) so back/forward and deep-links work.
 
 ## Project structure
 
 ```
-assets/    Resume PDF, headshot (webp), favicon (svg)
-css/       theme.css (tokens) + style.css (layout/components/animations)
-js/        data.js, graph.js, terminal.js, main.js  (all ES modules)
-index.html Single-page app; every node's content is pre-rendered for SEO and no-JS fallback.
-.github/workflows/deploy.yml  Static deploy to GitHub Pages.
+assets/              Resume PDF, headshot (webp), favicon (svg)
+css/                  theme.css (tokens) + style.css (layout/components/motion)
+js/                   data.js, content.js, layout.js, router.js, render.js,
+                      flip.js, main.js  (all ES modules)
+test/                 node --test unit tests for js/layout.js
+scripts/build.mjs     Generates index.html from index.template.html + js/data.js + js/content.js
+index.template.html   Page shell template (edit this, not index.html)
+index.html            GENERATED build artifact — never hand-edit
+.github/workflows/deploy.yml  CI build-parity check + static deploy to GitHub Pages
 CNAME, robots.txt, sitemap.xml, .nojekyll
 ```
 
@@ -35,24 +49,33 @@ python3 -m http.server 8000
 # then open http://localhost:8000/
 ```
 
-Any static server works. No dependencies to install.
+Any static server works. Editing `js/data.js` updates the live (JS-rendered)
+view immediately on refresh — no build step needed for that.
 
 ## Updating content
 
-All text content lives in `js/data.js`. Edit that file to change bio, work
-experience, projects, etc. The rendered `index.html` also contains the same
-content inline (for SEO + no-JS fallback) — keep them in sync when making
-substantial edits, or regenerate them from `data.js` by hand.
+All text content lives in `js/data.js` — the single source of truth. After
+editing it, regenerate the committed `index.html` (used for SEO and the
+no-JS fallback) and commit the result:
 
-To add a project: append an entry to the `projects` array in `js/data.js` and
-mirror it inside the `<!-- PROJECTS -->` section of `index.html`.
+```bash
+npm run build   # node scripts/build.mjs
+```
+
+CI runs `node scripts/build.mjs --check` and fails the deploy if `index.html`
+is stale relative to `js/data.js`/`js/content.js`/`index.template.html`.
+
+To add a project or work entry: append it (with a unique `id`) to the
+relevant array in `js/data.js`, add that `id` to `TREE.<parent>.children`,
+then run the build.
 
 ## Deployment
 
-Pushes to `main` trigger `.github/workflows/deploy.yml`, which stages the site
-files into `_site/` (excluding `.git`, `.github`, `README.md`, `LICENSE`) and
-uploads them as a GitHub Pages artifact. The `CNAME` file at the repo root
-keeps the `kanwarpal.com` custom domain.
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which runs the
+build-parity check, then stages the site into `_site/` (excluding dev-only
+files like `README.md`, `LICENSE`, `scripts/`, `test/`) and uploads it as a
+GitHub Pages artifact. The `CNAME` file at the repo root keeps the
+`kanwarpal.com` custom domain.
 
 Note: the first deploy after switching DNS/workflow may serve stale content
 from the GitHub Pages CDN for a few minutes — that's normal.
