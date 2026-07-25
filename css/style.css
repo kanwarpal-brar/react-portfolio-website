@@ -325,6 +325,7 @@ p {
 .wheel-item .wi-title {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 	color: var(--accent);
@@ -334,6 +335,7 @@ p {
 .wheel-item .wi-desc {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 	color: var(--fg-dim);
@@ -459,6 +461,7 @@ p {
 	line-height: 1.2;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
