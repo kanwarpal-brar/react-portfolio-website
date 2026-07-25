@@ -420,34 +420,47 @@ p {
    #card to leave room for its two lines even at the smallest size the
    composition allows. */
 #graph[data-view="section"]:not(.collapsed) #card {
-	padding: 0.35rem 0.6rem;
+	padding: 0.2rem 0.4rem;
 }
 /* .hub-mini (title + tagline) is what the full board shows for the
    work/projects hub node; .sec-full (heading + lede) takes over once the
    composition collapses and the wheel is hidden, restoring the usual
-   heading above the tap-target .sec-list. */
+   heading above the tap-target .sec-list. Deliberately smaller/tighter than
+   the ring nodes (.snode) it sits among — see SECTION_CARD_MAX in render.js
+   — so the hub reads as the smallest thing on the board, not a peer of the
+   ring, and every line of text is centered both ways within the node. */
 .hub-mini {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	gap: 0.15rem;
+	gap: 0.1rem;
+	width: 100%;
 	height: 100%;
 }
 .hub-title {
 	margin: 0;
 	color: var(--accent);
 	font-weight: 700;
-	letter-spacing: 0.08em;
+	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	font-size: 0.95rem;
+	font-size: 0.78rem;
+	line-height: 1.1;
+	white-space: nowrap;
 }
+/* Clamped to 2 lines like .wi-desc, so a slightly long tagline wraps instead
+   of forcing the node wider — the node's own tiny SECTION_CARD_MAX/MIN in
+   render.js already bound how tall those 2 lines are allowed to grow. */
 .hub-tagline {
 	margin: 0;
 	color: var(--fg-mute);
-	font-size: var(--fs-small);
-	line-height: 1.25;
+	font-size: 0.68rem;
+	line-height: 1.2;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 .sec-full {
 	display: none;
