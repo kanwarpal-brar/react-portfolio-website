@@ -16,7 +16,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-import { identity, seo, socials } from '../js/data.js';
+import { identity, seo, socials, TREE } from '../js/data.js';
 import { ringNodesHTML, homeCard, prerenderAll, pageTitle } from '../js/content.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,8 +45,7 @@ function jsonLd() {
 
 function prerenderHTML() {
   const sections = prerenderAll();
-  const order = ['work', 'projects', 'resume', 'socials', 'cluster'];
-  return order
+  return TREE.home.children
     .map(
       (id) =>
         `      <article class="prerender-section" data-prerender data-section="${id}">\n` +
