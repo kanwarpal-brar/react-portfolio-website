@@ -36,19 +36,20 @@ function goTo(path, trigger) {
 	// scaled/aimed from a stale size.
 	applyGeometry();
 	const card = document.getElementById("card");
+	const triggerOnScreen = trigger && document.contains(trigger);
 	if (state.view !== "home") {
 		requestAnimationFrame(() => {
 			try {
 				card?.focus({ preventScroll: true });
 			} catch (_) {}
 		});
-	} else if (trigger && document.contains(trigger)) {
+	} else if (triggerOnScreen) {
 		try {
 			trigger.focus({ preventScroll: true });
 		} catch (_) {}
 	}
 	if (card) {
-		if (trigger && document.contains(trigger)) flipCardFrom(trigger, card);
+		if (triggerOnScreen) flipCardFrom(trigger, card);
 		else flipCardEnter(card);
 	}
 }
