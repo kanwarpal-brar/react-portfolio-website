@@ -193,6 +193,19 @@ function projBoxHTML(d, { linked = true } = {}) {
   </article>`;
 }
 
+// Shared between the interactive hub (.sec-list) and the prerendered
+// *FullHTML variants — both list every work/extra entry or project, just
+// wrapped differently, so the entry markup itself is built once here.
+function workListHTML() {
+	return `${workExperience.map((w) => expBoxHTML("work", w)).join("\n")}
+    <h3>extra-curriculars</h3>
+    ${extraCurricular.map((e) => expBoxHTML("extra", e)).join("\n")}`;
+}
+
+function projectsListHTML() {
+	return projects.map((p) => projBoxHTML(p)).join("\n");
+}
+
 function workSectionHTML() {
 	// .hub-mini is the small title+tagline shown on the desktop board (the
 	// wheel supplies the child nodes, so the hub node itself stays minimal).
@@ -209,9 +222,7 @@ function workSectionHTML() {
       <p class="node-lede">${esc(workExperience.length)} roles · ${esc(extraCurricular.length)} extracurriculars</p>
     </div>
     <div class="sec-list">
-      ${workExperience.map((w) => expBoxHTML("work", w)).join("\n")}
-      <h3>extra-curriculars</h3>
-      ${extraCurricular.map((e) => expBoxHTML("extra", e)).join("\n")}
+      ${workListHTML()}
     </div>
   `;
 }
@@ -220,9 +231,7 @@ function workSectionFullHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("work"))}</p>
     <h3>work experience</h3>
-    ${workExperience.map((w) => expBoxHTML("work", w)).join("\n")}
-    <h3>extra-curriculars</h3>
-    ${extraCurricular.map((e) => expBoxHTML("extra", e)).join("\n")}
+    ${workListHTML()}
   `;
 }
 
@@ -238,7 +247,7 @@ function projectsSectionHTML() {
       <h3>projects</h3>
       <p class="node-lede">${esc(projects.length)} builds · systems, concurrency, devops</p>
     </div>
-    <div class="sec-list proj-grid">${projects.map((p) => projBoxHTML(p)).join("\n")}</div>
+    <div class="sec-list proj-grid">${projectsListHTML()}</div>
   `;
 }
 
@@ -246,7 +255,7 @@ function projectsSectionFullHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("projects"))}</p>
     <h3>projects</h3>
-    <div class="proj-grid">${projects.map((p) => projBoxHTML(p)).join("\n")}</div>
+    <div class="proj-grid">${projectsListHTML()}</div>
   `;
 }
 
