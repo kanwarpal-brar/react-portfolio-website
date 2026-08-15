@@ -29,16 +29,19 @@ export const resumeBlurb =
 
 export const socials = [
 	{
+		id: "github",
 		label: "github",
 		handle: "kanwarpal-brar",
 		url: "https://github.com/kanwarpal-brar",
 	},
 	{
+		id: "linkedin",
 		label: "linkedin",
 		handle: "kanwarpal-brar",
 		url: "https://linkedin.com/in/kanwarpal-brar",
 	},
 	{
+		id: "email",
 		label: "email",
 		handle: "kanwarpal.brar@outlook.com",
 		url: "mailto:kanwarpal.brar@outlook.com",
@@ -221,12 +224,14 @@ export const sectionSummary = {
 };
 
 /**
- * Short taglines for the small centered work/projects hub node (the wheel
- * carries the actual content, so this node is just a title + one line).
+ * Short taglines for the small hub nodes of sections that fan out children
+ * (work/projects/socials) — the fan carries the actual content, so this
+ * node is just a title + one line.
  */
 export const hubTagline = {
 	work: "Systems that scale.",
 	projects: "Side builds, real systems.",
+	socials: "Say hi, or send a PR.",
 };
 
 export const resumeCopy = {
@@ -252,6 +257,6 @@ export const TREE = {
 	},
 	projects: { kind: "list", children: projects.map((p) => p.id) },
 	resume: { kind: "leaf", children: [] },
-	socials: { kind: "leaf", children: [] },
+	socials: { kind: "list", children: socials.map((s) => s.id) },
 	cluster: { kind: "leaf", children: [] },
 };

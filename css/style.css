@@ -1,6 +1,6 @@
 /* ========================================================================
-   style.css — reset, chrome, graph (ring/wheel/card), motion, a11y.
-   Consumes custom properties from theme.css.
+   style.css — reset, chrome, pan/tree graph (world nodes + camera), motion,
+   a11y. Consumes custom properties from theme.css.
    ======================================================================== */
 
 /* -------- accessibility utility -------- */
@@ -137,8 +137,11 @@ p {
 }
 
 /* =================================================================
-   #graph — board: three concentric bands (#ring, #wheel, #card) plus
-   the home-view spoke overlay (#graph-lines). See AGENTS.md/SPEC.md.
+   #graph — the pannable world board: #world holds the six persistent
+   nodes (#pnodes) and the active section's fan children (#fan), all
+   positioned in world coordinates; the camera pans by translating
+   #world. #graph-lines lives in the same world layer, so connectors pan
+   with their nodes. See AGENTS.md.
    ================================================================= */
 #graph {
 	overflow: hidden;
@@ -152,293 +155,274 @@ p {
 	height: 100%;
 	pointer-events: none;
 	z-index: 0;
+	overflow: visible;
 }
 #graph-lines line {
-	stroke: var(--fg-mute);
 	stroke-width: 1;
-	stroke-dasharray: 3 4;
-	transition: stroke-dashoffset var(--t-med) var(--ease);
+	fill: none;
 }
-#graph-lines line.line-ring {
+#graph-lines .line-section {
 	stroke: var(--border-bright);
-	stroke-dasharray: none;
-	stroke-width: 1;
-	transition:
-		stroke-dashoffset var(--t-med) var(--ease),
-		stroke var(--tr-fast);
 }
-#graph-lines line.line-ring-active {
+#graph-lines .line-section-active {
 	stroke: var(--accent);
-	stroke-dasharray: none;
 	stroke-width: 1.5;
 }
-#graph-lines line.line-wheel {
+#graph-lines .line-child {
 	stroke: var(--accent-2);
 	stroke-dasharray: 2 3;
-	stroke-width: 1;
 	opacity: 0.85;
-	transition:
-		stroke-dashoffset var(--t-med) var(--ease),
-		stroke var(--tr-fast),
-		opacity var(--tr-fast);
 }
-#graph-lines line.line-wheel-active {
+#graph-lines .line-child-active {
 	stroke: var(--accent);
 	stroke-dasharray: none;
 	stroke-width: 2;
 	opacity: 1;
 }
 
-/* ---- #ring: 5 persistent section nodes, fixed pentagon slots -------- */
-#ring {
+/* ---- #world: camera layer ----------------------------------------------
+   One CSS transform pans the whole world; render.js sets --cam-x/--cam-y to
+   the negated world position of the focused node. The .jump class (first
+   geometry pass only) suppresses the transition so the page never pans on
+   load. */
+#world {
 	position: absolute;
 	inset: 0;
 	z-index: 3;
-	pointer-events: none;
+	transform: translate(var(--cam-x, 0px), var(--cam-y, 0px));
+	transition: transform var(--t-med) var(--ease);
+	will-change: transform;
 }
-.snode {
+#world.jump,
+#world.jump * {
+	transition: none !important;
+}
+
+/* ---- world nodes (persistent .pnode + ephemeral .fnode) -----------------
+   Shared shape: an outer positioned box carrying border/background/size,
+   holding a compact nav <button> (shown normally) and an expanded content
+   block (shown when .is-focused). Positions are world px in --x/--y relative
+   to the board center; sizes come from render.js as custom properties
+   (--nc-w/h, --home-w/h, ...), already scaled by the board scale s. */
+.pnode,
+.fnode {
 	position: absolute;
-	left: var(--x);
-	top: var(--y);
-	transform: translate(-50%, -50%);
-	width: 12ch;
-	min-height: 3.2rem;
-	aspect-ratio: 16 / 10;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: 0.3rem;
-	padding: 0.4rem 0.3rem;
-	text-align: center;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%) translate(var(--x, 0px), var(--y, 0px));
+	width: var(--nc-w, 132px);
+	height: var(--nc-h, 52px);
 	background: var(--bg-card);
 	border: 1px solid var(--border);
 	color: var(--fg-mute);
-	pointer-events: auto;
+	container-type: inline-size;
 	transition:
-		color var(--tr-fast),
+		transform var(--t-med) var(--ease),
+		width var(--t-med) var(--ease),
+		height var(--t-med) var(--ease),
+		opacity var(--tr-fast),
 		border-color var(--tr-fast),
+		color var(--tr-fast),
 		background var(--tr-fast);
 }
-.snode .sn-idx {
-	font-size: 0.68em;
-	font-weight: 400;
-	letter-spacing: 0.2em;
-	color: var(--fg-mute);
-	transition: color var(--tr-fast);
+.fnode {
+	width: var(--fan-w, 150px);
+	height: var(--fan-h, 80px);
+	z-index: 1;
 }
-.snode .sn-name {
+/* The focused node sits above its (hidden) siblings while it expands. */
+.pnode.is-focused,
+.fnode.is-focused {
+	z-index: 2;
+	background: var(--bg-inset);
+	border-color: var(--accent);
+	color: var(--fg);
+}
+/* Home's expanded border matches the dim home-view spokes (no section is
+   active there), the same pairing the old card border used. */
+.pnode-home.is-focused {
+	border-color: var(--border-bright);
+}
+
+/* Expanded box sizes per role (compact nodes keep the default --nc-*).
+   Width is fixed (geometry + spoke math assume it); height hugs content up
+   to the role's cap — boxes only ever get SMALLER than the size render.js
+   proves clearances for, so the geometry stays valid, and short content
+   doesn't leave a tall empty box. */
+.pnode.is-focused,
+.fnode.is-focused {
+	display: flex;
+	flex-direction: column;
+	height: auto;
+}
+.pnode-home.is-focused {
+	width: var(--home-w);
+	min-height: min(var(--home-h), 30rem);
+	max-height: var(--home-h);
+}
+.pnode-hub.is-focused {
+	width: var(--hub-w);
+	max-height: var(--hub-h);
+}
+.pnode-leaf.is-focused {
+	width: var(--leaf-w);
+	max-height: var(--leaf-h);
+}
+.fnode.is-focused {
+	width: var(--child-w);
+	max-height: var(--child-h);
+}
+
+/* Compact vs expanded content swap. The established node and camera slides
+   use the same eased timing. Connectors resample live node rectangles during
+   that motion, so they stay attached instead of snapping to an end state. */
+.pn-expanded,
+.fn-expanded {
+	display: none;
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+}
+.pnode.is-focused .pn-expanded,
+.fnode.is-focused .fn-expanded {
+	display: block;
+}
+.pnode.is-focused .pn-compact,
+.fnode.is-focused .fn-compact {
+	display: none;
+}
+
+/* Compact nav buttons fill their node. */
+.pn-compact,
+.fn-compact {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.1rem;
+	padding: 0.3rem;
+	text-align: center;
+	color: inherit;
+	overflow: hidden;
+}
+.fn-compact {
+	align-items: flex-start;
+	text-align: left;
+	font-size: var(--fs-small);
+	line-height: 1.3;
+}
+.pn-compact .sn-name {
 	font-weight: 700;
-	letter-spacing: 0.07em;
+	letter-spacing: 0.05em;
 	text-transform: uppercase;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-width: 100%;
 }
-/* Home view: ring is bright + is the primary nav. Section/child view: ring
-   dims (via a muted color token that stays >=7:1 — never opacity) but stays
-   fully interactive so direct section-to-section jumps always work. */
-#graph[data-view="home"] .snode {
+/* Home view: every section node is bright (primary nav). Section/child
+   views: unfocused nodes dim (via a muted color token that stays >=7:1 —
+   never opacity) but stay fully interactive so direct jumps always work. */
+#graph[data-view="home"] .pnode {
 	color: var(--fg);
 	border-color: var(--border-bright);
 }
-.snode.active,
-.snode:hover,
-.snode:focus-visible {
+.pn-compact.active,
+.pnode:hover,
+.pn-compact:focus-visible {
 	color: var(--fg);
+}
+.pnode:hover,
+.pnode:has(.pn-compact:focus-visible) {
 	border-color: var(--accent);
-}
-.snode.active {
-	background: var(--bg-inset);
-}
-.snode.active .sn-idx,
-.snode:hover .sn-idx,
-.snode:focus-visible .sn-idx {
-	color: var(--accent-2);
 }
 
-/* ---- #wheel: radial child menu (work/projects only) ------------------ */
-#wheel {
-	position: absolute;
-	inset: 0;
-	z-index: 4;
+/* Small fan boxes (scaled-down boards) shed their third line so the title
+   and one-line summary stay legible instead of clipping mid-line. */
+@container (max-width: 125px) {
+	.fn-compact .wi-meta,
+	.fn-compact .wi-tags {
+		display: none;
+	}
+	.fn-compact .wi-desc {
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+	}
+}
+
+/* Fan items enter and leave by opacity only. The camera is the one spatial
+   movement; avoiding independent item travel prevents child cards crossing
+   their hub or each other mid-transition. */
+.fnode.entering,
+.fnode.leaving {
+	opacity: 0;
 	pointer-events: none;
 }
-#wheel[hidden] {
-	display: none;
-}
-.wheel-item {
-	position: absolute;
-	left: var(--x, 50%);
-	top: var(--y, 50%);
-	transform: translate(-50%, -50%) scale(1);
-	width: 19ch;
-	height: 5.3rem;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 0.1rem;
-	padding: 0.4rem 0.6rem;
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	color: var(--fg-mute);
-	font-size: var(--fs-small);
-	line-height: 1.3;
-	text-align: left;
-	overflow: hidden;
-	pointer-events: auto;
-	opacity: 1;
-	transition:
-		left var(--t-med) var(--ease),
-		top var(--t-med) var(--ease),
-		transform var(--t-fast) var(--ease),
-		opacity var(--tr-fast),
-		border-color var(--tr-fast),
-		color var(--tr-fast);
-}
-/* Entrance/exit — see render.js updateWheel(). Position is already correct
-   when .entering is added (painted once), then removed a frame later so the
-   fade+scale-in is a transition, not a jump cut. */
-.wheel-item.entering {
+/* A focused child's siblings hide (they stay mounted so the fan folds back
+   in place when the child closes). */
+.fnode.dimmed {
 	opacity: 0;
-	transform: translate(-50%, -50%) scale(0.8);
-	transition: none;
-}
-.wheel-item.leaving {
-	opacity: 0;
-	transform: translate(-50%, -50%) scale(0.85);
 	pointer-events: none;
 }
-.wheel-item.active,
-.wheel-item:hover,
-.wheel-item:focus-visible {
+.fn-compact.active,
+.fnode:hover,
+.fn-compact:focus-visible {
 	color: var(--fg);
+}
+.fnode:hover,
+.fnode:has(.fn-compact:focus-visible) {
 	border-color: var(--accent);
 }
-.wheel-item:hover,
-.wheel-item:focus-visible {
-	outline: none;
-}
-.wheel-item.active {
-	background: var(--bg-inset);
-}
-.wheel-item .wi-title,
-.wheel-item .wi-desc {
+.fn-compact .wi-title,
+.fn-compact .wi-desc {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+	overflow-wrap: anywhere; /* long unbroken tokens (email handles) wrap */
 }
-.wheel-item .wi-title {
+.fn-compact .wi-title {
 	color: var(--accent);
 	font-weight: 700;
 	line-height: 1.15;
 }
-.wheel-item .wi-desc {
+.fn-compact .wi-desc {
 	color: var(--fg-dim);
 	font-size: 0.9em;
 	line-height: 1.2;
 }
-.wheel-item .wi-meta,
-.wheel-item .wi-tags {
+.fn-compact .wi-meta,
+.fn-compact .wi-tags {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: 0.85em;
 }
-.wheel-item .wi-meta {
+.fn-compact .wi-meta {
 	color: var(--fg-mute);
 }
-.wheel-item .wi-tags {
+.fn-compact .wi-tags {
 	color: var(--accent-2);
 }
 
-/* ---- #card: centered, content-sized, focus content -------- */
-#card {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 5;
-	/* Size is driven by render.js:applyGeometry() (--card-w/--card-h), which
-     derives it from the measured ring so a gap to the ring (and wheel) is
-     always kept. The fallbacks apply only before the first geometry pass. */
-	width: var(--card-w, min(660px, 82%));
-	height: var(--card-h, 62%);
-	max-width: 92%;
-	max-height: 88%;
-	overflow: hidden;
-	background: var(--bg-inset);
-	border: 1px solid var(--accent);
+/* Expanded content blocks: padded, top-aligned, scroll if the (scaled-down)
+   box can't fit the text. */
+.pn-expanded,
+.fn-expanded {
 	padding: 1rem 1.4rem;
-	color: var(--fg);
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	container-type: inline-size;
-	container-name: card;
+	overflow: auto;
 }
-/* Home + child (detail) views read top-down (document / full description), so
-   they top-align rather than center. They are sized by applyGeometry() to fit
-   their content within the ring band, so no scroll is needed (the collapsed
-   fallback re-enables scrolling for genuinely small screens). */
-#graph[data-view="home"] #card,
-#graph[data-child] #card {
-	justify-content: flex-start;
-}
-
-/* On home, no ring spoke is "active" (no section selected yet) — every
-   line-ring renders in the dim default color, not the accent. Match the card
-   border to that same dim color there so the card reads as part of the same
-   graph as its spokes; once a section is chosen its spoke turns accent and
-   the card's default accent border already agrees with it (see .line-ring vs
-   .line-ring-active above). */
-#graph[data-view="home"] #card {
-	border-color: var(--border-bright);
-}
-
-/* ---- card content typography ------------------------------------------ */
-#card .node-lede {
-	color: var(--fg-dim);
-	font-size: var(--fs-small);
-	margin-bottom: 0.4rem;
-}
-#card .tip {
-	color: var(--fg-mute);
-	font-size: var(--fs-small);
-}
-#card h3 {
-	color: var(--accent);
-	font-size: 1rem;
-	margin: 1.1em 0 0.3em;
-	letter-spacing: 0.02em;
-}
-/* The hub (wheel-visible) node is capped small by design — see
-   SECTION_CARD_MAX/SECTION_CARD_MIN in render.js — a single title + tagline
-   node, not a scaled-down card, so it needs tighter padding than the default
-   #card to leave room for its two lines even at the smallest size the
-   composition allows. */
-#graph[data-view="section"]:not(.collapsed) #card {
-	padding: 0.2rem 0.4rem;
-}
-/* .hub-mini (title + tagline) is what the full board shows for the
-   work/projects hub node; .sec-full (heading + lede) takes over once the
-   composition collapses and the wheel is hidden, restoring the usual
-   heading above the tap-target .sec-list. Deliberately smaller/tighter than
-   the ring nodes (.snode) it sits among — see SECTION_CARD_MAX in render.js
-   — so the hub reads as the smallest thing on the board, not a peer of the
-   ring, and every line of text is centered both ways within the node. */
-.hub-mini {
+/* …except hubs, whose two lines stay centered both ways. */
+.pnode-hub.is-focused .pn-expanded {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	gap: 0.1rem;
-	width: 100%;
-	height: 100%;
+	padding: 0.2rem 0.35rem;
 }
 .hub-title {
 	margin: 0;
@@ -446,38 +430,50 @@ p {
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	font-size: 0.78rem;
-	line-height: 1.1;
+	font-size: 0.72rem;
+	line-height: 1.05;
 	white-space: nowrap;
 }
-/* Clamped to 2 lines like .wi-desc, so a slightly long tagline wraps instead
-   of forcing the node wider — the node's own tiny SECTION_CARD_MAX/MIN in
-   render.js already bound how tall those 2 lines are allowed to grow. */
 .hub-tagline {
-	margin: 0;
+	margin: 0.08rem 0 0;
 	color: var(--fg-mute);
-	font-size: 0.68rem;
-	line-height: 1.2;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	line-clamp: 2;
-	-webkit-box-orient: vertical;
+	font-size: 0.58rem;
+	line-height: 1.1;
+	white-space: nowrap;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
 }
-.sec-full {
-	display: none;
+
+/* ---- expanded-node content typography ------------------------------------
+   (Also applies inside the collapsed #card, which renders the same content
+   builders.) */
+.node-lede {
+	color: var(--fg-dim);
+	font-size: var(--fs-small);
+	margin-bottom: 0.4rem;
 }
-#graph.collapsed .hub-mini {
-	display: none;
+.tip {
+	color: var(--fg-mute);
+	font-size: var(--fs-small);
 }
-#graph.collapsed .sec-full {
-	display: block;
+.pn-expanded h2,
+.fn-expanded h2,
+#card h2 {
+	color: var(--accent);
+	font-size: 1rem;
+	margin: 1.1em 0 0.3em;
+	letter-spacing: 0.02em;
 }
-#card h3::before {
+.pn-expanded h2::before,
+.fn-expanded h2::before,
+#card h2::before {
 	content: "── ";
 	color: var(--fg-mute);
 }
-#card h3::after {
+.pn-expanded h2::after,
+.fn-expanded h2::after,
+#card h2::after {
 	content: " ──";
 	color: var(--fg-mute);
 }
@@ -540,6 +536,11 @@ button.exp-box:focus-visible {
 .exp-desc {
 	display: block;
 	color: var(--fg-dim);
+	font-size: var(--fs-small);
+}
+.social-box a {
+	display: inline-block;
+	margin-top: 0.4rem;
 	font-size: var(--fs-small);
 }
 
@@ -616,6 +617,7 @@ button.pname-btn:focus-visible {
 	padding: 0.5rem 1rem;
 	margin: 0.6rem 0;
 	color: var(--accent);
+	white-space: nowrap;
 }
 .pdf-btn:hover {
 	background: var(--accent);
@@ -636,9 +638,10 @@ button.pname-btn:focus-visible {
 	color: var(--bg);
 }
 
-/* Card content scales down at narrow card widths (collapsed/mobile), via a
-   container query on #card itself — no viewport media query needed. */
-@container card (max-width: 420px) {
+/* Content inside any narrow container (a scaled-down expanded node, or the
+   collapsed card) stacks. #card, .pnode and .fnode are all query containers,
+   so this unnamed query resolves against whichever one is nearest. */
+@container (max-width: 420px) {
 	.bio-grid {
 		grid-template-columns: 1fr;
 	}
@@ -651,7 +654,7 @@ button.pname-btn:focus-visible {
 	}
 }
 
-/* ---- breadcrumb (child/detail view) -------------------------------------- */
+/* ---- breadcrumb (collapsed card's child/detail view) -------------------- */
 .breadcrumb {
 	display: flex;
 	align-items: center;
@@ -673,37 +676,30 @@ button.pname-btn:focus-visible {
 	color: var(--fg);
 }
 
-/* ---- collapsed layout: card-only (gated on board height/area, not width
-   alone — see render.js applyGeometry) ------------------------------------ */
-#graph.collapsed #ring,
-#graph.collapsed #wheel,
-#graph.collapsed #graph-lines {
+/* ---- #card: collapsed/mobile fallback ------------------------------------
+   The desktop board renders the world nodes; the card is the single
+   scrolling fallback shown only when the composition collapses (render.js
+   gates on the board scale, not width alone, so short laptop viewports
+   collapse correctly). */
+#card {
+	display: none;
+}
+#graph.collapsed #world {
 	display: none;
 }
 #graph.collapsed #card {
-	inset: 0;
-	transform: none;
-	width: auto;
-	height: auto;
-	max-width: none;
-	max-height: none;
+	display: flex;
+	flex-direction: column;
 	justify-content: flex-start;
+	position: absolute;
+	inset: 0;
+	z-index: 5;
 	overflow-y: auto;
-}
-/* The in-card child list is the tap target for sections when the wheel is
-   hidden (collapsed/mobile). On the full board the wheel supplies the nodes,
-   so the list stays hidden and the small hub node (.hub-mini) shows instead
-   — see .sec-full/.hub-mini above. */
-.sec-list {
-	display: none;
-}
-#graph.collapsed .sec-list {
-	display: block;
-	margin-top: 0.6rem;
-}
-#graph.collapsed .sec-list.proj-grid {
-	display: grid;
-	margin-top: 0.6rem;
+	background: var(--bg-inset);
+	border: 1px solid var(--accent);
+	padding: 1rem 1.4rem;
+	color: var(--fg);
+	container-type: inline-size;
 }
 
 /* =================================================================
@@ -771,19 +767,17 @@ html.nojs #graph {
 	overflow: visible;
 	height: auto;
 }
-html.nojs #ring,
-html.nojs #wheel,
+html.nojs #world,
 html.nojs #graph-lines {
 	display: none;
 }
 html.nojs #card {
+	display: block;
 	position: static;
-	transform: none;
 	width: 100%;
 	max-width: 820px;
 	margin: 0 auto;
 	height: auto;
-	max-height: none;
 	overflow: visible;
 }
 html.nojs #hintbar {
@@ -808,20 +802,24 @@ html.nojs .prerender-section h2 {
 }
 
 /* =================================================================
-   Reduced motion — two-tier motion model (plan §8). This disables
-   MOVEMENT only (wheel repositioning, spoke draw-in, FLIP is already a
-   JS no-op); it is intentionally NOT a blanket `transition: none`, so the
-   opacity/color crossfades elsewhere (ring dim/active, wheel enter/leave,
-   hover/focus) still play and views still read as a switch, not a jump cut.
+   Reduced motion — disables MOVEMENT only (camera pan, node repositioning
+   and resizing, spoke draw-in); it is intentionally NOT a blanket
+   `transition: none`, so the opacity/color crossfades elsewhere (node
+   dim/active, fan enter/leave, hover/focus) still play and views still
+   read as a switch, not a jump cut.
    ================================================================= */
 @media (prefers-reduced-motion: reduce) {
-	.wheel-item {
+	#world {
+		transition: none !important;
+	}
+	.pnode,
+	.fnode {
 		transition-property:
 			opacity, border-color, color, background-color !important;
 		transition-delay: 0s !important;
 	}
-	.wheel-item.entering,
-	.wheel-item.leaving {
+	.fnode.entering,
+	.fnode.leaving {
 		transform: none !important;
 	}
 	#graph-lines line {

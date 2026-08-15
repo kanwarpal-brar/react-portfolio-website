@@ -85,20 +85,49 @@
       <main id="graph" class="frame" data-view="home">
         <h1 class="visually-hidden">Kanwarpal Brar — portfolio</h1>
 
-        <svg
-          id="graph-lines"
-          aria-hidden="true"
-          preserveAspectRatio="none"
-        ></svg>
+        <!-- The pannable world: home at the origin, fixed section slots, and
+             an active section's child nodes. Connectors live in this same
+             layer, so they always pan in lockstep with their nodes. -->
+        <div id="world">
+          <svg id="graph-lines" aria-hidden="true" preserveAspectRatio="none"></svg>
+          <div id="pnodes"><div class="pnode pnode-home" data-pnode="home"><button type="button" class="pn-compact" data-nav="home"><span class="sn-name">home</span></button><div class="pn-expanded" role="region" aria-label="home" tabindex="-1">
+    <div class="bio-grid">
+      <img class="headshot" src="assets/headshot.webp" alt="Kanwarpal Brar" width="120" height="120" fetchpriority="high" decoding="async">
+      <div>
+        <p class="tagline">Developer, Researcher, Innovator</p>
+        <p>Software Engineer specializing in distributed systems and backend architecture. Interested in designing scalable microservices, RESTful APIs, and concurrent systems. Passionate about solving complex networking challenges and building reliable distributed applications.</p>
+      </div>
+    </div>
+    <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">[ view resume ]</a>
+    <h2>about</h2>
+    <p>Hi, I&#39;m Kanwarpal, Welcome to my portfolio website. I&#39;m a software engineer with a Computer Science degree from the University of Waterloo, specializing in distributed systems and backend development. My experience spans fintech, cloud infrastructure, and microservices architecture, with expertise in technologies like Python, Java, Go, and cloud platforms including AWS and Azure. I&#39;m passionate about building scalable solutions and continuously expanding my technical expertise.</p>
+  </div></div>
+<div class="pnode pnode-section" data-pnode="work"><button type="button" class="pn-compact" data-nav="work"><span class="sn-name">work</span></button><div class="pn-expanded" role="region" aria-label="work" tabindex="-1"><p class="hub-title">work</p><p class="hub-tagline">Systems that scale.</p></div></div>
+<div class="pnode pnode-section" data-pnode="projects"><button type="button" class="pn-compact" data-nav="projects"><span class="sn-name">projects</span></button><div class="pn-expanded" role="region" aria-label="projects" tabindex="-1"><p class="hub-title">projects</p><p class="hub-tagline">Side builds, real systems.</p></div></div>
+<div class="pnode pnode-section" data-pnode="resume"><button type="button" class="pn-compact" data-nav="resume"><span class="sn-name">resume</span></button><div class="pn-expanded" role="region" aria-label="resume" tabindex="-1">
+    <p class="node-lede">open to view</p>
+    <h2>resume</h2>
+    <p>Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.</p>
+    <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">[ open Kanwarpal_Brar_Resume.pdf ]</a>
+    <p class="tip">Opens the PDF in a new tab.</p>
+  </div></div>
+<div class="pnode pnode-section" data-pnode="socials"><button type="button" class="pn-compact" data-nav="socials"><span class="sn-name">socials</span></button><div class="pn-expanded" role="region" aria-label="socials" tabindex="-1"><p class="hub-title">socials</p><p class="hub-tagline">Say hi, or send a PR.</p></div></div>
+<div class="pnode pnode-section" data-pnode="cluster"><button type="button" class="pn-compact" data-nav="cluster"><span class="sn-name">cluster</span></button><div class="pn-expanded" role="region" aria-label="cluster" tabindex="-1">
+    <p class="node-lede">private K8s · access by request</p>
+    <h2>private kubernetes cluster</h2>
+    <p class="warning">[!] Access to this infrastructure is strictly controlled.</p>
+    <p>Welcome to the secure access portal for the private Kubernetes cluster. Access requires prior authorization. Endpoint: <strong><span class="redacted" aria-hidden="true">[REDACTED]</span></strong>.</p>
+    <p>To request access, email <a href="mailto:kanwarpal.brar@outlook.com">kanwarpal.brar@outlook.com</a> with:</p>
+    <ul><li>Your full name and organization</li>
+<li>Intended use case and project scope</li>
+<li>Required access level and duration</li>
+<li>Any relevant technical requirements</li></ul>
+  </div></div></div>
+          <div id="fan"></div>
+        </div>
 
-        <!-- 5 persistent section buttons, fixed pentagon slots. Always present;
-           CSS dims/highlights them via #graph[data-view]/[data-section]. -->
-        <div id="ring"><button type="button" class="snode" data-section="work"><span class="sn-idx">01</span><span class="sn-name">work</span></button><button type="button" class="snode" data-section="projects"><span class="sn-idx">02</span><span class="sn-name">projects</span></button><button type="button" class="snode" data-section="resume"><span class="sn-idx">03</span><span class="sn-name">resume</span></button><button type="button" class="snode" data-section="socials"><span class="sn-idx">04</span><span class="sn-name">socials</span></button><button type="button" class="snode" data-section="cluster"><span class="sn-idx">05</span><span class="sn-name">cluster</span></button></div>
-
-        <!-- Radial child menu; populated + shown only for sections with children. -->
-        <div id="wheel" hidden></div>
-
-        <!-- Centered, content-sized, scrolling card — the focused content. -->
+        <!-- Collapsed/mobile fallback: a single scrolling card (the desktop
+             board renders the world nodes above instead). -->
         <div id="card" tabindex="-1" role="region" aria-label="home">
           
     <div class="bio-grid">
@@ -109,7 +138,7 @@
       </div>
     </div>
     <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">[ view resume ]</a>
-    <h3>about</h3>
+    <h2>about</h2>
     <p>Hi, I&#39;m Kanwarpal, Welcome to my portfolio website. I&#39;m a software engineer with a Computer Science degree from the University of Waterloo, specializing in distributed systems and backend development. My experience spans fintech, cloud infrastructure, and microservices architecture, with expertise in technologies like Python, Java, Go, and cloud platforms including AWS and Azure. I&#39;m passionate about building scalable solutions and continuously expanding my technical expertise.</p>
   
         </div>
@@ -125,55 +154,55 @@
         <h2>── work ──</h2>
         
     <p class="node-lede">7 roles · Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post</p>
-    <h3>work experience</h3>
+    <h2>work experience</h2>
     <button type="button" class="exp-box" data-child="carta-2024-payments"><span class="exp-head">
-      <span class="role">Payments Software Engineering Co-op</span> · <span class="co">Carta</span>
+      <span class="exp-who"><span class="role">Payments Software Engineering Co-op</span> · <span class="co">Carta</span></span>
       <span class="when">Sept — Dec 2024</span>
     </span>
     <span class="exp-desc">Shipped critical fund impersonation controls within first 2 weeks of joining, preventing $5000+ in potential audit penalties using Django + React. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Led multi-service banking integration expansion processing $5M+ monthly, implementing international account workflows using Python, gRPC, Protocol Buffers, and Domain Driven Design.</span></button>
 <button type="button" class="exp-box" data-child="uwaterloo-2024"><span class="exp-head">
-      <span class="role">Distributed Systems Research Assistant</span> · <span class="co">UWaterloo</span>
+      <span class="exp-who"><span class="role">Distributed Systems Research Assistant</span> · <span class="co">UWaterloo</span></span>
       <span class="when">May — Aug 2024</span>
     </span>
     <span class="exp-desc">Conducted comprehensive benchmarking of Serverless frameworks to inform the design of a new high-performance Serverless platform. Deployed &amp; Optimized Kubernetes clusters achieving 200+ requests/second per node with KNative Serving. Reduced cold-start latency 20% through analysis and tuning of autoscaling, node configuration, and container runtime. Authored a comprehensive technical report proposing architectural changes, improving resource utilization 15%.</span></button>
 <button type="button" class="exp-box" data-child="carta-2024-backend"><span class="exp-head">
-      <span class="role">Backend Software Engineering Co-op</span> · <span class="co">Carta</span>
+      <span class="exp-who"><span class="role">Backend Software Engineering Co-op</span> · <span class="co">Carta</span></span>
       <span class="when">Jan — April 2024</span>
     </span>
     <span class="exp-desc">Improved OCX report generation speed 10% by implementing an O(n) complexity cell management system with Apache POI + Java. Enhanced AI powered search accuracy 6% through prompt engineering of report questions &amp; use-cases. Resolved 3000+ support tickets by streamlining Ownership Report access permissions in Carta Web&#39;s Django codebase. Optimized ownership report query complexity in Spring framework, resulting in a 5% decrease in user wait times.</span></button>
 <button type="button" class="exp-box" data-child="arctic-wolf-2023"><span class="exp-head">
-      <span class="role">Software Developer</span> · <span class="co">Arctic Wolf</span>
+      <span class="exp-who"><span class="role">Software Developer</span> · <span class="co">Arctic Wolf</span></span>
       <span class="when">May — Aug 2023</span>
     </span>
     <span class="exp-desc">Reduced response times 25% by developing a concurrent Prometheus metrics monitoring system in Go for an Apache Kafka Wrapper. Developed a reflection-based Golang unit test verifier, identifying missing/broken metrics tests with 100% accuracy. Reduced lead times by designing a forward/backwards compatible Kafka Serialization system using SchemaVer and Avro.</span></button>
 <button type="button" class="exp-box" data-child="genesys-2022"><span class="exp-head">
-      <span class="role">Full Stack Software Developer</span> · <span class="co">Genesys</span>
+      <span class="exp-who"><span class="role">Full Stack Software Developer</span> · <span class="co">Genesys</span></span>
       <span class="when">Sept — Dec 2022</span>
     </span>
     <span class="exp-desc">Reduced hosting costs 5% by transitioning scheduling API to serverless architecture using Python, Flask, and Lambda. Shrunk codebase size 30% by rewriting schedule statement management REST API in Python + Flask + RESTX.</span></button>
 <button type="button" class="exp-box" data-child="cloudspark-2022"><span class="exp-head">
-      <span class="role">Software Engineering Intern</span> · <span class="co">Cloudspark</span>
+      <span class="exp-who"><span class="role">Software Engineering Intern</span> · <span class="co">Cloudspark</span></span>
       <span class="when">Jan — Apr 2022</span>
     </span>
     <span class="exp-desc">Designed &amp; Implemented scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure. Led the development of Licensing, Notification, and Auth microservices for a start-up MVP, utilizing TypeScript, Nest.JS, CosmosDB, Dependency Injection, and Azure Service Bus.</span></button>
 <button type="button" class="exp-box" data-child="pillar-to-post-2021"><span class="exp-head">
-      <span class="role">DevOps Specialist</span> · <span class="co">Pillar To Post</span>
+      <span class="exp-who"><span class="role">DevOps Specialist</span> · <span class="co">Pillar To Post</span></span>
       <span class="when">May — Aug 2021</span>
     </span>
     <span class="exp-desc">Designed and Developed an Automated Web Software Testing Framework in Selenium using Python and JavaScript, eliminating manual testing and saving 100+ company hours.</span></button>
-    <h3>extra-curriculars</h3>
+    <h2>extra-curriculars</h2>
     <button type="button" class="exp-box" data-child="hvz"><span class="exp-head">
-      <span class="role">Humans vs. Zombies</span> · <span class="co">3x Webmaster</span>
+      <span class="exp-who"><span class="role">Humans vs. Zombies</span> · <span class="co">3x Webmaster</span></span>
       
     </span>
     <span class="exp-desc">UWaterloo Humans vs. Zombies (UWHVZ) runs week-long campus-wide games of Nerf tag. As 3x Webmaster I help develop the club website in Django, Python, HTML, CSS, and JavaScript.</span></button>
 <button type="button" class="exp-box" data-child="improv"><span class="exp-head">
-      <span class="role">Improv Club</span> · <span class="co">Member</span>
+      <span class="exp-who"><span class="role">Improv Club</span> · <span class="co">Member</span></span>
       
     </span>
     <span class="exp-desc">UWaterloo Improv Club runs weekly improv game sessions and guided tutorials. I joined to learn how to think on the spot and ended up making a lot of friends.</span></button>
 <button type="button" class="exp-box" data-child="tea-club"><span class="exp-head">
-      <span class="role">Tea &amp; Culture Club</span> · <span class="co">Regular</span>
+      <span class="exp-who"><span class="role">Tea &amp; Culture Club</span> · <span class="co">Regular</span></span>
       
     </span>
     <span class="exp-desc">UWaterloo Tea Club is a laid-back gathering of games, socialization, and tea. Weekly meetings with new flavors. Destroying people in UNO is just a bonus.</span></button>
@@ -183,7 +212,7 @@
         <h2>── projects ──</h2>
         
     <p class="node-lede">9 projects curated · systems, concurrency, devops</p>
-    <h3>projects</h3>
+    <h2>projects</h2>
     <div class="proj-grid"><article class="proj">
     <button type="button" class="pname pname-btn" data-child="concurrent-hashmap">concurrent-hashmap</button>
     <div class="pdesc">Highly concurrent, lock-free, probing hashmap implementation in C++.</div>
@@ -244,7 +273,7 @@
         <h2>── resume ──</h2>
         
     <p class="node-lede">open to view</p>
-    <h3>resume</h3>
+    <h2>resume</h2>
     <p>Take a look at my resume, and feel free to contact me with questions and opportunities of any nature.</p>
     <a class="pdf-btn" href="assets/Kanwarpal_Brar_Resume.pdf" target="_blank" rel="noopener">[ open Kanwarpal_Brar_Resume.pdf ]</a>
     <p class="tip">Opens the PDF in a new tab.</p>
@@ -254,7 +283,7 @@
         <h2>── socials ──</h2>
         
     <p class="node-lede">github · linkedin · email</p>
-    <h3>connect</h3>
+    <h2>connect</h2>
     <ul class="social-list">
       <li><span class="k">github</span><a href="https://github.com/kanwarpal-brar" target="_blank" rel="noopener">kanwarpal-brar</a></li>
 <li><span class="k">linkedin</span><a href="https://linkedin.com/in/kanwarpal-brar" target="_blank" rel="noopener">kanwarpal-brar</a></li>
@@ -266,7 +295,7 @@
         <h2>── cluster ──</h2>
         
     <p class="node-lede">private K8s · access by request</p>
-    <h3>private kubernetes cluster</h3>
+    <h2>private kubernetes cluster</h2>
     <p class="warning">[!] Access to this infrastructure is strictly controlled.</p>
     <p>Welcome to the secure access portal for the private Kubernetes cluster. Access requires prior authorization. Endpoint: <strong><span class="redacted" aria-hidden="true">[REDACTED]</span></strong>.</p>
     <p>To request access, email <a href="mailto:kanwarpal.brar@outlook.com">kanwarpal.brar@outlook.com</a> with:</p>

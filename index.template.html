@@ -69,20 +69,21 @@
       <main id="graph" class="frame" data-view="home">
         <h1 class="visually-hidden">{{name}} — portfolio</h1>
 
-        <svg
-          id="graph-lines"
-          aria-hidden="true"
-          preserveAspectRatio="none"
-        ></svg>
+        <!-- The pannable world: home at the origin, fixed section slots, and
+             an active section's child nodes. Connectors live in this same
+             layer, so they always pan in lockstep with their nodes. -->
+        <div id="world">
+          <svg
+            id="graph-lines"
+            aria-hidden="true"
+            preserveAspectRatio="none"
+          ></svg>
+          <div id="pnodes"><!-- inject:world --></div>
+          <div id="fan"></div>
+        </div>
 
-        <!-- 5 persistent section buttons, fixed pentagon slots. Always present;
-           CSS dims/highlights them via #graph[data-view]/[data-section]. -->
-        <div id="ring"><!-- inject:ring --></div>
-
-        <!-- Radial child menu; populated + shown only for sections with children. -->
-        <div id="wheel" hidden></div>
-
-        <!-- Centered, content-sized, scrolling card — the focused content. -->
+        <!-- Collapsed/mobile fallback: a single scrolling card (the desktop
+             board renders the world nodes above instead). -->
         <div id="card" tabindex="-1" role="region" aria-label="home">
           <!-- inject:home -->
         </div>

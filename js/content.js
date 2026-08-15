@@ -35,35 +35,13 @@ export function esc(value) {
 	);
 }
 
-// ---- child index (work + extra-curricular + project, keyed by id) --------
+// ---- child index (work + extra-curricular + project + social, keyed by id) --
 
 const CHILD_INDEX = {};
 for (const w of workExperience) CHILD_INDEX[w.id] = { kind: "work", data: w };
 for (const e of extraCurricular) CHILD_INDEX[e.id] = { kind: "extra", data: e };
 for (const p of projects) CHILD_INDEX[p.id] = { kind: "project", data: p };
-
-export function childInfo(id) {
-	return CHILD_INDEX[id] || null;
-}
-
-// ---- ring (5 persistent section nodes) ------------------------------------
-
-/** The five section ids, in TREE order (home's children). */
-export function ringSections() {
-	return TREE.home.children.slice();
-}
-
-export function ringNodesHTML() {
-	return ringSections()
-		.map(
-			(id, i) =>
-				`<button type="button" class="snode" data-section="${esc(id)}">` +
-				`<span class="sn-idx">${String(i + 1).padStart(2, "0")}</span>` +
-				`<span class="sn-name">${esc(id)}</span>` +
-				`</button>`,
-		)
-		.join("");
-}
+for (const s of socials) CHILD_INDEX[s.id] = { kind: "social", data: s };
 
 // ---- ledes / summaries -----------------------------------------------------
 
@@ -89,33 +67,57 @@ export function sectionLede(id) {
 	}
 }
 
-// ---- wheel (radial child menu) ---------------------------------------------
+// ---- persistent world nodes (home + 5 sections) -----------------------------
+//
+// Every node on the board shares one shape: an outer positioned <div> holding
+// a compact block (a nav <button>, shown normally) and an expanded block (the
+// focused content, shown when the node carries .is-focused). Both blocks are
+// built once; CSS toggles which is visible, so focusing a node never rebuilds
+// DOM. The outer div is NOT a button because expanded content holds block
+// elements and real links.
 
-// Every work/project child fits in the wheel (10 work, 9 projects), so no node
-// is stranded off the desktop board. squareWheelPositions spaces them evenly.
-export const WHEEL_CAP = 10;
-
-/**
- * Children to show in the radial wheel. Only the section (hub) view shows the
- * wheel; a child (detail) view hides it and gives the detail card the full
- * board so the description is readable without scrolling.
- */
-export function wheelChildren(state) {
-	if (state.view === "section") {
-		const t = TREE[state.section];
-		if (!t || !t.children || t.children.length === 0) return [];
-		return t.children.slice(0, WHEEL_CAP);
+function nodeExpandedHTML(id) {
+	if (id === "home") return homeCard();
+	if (TREE[id]?.children.length) {
+		return (
+			`<p class="hub-title">${esc(id)}</p>` +
+			`<p class="hub-tagline">${esc(hubTagline[id])}</p>`
+		);
 	}
-	return [];
+	return SECTION_BODY[id] ? SECTION_BODY[id]() : "";
 }
 
-/**
- * Inner HTML for a wheel item. Enlarged boxes (see .wheel-item in style.css)
- * carry real content: work → company + role + dates; projects → name + tagline
- * + tech stack; extracurriculars → name + role. Long fields are clamped/ellipsed
- * by CSS so they never spill their box.
- */
-export function wheelItemHTML(id) {
+/** Static markup for #world: home plus the five sections, in TREE order. */
+export function worldNodesHTML() {
+	return ["home", ...TREE.home.children]
+		.map(
+			(id) =>
+				`<div class="pnode pnode-${id === "home" ? "home" : "section"}" data-pnode="${esc(id)}">` +
+				`<button type="button" class="pn-compact" data-nav="${esc(id)}">` +
+				`<span class="sn-name">${esc(id)}</span>` +
+				`</button>` +
+				`<div class="pn-expanded" role="region" aria-label="${esc(id)}" tabindex="-1">` +
+				nodeExpandedHTML(id) +
+				`</div>` +
+				`</div>`,
+		)
+		.join("\n");
+}
+
+// ---- fan (children of the active section) -----------------------------------
+
+/** Children fanned around the active section, in both section and child
+ * views (a focused child keeps its — hidden — siblings mounted). */
+export function activeChildren(state) {
+	const id =
+		state.view === "section" || state.view === "child" ? state.section : null;
+	return TREE[id]?.children || [];
+}
+
+/** Compact fan-item content: work → company + role + dates; projects → name +
+ * tagline + stack; extracurriculars → name + role; socials → label + handle.
+ * Long fields are clamped/ellipsed by CSS so they never spill their box. */
+function childCompactHTML(id) {
 	const c = CHILD_INDEX[id];
 	if (!c) return `<span class="wi-title">${esc(id)}</span>`;
 	if (c.kind === "project") {
@@ -136,9 +138,46 @@ export function wheelItemHTML(id) {
 			(c.data.date ? `<span class="wi-meta">${esc(c.data.date)}</span>` : "")
 		);
 	}
+	if (c.kind === "social") {
+		return (
+			`<span class="wi-title">${esc(c.data.label)}</span>` +
+			`<span class="wi-desc">${esc(c.data.handle)}</span>`
+		);
+	}
 	return (
 		`<span class="wi-title">${esc(c.data.name)}</span>` +
 		`<span class="wi-desc">${esc(c.data.role)}</span>`
+	);
+}
+
+function socialBoxHTML(s) {
+	const external = s.url.startsWith("http");
+	return `<article class="exp-box social-box">
+    <span class="exp-head"><span class="role">${esc(s.label)}</span></span>
+    <span class="exp-desc">${esc(s.handle)}</span>
+    <a href="${esc(s.url)}"${external ? ' target="_blank" rel="noopener"' : ""}>open ↗</a>
+  </article>`;
+}
+
+/** Expanded fan-item content (the focused child's full detail). */
+function childExpandedHTML(id) {
+	const c = CHILD_INDEX[id];
+	if (!c) return `<p>${esc(id)}</p>`;
+	if (c.kind === "project")
+		return `<div class="proj-grid single">${projBoxHTML(c.data, { linked: false })}</div>`;
+	if (c.kind === "social") return socialBoxHTML(c.data);
+	return expBoxHTML(c.kind, c.data, { linked: false });
+}
+
+/** Full markup for one fan node: compact nav button + expanded detail. */
+export function childNodeHTML(id) {
+	return (
+		`<button type="button" class="fn-compact" data-child="${esc(id)}">` +
+		childCompactHTML(id) +
+		`</button>` +
+		`<div class="fn-expanded" role="region" aria-label="${esc(id)} detail" tabindex="-1">` +
+		childExpandedHTML(id) +
+		`</div>`
 	);
 }
 
@@ -154,12 +193,16 @@ export function homeCard() {
       </div>
     </div>
     <a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ view resume ]</a>
-    <h3>about</h3>
+    <h2>about</h2>
     <p>${esc(aboutBlurb)}</p>
   `;
 }
 
-// ---- section bodies (work / projects / resume / socials / cluster) --------
+// ---- section bodies (work / projects / resume / socials / cluster) ---------
+// These are the FULL section renderings, used by the collapsed/mobile card
+// and the no-JS prerender. (On the desktop board, sections with children
+// expand to a small hub instead — see nodeExpandedHTML — because their
+// children are already on the board as fan nodes.)
 
 function expBoxHTML(kind, d, { linked = true } = {}) {
 	const roleText = d.title || d.name || "";
@@ -170,7 +213,7 @@ function expBoxHTML(kind, d, { linked = true } = {}) {
 	// both the clickable (card list) and static (child detail) renderings
 	// share this all-<span> inner markup.
 	const inner = `<span class="exp-head">
-      <span class="role">${esc(roleText)}</span> · <span class="co">${esc(coText)}</span>
+      <span class="exp-who"><span class="role">${esc(roleText)}</span> · <span class="co">${esc(coText)}</span></span>
       ${when ? `<span class="when">${esc(when)}</span>` : ""}
     </span>
     <span class="exp-desc">${esc(desc)}</span>`;
@@ -193,69 +236,21 @@ function projBoxHTML(d, { linked = true } = {}) {
   </article>`;
 }
 
-// Shared between the interactive hub (.sec-list) and the prerendered
-// *FullHTML variants — both list every work/extra entry or project, just
-// wrapped differently, so the entry markup itself is built once here.
-function workListHTML() {
-	return `${workExperience.map((w) => expBoxHTML("work", w)).join("\n")}
-    <h3>extra-curriculars</h3>
-    ${extraCurricular.map((e) => expBoxHTML("extra", e)).join("\n")}`;
-}
-
-function projectsListHTML() {
-	return projects.map((p) => projBoxHTML(p)).join("\n");
-}
-
 function workSectionHTML() {
-	// .hub-mini is the small title+tagline shown on the desktop board (the
-	// wheel supplies the child nodes, so the hub node itself stays minimal).
-	// .sec-full is the fuller heading+count CSS shows instead once collapsed,
-	// above the same child list .sec-list reveals for mobile tapping — both
-	// paths render the same entries, just gated by #graph.collapsed in CSS.
-	return `
-    <div class="hub-mini">
-      <p class="hub-title">work</p>
-      <p class="hub-tagline">${esc(hubTagline.work)}</p>
-    </div>
-    <div class="sec-full">
-      <h3>work experience</h3>
-      <p class="node-lede">${esc(workExperience.length)} roles · ${esc(extraCurricular.length)} extracurriculars</p>
-    </div>
-    <div class="sec-list">
-      ${workListHTML()}
-    </div>
-  `;
-}
-
-function workSectionFullHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("work"))}</p>
-    <h3>work experience</h3>
-    ${workListHTML()}
+    <h2>work experience</h2>
+    ${workExperience.map((w) => expBoxHTML("work", w)).join("\n")}
+    <h2>extra-curriculars</h2>
+    ${extraCurricular.map((e) => expBoxHTML("extra", e)).join("\n")}
   `;
 }
 
 function projectsSectionHTML() {
-	// See workSectionHTML(): .hub-mini/.sec-full are the desktop/collapsed
-	// heading swap, .sec-list is the collapsed/mobile tap target list.
-	return `
-    <div class="hub-mini">
-      <p class="hub-title">projects</p>
-      <p class="hub-tagline">${esc(hubTagline.projects)}</p>
-    </div>
-    <div class="sec-full">
-      <h3>projects</h3>
-      <p class="node-lede">${esc(projects.length)} builds · systems, concurrency, devops</p>
-    </div>
-    <div class="sec-list proj-grid">${projectsListHTML()}</div>
-  `;
-}
-
-function projectsSectionFullHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("projects"))}</p>
-    <h3>projects</h3>
-    <div class="proj-grid">${projectsListHTML()}</div>
+    <h2>projects</h2>
+    <div class="proj-grid">${projects.map((p) => projBoxHTML(p)).join("\n")}</div>
   `;
 }
 
@@ -263,7 +258,7 @@ function resumeSectionHTML() {
 	const filename = resumePath.split("/").pop();
 	return `
     <p class="node-lede">${esc(sectionLede("resume"))}</p>
-    <h3>resume</h3>
+    <h2>resume</h2>
     <p>${esc(resumeBlurb)}</p>
     <a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ open ${esc(filename)} ]</a>
     <p class="tip">${esc(resumeCopy.tip)}</p>
@@ -273,7 +268,7 @@ function resumeSectionHTML() {
 function socialsSectionHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("socials"))}</p>
-    <h3>connect</h3>
+    <h2>connect</h2>
     <ul class="social-list">
       ${socials
 				.map(
@@ -290,7 +285,7 @@ function socialsSectionHTML() {
 function clusterSectionHTML() {
 	return `
     <p class="node-lede">${esc(sectionLede("cluster"))}</p>
-    <h3>${esc(clusterCopy.title.toLowerCase())}</h3>
+    <h2>${esc(clusterCopy.title.toLowerCase())}</h2>
     <p class="warning">[!] Access to this infrastructure is strictly controlled.</p>
     <p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p>
     <p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p>
@@ -316,17 +311,10 @@ function breadcrumbHTML(section, child) {
   </div>`;
 }
 
-function childDetailHTML(childId) {
-	const c = CHILD_INDEX[childId];
-	if (!c) return "<p>Not found.</p>";
-	if (c.kind === "project")
-		return `<div class="proj-grid single">${projBoxHTML(c.data, { linked: false })}</div>`;
-	return expBoxHTML(c.kind, c.data, { linked: false });
-}
-
 // ---- top-level dispatch ------------------------------------------------------
 
-/** Build the #card innerHTML for a given router state. */
+/** Build the #card innerHTML for a given router state (collapsed/mobile
+ * fallback only — the desktop board renders the world nodes instead). */
 export function cardHTML(state) {
 	if (state.view === "home") return homeCard();
 	if (state.view === "section") {
@@ -335,7 +323,8 @@ export function cardHTML(state) {
 	}
 	if (state.view === "child") {
 		return (
-			breadcrumbHTML(state.section, state.child) + childDetailHTML(state.child)
+			breadcrumbHTML(state.section, state.child) +
+			childExpandedHTML(state.child)
 		);
 	}
 	return "";
@@ -345,8 +334,8 @@ export function cardHTML(state) {
 export function prerenderAll() {
 	return {
 		home: homeCard(),
-		work: workSectionFullHTML(),
-		projects: projectsSectionFullHTML(),
+		work: workSectionHTML(),
+		projects: projectsSectionHTML(),
 		resume: resumeSectionHTML(),
 		socials: socialsSectionHTML(),
 		cluster: clusterSectionHTML(),

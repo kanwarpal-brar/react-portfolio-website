@@ -28,3 +28,6 @@ playwright-mcp.config.json
 
 # pi subagent run artifacts
 .pi-subagents/
+
+# local MCP server config
+.mcp.json

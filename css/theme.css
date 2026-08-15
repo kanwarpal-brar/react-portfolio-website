@@ -38,7 +38,7 @@
 
 	/* timing */
 	--t-fast: 140ms;
-	--t-med: 320ms;
-	--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--t-med: 420ms;
+	--ease: cubic-bezier(0.4, 0, 0.2, 1);
 	--tr-fast: var(--t-fast) linear; /* shorthand for the common linear color/border fade */
 }

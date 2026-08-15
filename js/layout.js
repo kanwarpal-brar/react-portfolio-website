@@ -4,17 +4,18 @@
 // plain numbers/objects.
 
 /**
- * RING_SLOTS — fixed pentagon positions for the five persistent section
- * nodes, expressed as a percentage of the board (#graph). These never
- * change between views, so ring nodes never move.
+ * boardScale — the single viewport-adaptation factor for the whole world.
+ * Every node size, position, and fan frame is defined at a reference scale
+ * (s = 1) and multiplied by s, so all clearances between boxes are
+ * scale-invariant: if the reference layout fits, every scaled layout fits.
+ * The home-view world spans fitW × fitH px at s = 1; s is the smaller of the
+ * two per-axis fits (the layout is wider than tall), capped at `max`.
  */
-export const RING_SLOTS = {
-	work: { x: 50, y: 8 },
-	projects: { x: 88, y: 37 },
-	cluster: { x: 73.5, y: 84 },
-	socials: { x: 26.5, y: 84 },
-	resume: { x: 12, y: 37 },
-};
+export function boardScale({ bw, bh, margin = 12, fitW, fitH, max = 1.3 }) {
+	const sx = (bw - 2 * margin) / fitW;
+	const sy = (bh - 2 * margin) / fitH;
+	return Math.max(0, Math.min(max, sx, sy));
+}
 
 /**
  * rectPerimeterPoint — the point at arc-length `s` (clockwise from the
@@ -42,9 +43,8 @@ export function rectPerimeterPoint(halfW, halfH, s) {
  * around a rectangle ("square wheel") centered at (cx, cy) with half-extents
  * (halfW, halfH). Nodes are centered within their arc segment (offset by half
  * a step) so none sits exactly at the top-center (clear of the vertical spoke
- * to the `work`/`projects` ring node) and the layout is left-right symmetric
- * for even counts. Returns an array of absolute {x, y} points, clockwise from
- * the top.
+ * to the section node) and the layout is left-right symmetric for even
+ * counts. Returns an array of absolute {x, y} points, clockwise from the top.
  */
 export function squareWheelPositions({ count, cx, cy, halfW, halfH }) {
 	if (!count || count <= 0) return [];
@@ -76,63 +76,22 @@ export function rectEdgePoint(cx, cy, nx, ny, hw, hh) {
 }
 
 /**
- * largestClearRect — the largest axis-aligned rectangle, centered at (cx, cy)
- * and locked to aspect ratio aw:ah, whose edges stay at least `gap` px away
- * from every node box in `nodes` (each `{x, y, hw, hh}`). Returns
- * `{ halfW, halfH }`.
- *
- * A centered card of half-size (s·aw, s·ah) overlaps a node iff it is within
- * range on BOTH axes; so the node stays clear as long as
- *   s ≤ max( (|dx|-hw-gap)/aw , (|dy|-hh-gap)/ah )
- * (clearing on either axis is enough). The binding limit is the smallest such
- * `s` across all nodes. This is what lets the card grow into the corners that
- * point *between* the ring nodes instead of being crushed by the nearest one.
+ * spokeLines — connector endpoints from one hub to its nodes, clipped to the
+ * real box edges. Coordinates are supplied by the caller in one space
+ * (screen or world); this helper deliberately has no knowledge of views.
  */
-export function largestClearRect(nodes, cx, cy, gap, aw, ah) {
-	let s = Infinity;
-	for (const n of nodes) {
-		const tw = (Math.abs(n.x - cx) - n.hw - gap) / aw;
-		const th = (Math.abs(n.y - cy) - n.hh - gap) / ah;
-		s = Math.min(s, Math.max(tw, th));
-	}
-	if (!Number.isFinite(s) || s < 0) s = 0;
-	return { halfW: s * aw, halfH: s * ah };
-}
-
-/** One spoke line from `n` (a ring or wheel node) to the card at (cx, cy),
- * clipped to both boxes' edges. Shared by the ring/wheel loops below, which
- * differ only in `type` and which state field marks the active node. */
-function spokeLine(n, cx, cy, cardHalf, type, activeId) {
-	const start = rectEdgePoint(n.x, n.y, cx, cy, cardHalf.w, cardHalf.h);
-	const end = rectEdgePoint(cx, cy, n.x, n.y, n.hw, n.hh);
-	return {
-		id: n.id,
-		type,
-		active: n.id === activeId,
-		x1: start.x,
-		y1: start.y,
-		x2: end.x,
-		y2: end.y,
-	};
-}
-
-/**
- * graphLinePoints — spoke endpoints for any view (home, section, child):
- * computes lines from card center/edge to ring nodes and/or wheel nodes.
- */
-export function graphLinePoints({
-	cx,
-	cy,
-	cardHalf,
-	ringNodes = [],
-	wheelNodes = [],
-	activeSection = null,
-	activeChild = null,
-}) {
-	const lines = [];
-	for (const n of ringNodes)
-		lines.push(spokeLine(n, cx, cy, cardHalf, "ring", activeSection));
-	for (const n of wheelNodes)
-		lines.push(spokeLine(n, cx, cy, cardHalf, "wheel", activeChild));
-	return lines;
+export function spokeLines({ hub, nodes, type, activeId = null }) {
+	return nodes.map((node) => {
+		const start = rectEdgePoint(node.x, node.y, hub.x, hub.y, hub.hw, hub.hh);
+		const end = rectEdgePoint(hub.x, hub.y, node.x, node.y, node.hw, node.hh);
+		return {
+			id: node.id,
+			type,
+			active: node.id === activeId,
+			x1: start.x,
+			y1: start.y,
+			x2: end.x,
+			y2: end.y,
+		};
+	});
 }

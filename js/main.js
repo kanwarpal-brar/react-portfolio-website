@@ -8,7 +8,6 @@ import {
 	applyGeometry,
 	initShell,
 } from "./render.js";
-import { flipCardFrom, flipCardEnter } from "./flip.js";
 
 function debounce(fn, ms) {
 	let t;
@@ -19,38 +18,38 @@ function debounce(fn, ms) {
 }
 
 /**
- * Navigate + render synchronously, with focus handling and a card entrance
- * animation. Every in-app navigation runs through here (ring/tile/breadcrumb
- * clicks, background-click-home, and Esc, via the `goTo` callback), so
- * returning home animates the same as entering a section. When the trigger
- * element is still on-screen the card grows from it (FLIP); otherwise it plays
- * the generic settle-in. The follow-up hashchange re-renders but does not
- * re-animate, so there's no double entrance.
+ * Navigate + render synchronously, with focus handling. Every in-app
+ * navigation runs through here (node/breadcrumb clicks, background-click-home,
+ * and Esc). The camera pan + node expand/collapse animations are pure CSS
+ * transitions on the persistent world nodes, so there is nothing to measure
+ * or choreograph here — render + a synchronous geometry pass is enough. The
+ * follow-up hashchange re-renders the same state, which is a no-op visually.
  */
 function goTo(path, trigger) {
 	const state = navigate(path);
 	render(state);
-	// Size the card to its FINAL box now (render only schedules geometry for the
-	// next frame). flipCardFrom measures the card's box to compute the grow-from
-	// transform, so it must be final before the flip — otherwise the animation is
-	// scaled/aimed from a stale size.
+	// Commit positions/camera now (render only schedules geometry for the next
+	// frame) so focus lands on the already-focused node.
 	applyGeometry();
-	const card = document.getElementById("card");
 	const triggerOnScreen = trigger && document.contains(trigger);
 	if (state.view !== "home") {
+		// Move focus to the focused node's expanded region (or the card when
+		// collapsed, where the world is hidden).
+		const graph = document.getElementById("graph");
+		const target = graph?.classList.contains("collapsed")
+			? document.getElementById("card")
+			: document.querySelector(
+					".is-focused .pn-expanded, .is-focused .fn-expanded",
+				);
 		requestAnimationFrame(() => {
 			try {
-				card?.focus({ preventScroll: true });
+				target?.focus({ preventScroll: true });
 			} catch (_) {}
 		});
 	} else if (triggerOnScreen) {
 		try {
 			trigger.focus({ preventScroll: true });
 		} catch (_) {}
-	}
-	if (card) {
-		if (triggerOnScreen) flipCardFrom(trigger, card);
-		else flipCardEnter(card);
 	}
 }
 
@@ -59,17 +58,15 @@ function handleGraphClick(e) {
 
 	const btn = e.target.closest("button");
 	if (!btn) {
-		// Click on the bare board (not card or content) returns home
-		if (e.target.id === "graph" && currentState().view !== "home") {
+		// Click on the bare board (not a node or content) returns home. Empty
+		// space can be #graph itself or one of the world's full-size layers.
+		const bare = ["graph", "world", "pnodes", "fan"].includes(e.target.id);
+		if (bare && currentState().view !== "home") {
 			goTo("home", null);
 		}
 		return;
 	}
 
-	if (btn.classList.contains("snode")) {
-		goTo(btn.dataset.section, btn);
-		return;
-	}
 	if (btn.dataset.nav) {
 		goTo(btn.dataset.nav, btn);
 		return;
@@ -103,30 +100,11 @@ function boot() {
 		else if (s.view === "section") goTo("home", null);
 	});
 
-	// Recompute geometry once the card's flip entrance settles, as a safety net
-	// (geometry is already transform-immune, but this guarantees a final pass).
-	const cardEl = document.getElementById("card");
-	if (cardEl) {
-		cardEl.addEventListener("transitionend", (e) => {
-			if (e.target === cardEl && e.propertyName === "transform")
-				scheduleGeometry();
-		});
-	}
-
 	if (typeof ResizeObserver !== "undefined" && graph) {
-		const ro = new ResizeObserver(() => scheduleGeometry());
-		ro.observe(graph);
+		new ResizeObserver(scheduleGeometry).observe(graph);
 	} else {
-		window.addEventListener("resize", () => scheduleGeometry());
+		window.addEventListener("resize", scheduleGeometry);
 	}
-	window.addEventListener("orientationchange", () => scheduleGeometry());
-
-	// Recompute once the monospace web font loads (ring nodes are sized in `ch`,
-	// so their box changes when the real font replaces the fallback) and once the
-	// page fully loads — belt-and-suspenders against an early first pass.
-	if (document.fonts && document.fonts.ready)
-		document.fonts.ready.then(() => scheduleGeometry());
-	window.addEventListener("load", () => scheduleGeometry(), { once: true });
 
 	// Topbar viewport read-out: the actual window size in px, a small TUI
 	// chrome touch. (Was a derived cols\u00d7rows char-grid estimate \u2014 accurate to
