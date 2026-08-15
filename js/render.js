@@ -1,77 +1,233 @@
-// render.js — assign focus/ring/hidden roles, measure the focused panel,
-// position the derived ring, and draw simple decorative edges.
+// render.js — one rigid world, moved by a camera.
+//
+// The graph has a single set of world coordinates built once per board size.
+// Navigating never re-places a node: it moves the camera so the focused node
+// sits at board centre. Because nodes keep their positions, the parent of a
+// node keeps its real direction and the transition reads as a pan along the
+// edge to the next node, rather than a per-view re-slotting.
 
-import { edgeLines, NODE, ringPositions } from "./layout.js";
+import {
+	allEdges,
+	buildGraph,
+	buildWorld,
+	cameraFor,
+	distancesFrom,
+	linkedFor,
+	NODE,
+	occludedBy,
+	visibleFor,
+} from "./layout.js";
 import { nodeIds, pageTitle } from "./content.js";
 import { TREE } from "./data.js";
 
-const PANEL_WIDTHS = [880, 820, 760, 700, 640, 580, 520, 480];
-const TOP = -Math.PI / 2;
-const BOTTOM = Math.PI / 2;
+// Wider panels are shorter, and board height is the scarce resource, so this
+// ladder is scored rather than taken widest-first.
+const PANEL_WIDTHS = [960, 900, 880, 840, 800, 760, 720, 680, 640, 560, 480];
+const FLOW_QUERY = "(max-width: 1100px)";
+// A panel may shrink below the view's width while it costs no more than this
+// much extra height. Short content then gets a tight panel instead of a wide
+// one padded with dead space.
+const REFLOW_TOLERANCE = 8;
+// Preferred breathing room between a neighbour card and the board edge.
+const EDGE_GAP = 36;
+// Beyond this many hops the map is context rather than content, so all further
+// nodes share the faintest tier instead of fading to nothing.
+const MAX_DIM_TIER = 3;
 
+const graphTree = buildGraph(TREE, "home");
+
+let world = null;
+let worldKey = "";
+let edgeKey = "";
 let geometryRaf = 0;
-let edgeRaf = 0;
-let edgeUntil = 0;
-let edgeState = null;
 
 function focusId(state) {
 	if (state.view === "home") return "home";
 	return state.view === "child" ? state.child : state.section;
 }
 
-function ringIds(state) {
-	if (state.view === "home") return TREE.home.children;
-	if (state.view === "section")
-		return ["home", ...TREE[state.section].children];
-	return [
-		state.section,
-		...TREE[state.section].children.filter((id) => id !== state.child),
-	];
-}
-
-function startAngle(state) {
-	return state.view === "home" ? TOP : BOTTOM;
-}
-
 function elementFor(id) {
 	return document.querySelector(`[data-node="${CSS.escape(id)}"]`);
 }
 
-function measurePanel(node, width) {
-	const panel = node.querySelector(".panel");
+/**
+ * Measure a panel once, offscreen, at a given width. CSS never interpolates
+ * `auto`: the renderer writes measured px so width/height animate numerically.
+ */
+function measurePanel(id, width) {
+	const panel = elementFor(id)?.querySelector(".panel");
 	if (!panel) return 0;
-	const previousStyle = panel.getAttribute("style");
-	// The panel is normally absolutely inset into its node. Measure it once as
-	// an offscreen, auto-height box instead of asking CSS to interpolate `auto`.
+	const previous = panel.getAttribute("style");
 	panel.style.cssText = `position:fixed;inset:auto;left:-10000px;top:0;width:${width}px;height:auto;visibility:hidden;pointer-events:none;display:block`;
-	// scrollHeight excludes this box's own horizontal borders; reserve them so
-	// the final border-box panel never clips a line by one or two pixels.
+	// scrollHeight excludes the box's own horizontal borders; reserve them so the
+	// final border-box panel never clips a line by a pixel or two.
 	const height = Math.ceil(panel.scrollHeight) + 2;
-	if (previousStyle == null) panel.removeAttribute("style");
-	else panel.setAttribute("style", previousStyle);
+	if (previous == null) panel.removeAttribute("style");
+	else panel.setAttribute("style", previous);
 	return height;
 }
 
-function chooseLayout(graph, focus) {
-	const board = graph.getBoundingClientRect();
-	if (!board.width || !board.height) return { mode: "flow" };
-	const state = graph._state;
-	const ids = ringIds(state);
-	if (window.matchMedia("(max-width: 900px)").matches) return { mode: "flow" };
-
-	for (const width of PANEL_WIDTHS) {
-		const height = measurePanel(focus, width);
-		const points = ringPositions({
-			n: ids.length,
-			startAngle: startAngle(state),
-			panelW: width,
-			panelH: height,
-			boardW: board.width,
-			boardH: board.height,
-		});
-		if (points) return { mode: "ring", width, height, points, board };
+/** Every panel measured at every candidate width: `{ id: { width: height } }`. */
+function measureMatrix() {
+	const matrix = {};
+	for (const id of nodeIds()) {
+		matrix[id] = {};
+		for (const width of PANEL_WIDTHS)
+			matrix[id][width] = measurePanel(id, width);
 	}
-	return { mode: "flow" };
+	return matrix;
+}
+
+/**
+ * Fit each panel individually, never wider than the view's ceiling. A node with
+ * little to say gets a small panel; only long content earns a wide one.
+ */
+function fitSizes(matrix, ceiling) {
+	const sizes = {};
+	for (const id of nodeIds()) {
+		const base = matrix[id][ceiling];
+		let chosen = ceiling;
+		for (const width of PANEL_WIDTHS) {
+			if (width > ceiling) continue;
+			if (matrix[id][width] <= base + REFLOW_TOLERANCE) chosen = width;
+		}
+		sizes[id] = { w: chosen, h: matrix[id][chosen] };
+	}
+	return sizes;
+}
+
+/**
+ * How well a world fills the board. Neighbours pushed close to the edge score
+ * badly, but so does a world that huddles near the centre and leaves the board
+ * empty, so this rewards the placement whose neighbours sit nearest a target
+ * band inside the edge.
+ */
+function fillScore(positions, boardW, boardH) {
+	let total = 0;
+	let count = 0;
+	for (const id of Object.keys(positions)) {
+		const camera = cameraFor(positions, id);
+		for (const other of visibleFor(graphTree, id)) {
+			if (other === id) continue;
+			const x = positions[other].x + camera.x;
+			const y = positions[other].y + camera.y;
+			const slackX = boardW / 2 - Math.abs(x) - NODE.w / 2;
+			const slackY = boardH / 2 - Math.abs(y) - NODE.h / 2;
+			const slack = Math.min(slackX, slackY);
+			// Off-board neighbours are allowed — the board is a window onto a larger
+			// map — but they cost more than a well-placed card, so a world that keeps
+			// links reachable still wins.
+			total -=
+				slack < 0
+					? EDGE_GAP + Math.min(-slack, 400)
+					: Math.abs(slack - EDGE_GAP);
+			count++;
+		}
+	}
+	return count ? total / count : -Infinity;
+}
+
+/**
+ * Build the best world for this board: try every panel width and keep the one
+ * whose tightest view has the most room. Returns `null` when nothing fits, and
+ * the caller switches to the flow presentation.
+ */
+function solveWorld(boardW, boardH) {
+	const matrix = measureMatrix();
+	let best = null;
+	for (const ceiling of PANEL_WIDTHS) {
+		const sizes = fitSizes(matrix, ceiling);
+		const positions = buildWorld({
+			graph: graphTree,
+			root: "home",
+			panelSize: (id) => sizes[id],
+			boardW,
+			boardH,
+		});
+		if (!positions) continue;
+		const score = fillScore(positions, boardW, boardH);
+		if (score === -Infinity) continue;
+		if (!best || score > best.score)
+			best = { positions, sizes, score, ceiling };
+	}
+	return best;
+}
+
+function ensureWorld(boardW, boardH) {
+	const key = `${Math.round(boardW)}x${Math.round(boardH)}`;
+	if (worldKey === key) return world;
+	worldKey = key;
+	world = solveWorld(boardW, boardH);
+	return world;
+}
+
+/**
+ * Draw the whole graph's edges once, in world coordinates. The edge layer shares
+ * the camera transform with the node layer, so lines pan welded to their cards
+ * and are never redrawn mid-transition. Edges touching the focused node are
+ * marked so CSS can bring them forward.
+ */
+function drawEdges(graph, focus) {
+	const svg = graph.querySelector("#graph-lines");
+	if (!svg) return;
+	if (graph.dataset.layout !== "world" || !world) {
+		svg.replaceChildren();
+		edgeKey = "";
+		return;
+	}
+	const board = graph.getBoundingClientRect();
+	// The board is a window onto a larger world, so the SVG viewBox is centred on
+	// the origin and overflow is left visible.
+	svg.setAttribute(
+		"viewBox",
+		`${-board.width / 2} ${-board.height / 2} ${board.width} ${board.height}`,
+	);
+	const active = new Set(linkedFor(graphTree, focus));
+	const key = `${worldKey}|${board.width}x${board.height}`;
+	if (edgeKey !== key) {
+		edgeKey = key;
+		svg.replaceChildren(
+			...allEdges(graphTree, world.positions).map((line) => {
+				const element = document.createElementNS(
+					"http://www.w3.org/2000/svg",
+					"line",
+				);
+				element.setAttribute("x1", line.x1);
+				element.setAttribute("y1", line.y1);
+				element.setAttribute("x2", line.x2);
+				element.setAttribute("y2", line.y2);
+				element.dataset.from = line.from;
+				element.dataset.to = line.to;
+				return element;
+			}),
+		);
+	}
+	for (const line of svg.children) {
+		const touchesFocus =
+			line.dataset.from === focus || line.dataset.to === focus;
+		const adjacent =
+			active.has(line.dataset.from) || active.has(line.dataset.to);
+		if (touchesFocus) line.dataset.rank = "focus";
+		else if (adjacent) line.dataset.rank = "near";
+		else line.dataset.rank = "far";
+	}
+}
+
+/**
+ * Every node stays interactive, because every node stays on the map. Only the
+ * focused node's panel is exposed, and only panel-occluded nodes are dropped
+ * from the tab order along with being hidden.
+ */
+function setInteractivity(focus, hidden) {
+	for (const id of nodeIds()) {
+		const node = elementFor(id);
+		if (!node) continue;
+		const isFocus = id === focus;
+		node.inert = hidden.has(id);
+		node.querySelector(".panel")?.toggleAttribute("inert", !isFocus);
+		const link = node.querySelector(".node-link");
+		if (link) link.tabIndex = isFocus ? -1 : 0;
+	}
 }
 
 function setFlowInteractivity() {
@@ -84,140 +240,99 @@ function setFlowInteractivity() {
 	}
 }
 
-function setFocusDimensions(focus, layout) {
-	focus.style.setProperty("--panel-w", `${layout.width}px`);
-	focus.style.setProperty("--panel-h", `${layout.height}px`);
-}
-
-function setRingInteractivity(focus, ring) {
+function clearWorldStyles(graph) {
 	for (const id of nodeIds()) {
 		const node = elementFor(id);
 		if (!node) continue;
-		const isFocus = id === focus;
-		const isRing = ring.has(id);
-		node.inert = !isFocus && !isRing;
-		const panel = node.querySelector(".panel");
-		panel?.toggleAttribute("inert", !isFocus);
-		const link = node.querySelector(".node-link");
-		if (link) link.tabIndex = isFocus ? -1 : 0;
+		node.style.removeProperty("--x");
+		node.style.removeProperty("--y");
+		node.style.removeProperty("--panel-w");
+		node.style.removeProperty("--panel-h");
+		node.removeAttribute("data-depth");
 	}
-}
-
-function drawEdges(graph, focus, ids) {
-	const svg = graph.querySelector("#graph-lines");
-	if (!svg) return;
-	if (graph.dataset.layout !== "ring") {
-		svg.replaceChildren();
-		return;
-	}
-	const board = graph.getBoundingClientRect();
-	const focusRect = focus.getBoundingClientRect();
-	const from = {
-		x: focusRect.left - board.left + focusRect.width / 2,
-		y: focusRect.top - board.top + focusRect.height / 2,
-	};
-	const to = ids
-		.map((id) => {
-			const node = elementFor(id);
-			const rect = node?.getBoundingClientRect();
-			return rect
-				? {
-						id,
-						x: rect.left - board.left + rect.width / 2,
-						y: rect.top - board.top + rect.height / 2,
-					}
-				: null;
-		})
-		.filter(Boolean);
-	const lines = edgeLines({ from, to });
-	svg.setAttribute("viewBox", `0 0 ${board.width} ${board.height}`);
-	svg.replaceChildren(
-		...lines.map((line) => {
-			const element = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"line",
-			);
-			element.setAttribute("x1", line.x1);
-			element.setAttribute("y1", line.y1);
-			element.setAttribute("x2", line.x2);
-			element.setAttribute("y2", line.y2);
-			return element;
-		}),
-	);
+	graph.style.removeProperty("--cam-x");
+	graph.style.removeProperty("--cam-y");
+	graph.querySelector("#graph-lines")?.replaceChildren();
+	edgeKey = "";
 }
 
 function applyGeometry() {
 	const graph = document.querySelector("#graph");
-	if (!graph?._state) return;
-	const focus = elementFor(focusId(graph._state));
-	if (!focus) return;
-	const ids = ringIds(graph._state);
-	const layout = chooseLayout(graph, focus);
-	graph.dataset.layout = layout.mode;
+	const state = graph?._state;
+	if (!state) return;
+	const focus = focusId(state);
 
-	if (layout.mode === "flow") {
-		focus.style.removeProperty("--panel-w");
-		focus.style.removeProperty("--panel-h");
-		for (const id of nodeIds()) {
-			const node = elementFor(id);
-			node?.style.removeProperty("--x");
-			node?.style.removeProperty("--y");
-		}
-		clearEdgeSync();
-		graph.querySelector("#graph-lines")?.replaceChildren();
+	const board = graph.getBoundingClientRect();
+	const flow =
+		window.matchMedia(FLOW_QUERY).matches ||
+		!board.width ||
+		!board.height ||
+		!ensureWorld(board.width, board.height);
+
+	if (flow) {
+		graph.dataset.layout = "flow";
+		clearWorldStyles(graph);
 		setFlowInteractivity();
 		return;
 	}
 
-	setRingInteractivity(focusId(graph._state), new Set(ids));
-	setFocusDimensions(focus, layout);
-	ids.forEach((id, index) => {
-		const point = layout.points[index];
+	graph.dataset.layout = "world";
+	const { positions, sizes } = world;
+	// World coordinates: written once per board size, identical for every view.
+	for (const id of nodeIds()) {
 		const node = elementFor(id);
-		if (!node) return;
-		node.style.setProperty(
-			"--x",
-			`${Math.round(point.x - layout.board.width / 2)}px`,
-		);
-		node.style.setProperty(
-			"--y",
-			`${Math.round(point.y - layout.board.height / 2)}px`,
-		);
-		node.style.setProperty("--delay", `${index * 25}ms`);
-	});
-	// Store the newest topology before any edge frame is queued. Every later
-	// frame reads this shared state, so rapid navigation cannot restore stale
-	// focus/ring endpoints from a captured callback.
-	edgeState = { focus, ids };
-	edgeUntil = performance.now() + 440;
-	requestAnimationFrame(() => {
-		if (!edgeState) return;
-		drawEdges(graph, edgeState.focus, edgeState.ids);
-		syncEdges(graph);
-	});
+		const point = positions[id];
+		if (!node || !point) continue;
+		node.style.setProperty("--x", `${Math.round(point.x)}px`);
+		node.style.setProperty("--y", `${Math.round(point.y)}px`);
+		node.style.setProperty("--panel-w", `${sizes[id].w}px`);
+		node.style.setProperty("--panel-h", `${sizes[id].h}px`);
+	}
+
+	// The camera is the only thing navigation changes.
+	const camera = cameraFor(positions, focus);
+	graph.style.setProperty("--cam-x", `${Math.round(camera.x)}px`);
+	graph.style.setProperty("--cam-y", `${Math.round(camera.y)}px`);
+
+	// Depth dims the map by hop distance so the eye can tell where it is, while
+	// the rest of the graph stays present as context.
+	const distance = distancesFrom(graphTree, focus);
+	const hidden = occludedBy(positions, focus, sizes[focus]);
+	for (const id of nodeIds()) {
+		const node = elementFor(id);
+		if (!node) continue;
+		const depth = distance[id] ?? MAX_DIM_TIER;
+		node.dataset.depth = String(Math.min(depth, MAX_DIM_TIER));
+		node.toggleAttribute("data-occluded", hidden.has(id));
+	}
+
+	setInteractivity(focus, hidden);
+	drawEdges(graph, focus);
 }
 
-function clearEdgeSync() {
-	if (edgeRaf) cancelAnimationFrame(edgeRaf);
-	edgeRaf = 0;
-	edgeState = null;
-}
-
-// Geometry is derived once per navigation. This short, read-only pass merely
-// follows the CSS transition so centre-to-centre decorative lines stay joined
-// to moving cards; it does not recalculate layout or inspect SVG transforms.
-function syncEdges(graph) {
-	if (edgeRaf) return;
-	const tick = () => {
-		if (edgeState) drawEdges(graph, edgeState.focus, edgeState.ids);
-		if (edgeState && performance.now() < edgeUntil) {
-			edgeRaf = requestAnimationFrame(tick);
-		} else {
-			edgeRaf = 0;
-			edgeState = null;
-		}
+/**
+ * Move keyboard focus to the newly focused panel. The panel fades in behind the
+ * camera pan, and a `visibility: hidden` element cannot take focus, so this
+ * waits for it to become visible rather than firing on the next frame and
+ * silently dropping focus to <body>.
+ */
+function moveFocusToPanel(focus) {
+	const panel = elementFor(focus)?.querySelector(".panel");
+	if (!panel) return;
+	const attempt = () => {
+		if (getComputedStyle(panel).visibility === "hidden") return false;
+		panel.focus({ preventScroll: true });
+		return document.activeElement === panel;
 	};
-	edgeRaf = requestAnimationFrame(tick);
+	if (attempt()) return;
+	panel.addEventListener("transitionend", attempt, { once: true });
+	// Belt and braces: transitions can be disabled (reduced motion) or coalesced,
+	// so also retry on a short timer bounded by the pan itself.
+	let elapsed = 0;
+	const poll = setInterval(() => {
+		elapsed += 50;
+		if (attempt() || elapsed >= 1200) clearInterval(poll);
+	}, 50);
 }
 
 export function scheduleGeometry() {
@@ -228,44 +343,39 @@ export function scheduleGeometry() {
 	});
 }
 
+export function invalidateWorld() {
+	worldKey = "";
+	world = null;
+}
+
 export function render(state, { moveFocus = false } = {}) {
 	const graph = document.querySelector("#graph");
 	if (!graph) return;
-	clearEdgeSync();
 	graph._state = state;
 	graph.dataset.view = state.view;
-	const focusIdValue = focusId(state);
-	graph.dataset.focus = focusIdValue;
+	const focus = focusId(state);
+	graph.dataset.focus = focus;
 	document.title = pageTitle(state);
 
-	const focus = elementFor(focusIdValue);
-	if (!focus) return;
-	const layout = chooseLayout(graph, focus);
-	graph.dataset.layout = layout.mode;
-	if (layout.mode === "ring") setFocusDimensions(focus, layout);
-
-	const ring = new Set(ringIds(state));
+	// Every node stays on the map: only the focused one expands, its direct
+	// links are highlighted, and everything else remains visible context.
+	const linked = new Set(linkedFor(graphTree, focus));
 	for (const id of nodeIds()) {
 		const node = elementFor(id);
 		if (!node) continue;
-		let role = "hidden";
-		if (id === focusIdValue) role = "focus";
-		else if (ring.has(id)) role = "ring";
+		let role = "distant";
+		if (id === focus) role = "focus";
+		else if (linked.has(id)) role = "linked";
 		node.dataset.role = role;
 		const link = node.querySelector(".node-link");
 		if (link) {
-			if (id === focusIdValue) link.setAttribute("aria-current", "page");
+			if (id === focus) link.setAttribute("aria-current", "page");
 			else link.removeAttribute("aria-current");
 		}
 	}
-	if (layout.mode === "flow") setFlowInteractivity();
-	else setRingInteractivity(focusIdValue, ring);
-	scheduleGeometry();
-	if (moveFocus) {
-		requestAnimationFrame(() =>
-			focus.querySelector(".panel")?.focus({ preventScroll: true }),
-		);
-	}
+
+	applyGeometry();
+	if (moveFocus) moveFocusToPanel(focus);
 }
 
 export function initShell() {

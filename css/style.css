@@ -110,6 +110,13 @@ kbd {
 	overflow: hidden;
 	isolation: isolate;
 }
+/* The camera. Both layers share one transform, so edges stay welded to cards
+ * for the whole pan without being redrawn frame by frame. */
+#graph-lines,
+#nodes {
+	transform: translate3d(var(--cam-x, 0px), var(--cam-y, 0px), 0);
+	transition: transform var(--t-pan) var(--ease-pan);
+}
 #graph-lines {
 	position: absolute;
 	inset: 0;
@@ -117,11 +124,25 @@ kbd {
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
+	overflow: visible;
 }
+/* Edges belong to the map, so all of them are drawn. Rank only changes emphasis:
+ * the focused node's own edges read clearly, the rest recede into context. */
 #graph-lines line {
 	stroke: var(--border-bright);
 	stroke-width: 1;
 	stroke-dasharray: 3 5;
+	transition: opacity var(--t-pan) var(--ease-pan);
+}
+#graph-lines line[data-rank="focus"] {
+	stroke: var(--accent);
+	opacity: 0.75;
+}
+#graph-lines line[data-rank="near"] {
+	opacity: 0.5;
+}
+#graph-lines line[data-rank="far"] {
+	opacity: 0.22;
 }
 #nodes {
 	position: absolute;
@@ -129,38 +150,65 @@ kbd {
 	z-index: 1;
 }
 
+/* Nodes are placed in world coordinates and never move between views. The whole
+ * map is always rendered; only the focused node's size and each node's emphasis
+ * change, so the graph stays one continuous structure while the camera moves. */
 .node {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	z-index: 2;
-	opacity: 0;
-	pointer-events: none;
-}
-.node[data-role="ring"] {
 	width: 176px;
 	height: 76px;
-	transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
+	margin: -38px 0 0 -88px;
+	translate: var(--x, 0px) var(--y, 0px);
 	opacity: 1;
 	pointer-events: auto;
 	transition:
-		transform var(--t-med) var(--ease) var(--delay, 0ms),
-		opacity var(--t-fast) linear;
+		width var(--t-size) var(--ease) var(--d-size),
+		height var(--t-size) var(--ease) var(--d-size),
+		margin var(--t-size) var(--ease) var(--d-size),
+		opacity var(--t-pan) var(--ease-pan);
+}
+/* Distance dimming: the focus and its links are legible, the rest of the map
+ * recedes but stays visible so connectivity is never lost.
+ *
+ * These floors are an accessibility constraint, not a taste call. Distant cards
+ * are still real links with real text, so they must keep AA contrast — dimming
+ * them to a whisper (0.22) failed Lighthouse's colour-contrast audit. Depth is
+ * carried mostly by the border and edge treatment instead. */
+.node[data-depth="1"] {
+	opacity: 0.92;
+}
+.node[data-depth="2"] {
+	opacity: 0.82;
+}
+.node[data-depth="3"] {
+	opacity: 0.74;
+}
+.node[data-depth="2"] .compact,
+.node[data-depth="3"] .compact {
+	border-color: var(--border);
 }
 .node[data-role="focus"] {
+	z-index: 3;
 	width: var(--panel-w);
 	height: var(--panel-h);
-	transform: translate(-50%, -50%);
+	margin: calc(var(--panel-h) / -2) 0 0 calc(var(--panel-w) / -2);
 	opacity: 1;
-	pointer-events: auto;
-	transition:
-		width var(--t-med) var(--ease),
-		height var(--t-med) var(--ease),
-		transform var(--t-med) var(--ease),
-		opacity var(--t-fast) linear;
+	/* Growth starts just before the camera lands, overlapping travel and
+	 * arrival into a single gesture. */
+	--d-size: var(--d-arrive);
 }
-.node[data-role="hidden"] {
+/* A node the focused panel would cover is removed rather than drawn underneath
+ * it. It is also made inert, so it cannot be tabbed to while invisible. */
+.node[data-occluded] {
+	opacity: 0;
 	visibility: hidden;
+	pointer-events: none;
+	transition:
+		opacity var(--t-fade) linear,
+		visibility 0s linear var(--t-fade);
 }
 
 .compact,
@@ -178,8 +226,8 @@ kbd {
 	padding: 0.8rem;
 	color: var(--fg);
 	text-decoration: none;
-	opacity: 0;
-	visibility: hidden;
+	opacity: 1;
+	visibility: visible;
 	transition:
 		opacity var(--t-fast) linear,
 		visibility 0s linear var(--t-fast);
@@ -213,19 +261,23 @@ kbd {
 		opacity var(--t-med) var(--ease),
 		visibility 0s linear var(--t-med);
 }
-.node[data-role="ring"] .compact {
+.node[data-role="linked"] .compact,
+.node[data-role="distant"] .compact {
 	opacity: 1;
 	visibility: visible;
-	transition-delay: var(--delay, 0ms), var(--delay, 0ms);
 }
 .node[data-role="focus"] .compact {
 	pointer-events: none;
+	/* The compact label leaves as the panel grows in, so the two layers never
+	 * sit stacked on screen. */
+	transition-delay: var(--d-arrive), calc(var(--d-arrive) + var(--t-fade));
 }
 .node[data-role="focus"] .panel {
 	opacity: 1;
 	visibility: visible;
 	pointer-events: auto;
-	transition-delay: 0s;
+	transition-delay:
+		calc(var(--d-arrive) + var(--t-size) * 0.3), var(--d-arrive);
 }
 
 .bio-grid {
@@ -270,6 +322,13 @@ kbd {
 }
 
 /* A legitimate alternate presentation: same nodes, no duplicate card. */
+#graph[data-layout="flow"] #nodes,
+#graph[data-layout="flow"] #graph-lines,
+.nojs #nodes,
+.nojs #graph-lines {
+	transform: none;
+	transition: none;
+}
 #graph[data-layout="flow"],
 .nojs #graph {
 	overflow: auto;
@@ -292,7 +351,10 @@ kbd {
 	position: static;
 	width: auto;
 	height: auto;
+	margin: 0;
+	translate: none;
 	transform: none;
+	transition: none;
 	opacity: 1;
 	visibility: visible;
 	pointer-events: auto;
@@ -327,7 +389,7 @@ kbd {
 	display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 	#shell {
 		height: auto;
 		min-height: 100dvh;
@@ -336,7 +398,7 @@ kbd {
 		min-height: 0;
 	}
 	#graph,
-	#graph[data-layout="ring"] {
+	#graph[data-layout="world"] {
 		overflow: auto;
 		padding: 1rem;
 	}
@@ -349,12 +411,17 @@ kbd {
 		gap: 0.7rem;
 		max-width: 44rem;
 		margin: 0 auto;
+		transform: none;
+		transition: none;
 	}
 	.node {
 		position: static;
 		width: auto !important;
 		height: auto !important;
+		margin: 0 !important;
+		translate: none !important;
 		transform: none !important;
+		transition: none !important;
 		opacity: 1 !important;
 		visibility: visible !important;
 		pointer-events: auto !important;
