@@ -26,7 +26,8 @@ playwright-mcp.config.json
 # Claude Code local settings (contains sensitive permissions)
 .claude/settings.local.json
 
-# pi subagent run artifacts
+# pi runtime and subagent artifacts
+.pi/
 .pi-subagents/
 
 # local MCP server config

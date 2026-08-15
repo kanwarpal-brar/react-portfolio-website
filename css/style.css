@@ -1,828 +1,413 @@
-/* ========================================================================
-   style.css — reset, chrome, pan/tree graph (world nodes + camera), motion,
-   a11y. Consumes custom properties from theme.css.
-   ======================================================================== */
+/* TUI node board — one DOM for graph, flow, and no-JS presentations. */
 
-/* -------- accessibility utility -------- */
-.visually-hidden {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
-}
-
-/* -------- reset -------- */
-*,
-*::before,
-*::after {
+* {
 	box-sizing: border-box;
 }
 html,
 body {
+	min-height: 100%;
 	margin: 0;
-	padding: 0;
-	height: 100%;
 }
 body {
 	background: var(--bg);
 	color: var(--fg);
 	font: var(--fs-base) / var(--lh) var(--mono);
 	-webkit-font-smoothing: antialiased;
-	text-rendering: optimizeLegibility;
-	overflow: hidden;
 }
 a {
 	color: var(--accent);
-	text-decoration: underline;
-	text-underline-offset: 2px;
+	text-underline-offset: 0.16em;
 }
-a:hover,
-a:focus-visible {
-	opacity: 0.8;
-}
-code {
-	background: var(--bg-card);
-	padding: 0 0.25em;
-	border-radius: 2px;
-	color: var(--accent);
-}
-button {
-	font: inherit;
-	color: inherit;
-	background: none;
-	border: 0;
-	padding: 0;
-	cursor: pointer;
+a:hover {
+	color: var(--fg);
 }
 img {
+	display: block;
 	max-width: 100%;
 	height: auto;
-	display: block;
 }
-pre,
-code {
-	font: inherit;
+p {
+	margin: 0 0 0.85rem;
+}
+h2 {
+	margin: 0 0 0.55rem;
+	color: var(--accent);
+	font-size: 1em;
+	text-transform: lowercase;
 }
 ul {
 	margin: 0;
-	padding-left: 1.2em;
-}
-h1,
-h2,
-h3 {
-	margin: 0 0 0.4em;
-	font-weight: 700;
-	letter-spacing: 0.01em;
-}
-p {
-	margin: 0 0 0.8em;
+	padding-left: 1.25rem;
 }
 :focus-visible {
 	outline: 2px solid var(--accent);
-	outline-offset: 2px;
+	outline-offset: 3px;
+}
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
 }
 
-/* -------- layout skeleton -------- */
 #shell {
 	display: grid;
-	grid-template-rows: auto 1fr auto;
-	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr) auto;
+	gap: 0.65rem;
 	height: 100dvh;
-	min-height: 100svh;
 	padding: 0.75rem;
-	gap: 0.6rem;
 }
-#topbar,
-#graph,
-#hintbar {
-	min-width: 0;
-}
-
 .frame {
 	border: 1px solid var(--border);
 	background: var(--bg-panel);
-	position: relative;
 }
-
-/* top status bar */
-#topbar {
-	padding: 0.4rem 0.8rem;
+#topbar,
+#hintbar {
 	display: flex;
 	align-items: center;
-	gap: 0.75rem;
+	min-height: 2.4rem;
+	padding: 0.45rem 0.75rem;
 	color: var(--fg-dim);
 	font-size: var(--fs-small);
 }
 #topbar .dots {
-	display: inline-flex;
+	display: flex;
 	gap: 0.35rem;
+	margin-right: 0.75rem;
 }
-#topbar .dot {
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background: var(--border-bright);
+.dot {
+	width: 0.55rem;
+	height: 0.55rem;
+	border: 1px solid var(--border-bright);
+	background: var(--bg-inset);
 }
-#topbar .title {
-	flex: 1;
-	text-align: center;
+.dot:first-child {
+	border-color: var(--accent-2);
 }
-#topbar .meta {
+.title {
+	color: var(--fg);
+}
+.meta {
+	margin-left: auto;
 	color: var(--fg-mute);
 }
+#hintbar {
+	justify-content: center;
+	color: var(--fg-mute);
+}
+kbd {
+	border: 1px solid var(--border-bright);
+	padding: 0 0.28em;
+	color: var(--fg);
+	font: inherit;
+}
 
-/* =================================================================
-   #graph — the pannable world board: #world holds the six persistent
-   nodes (#pnodes) and the active section's fan children (#fan), all
-   positioned in world coordinates; the camera pans by translating
-   #world. #graph-lines lives in the same world layer, so connectors pan
-   with their nodes. See AGENTS.md.
-   ================================================================= */
 #graph {
-	overflow: hidden;
-	min-height: 0;
 	position: relative;
+	min-height: 0;
+	overflow: hidden;
+	isolation: isolate;
 }
 #graph-lines {
 	position: absolute;
 	inset: 0;
+	z-index: 0;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
-	z-index: 0;
-	overflow: visible;
 }
 #graph-lines line {
-	stroke-width: 1;
-	fill: none;
-}
-#graph-lines .line-section {
 	stroke: var(--border-bright);
+	stroke-width: 1;
+	stroke-dasharray: 3 5;
 }
-#graph-lines .line-section-active {
-	stroke: var(--accent);
-	stroke-width: 1.5;
-}
-#graph-lines .line-child {
-	stroke: var(--accent-2);
-	stroke-dasharray: 2 3;
-	opacity: 0.85;
-}
-#graph-lines .line-child-active {
-	stroke: var(--accent);
-	stroke-dasharray: none;
-	stroke-width: 2;
-	opacity: 1;
-}
-
-/* ---- #world: camera layer ----------------------------------------------
-   One CSS transform pans the whole world; render.js sets --cam-x/--cam-y to
-   the negated world position of the focused node. The .jump class (first
-   geometry pass only) suppresses the transition so the page never pans on
-   load. */
-#world {
+#nodes {
 	position: absolute;
 	inset: 0;
-	z-index: 3;
-	transform: translate(var(--cam-x, 0px), var(--cam-y, 0px));
-	transition: transform var(--t-med) var(--ease);
-	will-change: transform;
-}
-#world.jump,
-#world.jump * {
-	transition: none !important;
-}
-
-/* ---- world nodes (persistent .pnode + ephemeral .fnode) -----------------
-   Shared shape: an outer positioned box carrying border/background/size,
-   holding a compact nav <button> (shown normally) and an expanded content
-   block (shown when .is-focused). Positions are world px in --x/--y relative
-   to the board center; sizes come from render.js as custom properties
-   (--nc-w/h, --home-w/h, ...), already scaled by the board scale s. */
-.pnode,
-.fnode {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%) translate(var(--x, 0px), var(--y, 0px));
-	width: var(--nc-w, 132px);
-	height: var(--nc-h, 52px);
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	color: var(--fg-mute);
-	container-type: inline-size;
-	transition:
-		transform var(--t-med) var(--ease),
-		width var(--t-med) var(--ease),
-		height var(--t-med) var(--ease),
-		opacity var(--tr-fast),
-		border-color var(--tr-fast),
-		color var(--tr-fast),
-		background var(--tr-fast);
-}
-.fnode {
-	width: var(--fan-w, 150px);
-	height: var(--fan-h, 80px);
 	z-index: 1;
 }
-/* The focused node sits above its (hidden) siblings while it expands. */
-.pnode.is-focused,
-.fnode.is-focused {
+
+.node {
+	position: absolute;
+	top: 50%;
+	left: 50%;
 	z-index: 2;
-	background: var(--bg-inset);
-	border-color: var(--accent);
-	color: var(--fg);
-}
-/* Home's expanded border matches the dim home-view spokes (no section is
-   active there), the same pairing the old card border used. */
-.pnode-home.is-focused {
-	border-color: var(--border-bright);
-}
-
-/* Expanded box sizes per role (compact nodes keep the default --nc-*).
-   Width is fixed (geometry + spoke math assume it); height hugs content up
-   to the role's cap — boxes only ever get SMALLER than the size render.js
-   proves clearances for, so the geometry stays valid, and short content
-   doesn't leave a tall empty box. */
-.pnode.is-focused,
-.fnode.is-focused {
-	display: flex;
-	flex-direction: column;
-	height: auto;
-}
-.pnode-home.is-focused {
-	width: var(--home-w);
-	min-height: min(var(--home-h), 30rem);
-	max-height: var(--home-h);
-}
-.pnode-hub.is-focused {
-	width: var(--hub-w);
-	max-height: var(--hub-h);
-}
-.pnode-leaf.is-focused {
-	width: var(--leaf-w);
-	max-height: var(--leaf-h);
-}
-.fnode.is-focused {
-	width: var(--child-w);
-	max-height: var(--child-h);
-}
-
-/* Compact vs expanded content swap. The established node and camera slides
-   use the same eased timing. Connectors resample live node rectangles during
-   that motion, so they stay attached instead of snapping to an end state. */
-.pn-expanded,
-.fn-expanded {
-	display: none;
-	width: 100%;
-	flex: 1;
-	min-height: 0;
-}
-.pnode.is-focused .pn-expanded,
-.fnode.is-focused .fn-expanded {
-	display: block;
-}
-.pnode.is-focused .pn-compact,
-.fnode.is-focused .fn-compact {
-	display: none;
-}
-
-/* Compact nav buttons fill their node. */
-.pn-compact,
-.fn-compact {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 0.1rem;
-	padding: 0.3rem;
-	text-align: center;
-	color: inherit;
-	overflow: hidden;
-}
-.fn-compact {
-	align-items: flex-start;
-	text-align: left;
-	font-size: var(--fs-small);
-	line-height: 1.3;
-}
-.pn-compact .sn-name {
-	font-weight: 700;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 100%;
-}
-/* Home view: every section node is bright (primary nav). Section/child
-   views: unfocused nodes dim (via a muted color token that stays >=7:1 —
-   never opacity) but stay fully interactive so direct jumps always work. */
-#graph[data-view="home"] .pnode {
-	color: var(--fg);
-	border-color: var(--border-bright);
-}
-.pn-compact.active,
-.pnode:hover,
-.pn-compact:focus-visible {
-	color: var(--fg);
-}
-.pnode:hover,
-.pnode:has(.pn-compact:focus-visible) {
-	border-color: var(--accent);
-}
-
-/* Small fan boxes (scaled-down boards) shed their third line so the title
-   and one-line summary stay legible instead of clipping mid-line. */
-@container (max-width: 125px) {
-	.fn-compact .wi-meta,
-	.fn-compact .wi-tags {
-		display: none;
-	}
-	.fn-compact .wi-desc {
-		-webkit-line-clamp: 1;
-		line-clamp: 1;
-	}
-}
-
-/* Fan items enter and leave by opacity only. The camera is the one spatial
-   movement; avoiding independent item travel prevents child cards crossing
-   their hub or each other mid-transition. */
-.fnode.entering,
-.fnode.leaving {
 	opacity: 0;
 	pointer-events: none;
 }
-/* A focused child's siblings hide (they stay mounted so the fan folds back
-   in place when the child closes). */
-.fnode.dimmed {
+.node[data-role="ring"] {
+	width: 176px;
+	height: 76px;
+	transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
+	opacity: 1;
+	pointer-events: auto;
+	transition:
+		transform var(--t-med) var(--ease) var(--delay, 0ms),
+		opacity var(--t-fast) linear;
+}
+.node[data-role="focus"] {
+	width: var(--panel-w);
+	height: var(--panel-h);
+	transform: translate(-50%, -50%);
+	opacity: 1;
+	pointer-events: auto;
+	transition:
+		width var(--t-med) var(--ease),
+		height var(--t-med) var(--ease),
+		transform var(--t-med) var(--ease),
+		opacity var(--t-fast) linear;
+}
+.node[data-role="hidden"] {
+	visibility: hidden;
+}
+
+.compact,
+.panel {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	border: 1px solid var(--border-bright);
+	background: var(--bg-card);
+}
+.compact {
+	display: grid;
+	align-content: center;
+	gap: 0.2rem;
+	padding: 0.8rem;
+	color: var(--fg);
+	text-decoration: none;
 	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity var(--t-fast) linear,
+		visibility 0s linear var(--t-fast);
+}
+.compact:hover,
+.compact:focus-visible {
+	border-color: var(--accent);
+	background: #17171d;
+}
+.compact-name {
+	overflow: hidden;
+	color: var(--accent);
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.compact-meta {
+	overflow: hidden;
+	color: var(--fg-mute);
+	font-size: var(--fs-small);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.panel {
+	padding: 1.25rem 1.4rem;
+	opacity: 0;
+	visibility: hidden;
+	overflow: hidden;
+	pointer-events: none;
+	transition:
+		opacity var(--t-med) var(--ease),
+		visibility 0s linear var(--t-med);
+}
+.node[data-role="ring"] .compact {
+	opacity: 1;
+	visibility: visible;
+	transition-delay: var(--delay, 0ms), var(--delay, 0ms);
+}
+.node[data-role="focus"] .compact {
 	pointer-events: none;
 }
-.fn-compact.active,
-.fnode:hover,
-.fn-compact:focus-visible {
-	color: var(--fg);
-}
-.fnode:hover,
-.fnode:has(.fn-compact:focus-visible) {
-	border-color: var(--accent);
-}
-.fn-compact .wi-title,
-.fn-compact .wi-desc {
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
-	overflow-wrap: anywhere; /* long unbroken tokens (email handles) wrap */
-}
-.fn-compact .wi-title {
-	color: var(--accent);
-	font-weight: 700;
-	line-height: 1.15;
-}
-.fn-compact .wi-desc {
-	color: var(--fg-dim);
-	font-size: 0.9em;
-	line-height: 1.2;
-}
-.fn-compact .wi-meta,
-.fn-compact .wi-tags {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-size: 0.85em;
-}
-.fn-compact .wi-meta {
-	color: var(--fg-mute);
-}
-.fn-compact .wi-tags {
-	color: var(--accent-2);
-}
-
-/* Expanded content blocks: padded, top-aligned, scroll if the (scaled-down)
-   box can't fit the text. */
-.pn-expanded,
-.fn-expanded {
-	padding: 1rem 1.4rem;
-	overflow: auto;
-}
-/* …except hubs, whose two lines stay centered both ways. */
-.pnode-hub.is-focused .pn-expanded {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	padding: 0.2rem 0.35rem;
-}
-.hub-title {
-	margin: 0;
-	color: var(--accent);
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	font-size: 0.72rem;
-	line-height: 1.05;
-	white-space: nowrap;
-}
-.hub-tagline {
-	margin: 0.08rem 0 0;
-	color: var(--fg-mute);
-	font-size: 0.58rem;
-	line-height: 1.1;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 100%;
-}
-
-/* ---- expanded-node content typography ------------------------------------
-   (Also applies inside the collapsed #card, which renders the same content
-   builders.) */
-.node-lede {
-	color: var(--fg-dim);
-	font-size: var(--fs-small);
-	margin-bottom: 0.4rem;
-}
-.tip {
-	color: var(--fg-mute);
-	font-size: var(--fs-small);
-}
-.pn-expanded h2,
-.fn-expanded h2,
-#card h2 {
-	color: var(--accent);
-	font-size: 1rem;
-	margin: 1.1em 0 0.3em;
-	letter-spacing: 0.02em;
-}
-.pn-expanded h2::before,
-.fn-expanded h2::before,
-#card h2::before {
-	content: "── ";
-	color: var(--fg-mute);
-}
-.pn-expanded h2::after,
-.fn-expanded h2::after,
-#card h2::after {
-	content: " ──";
-	color: var(--fg-mute);
+.node[data-role="focus"] .panel {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transition-delay: 0s;
 }
 
 .bio-grid {
 	display: grid;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: 120px minmax(0, 1fr);
 	gap: 1rem;
 	align-items: start;
 }
 .headshot {
-	width: 120px;
-	height: 120px;
 	border: 1px solid var(--border-bright);
-	image-rendering: -webkit-optimize-contrast;
+	filter: grayscale(0.2) contrast(1.05);
 }
-.tagline {
-	color: var(--accent-2);
-	font-weight: 700;
-	margin-bottom: 0.3em;
-}
-
-.exp-box {
-	display: block;
-	width: 100%;
-	text-align: left;
-	border: 1px solid var(--border);
-	padding: 0.75rem 0.9rem;
-	margin: 0.6rem 0;
-	background: var(--bg-card);
-	color: inherit;
-	font: inherit;
-}
-button.exp-box {
-	cursor: pointer;
-	transition: border-color var(--tr-fast);
-}
-button.exp-box:hover,
-button.exp-box:focus-visible {
-	border-color: var(--accent);
-}
-.exp-head {
-	display: flex;
-	justify-content: space-between;
-	gap: 1rem;
-	flex-wrap: wrap;
-	margin-bottom: 0.35rem;
-}
-.exp-head .role {
-	color: var(--accent);
-	font-weight: 700;
-}
-.exp-head .co {
-	color: var(--fg);
-}
-.exp-head .when {
-	color: var(--fg-dim);
-	font-size: var(--fs-small);
-}
-.exp-desc {
-	display: block;
-	color: var(--fg-dim);
-	font-size: var(--fs-small);
-}
-.social-box a {
-	display: inline-block;
-	margin-top: 0.4rem;
-	font-size: var(--fs-small);
-}
-
-.proj-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-	gap: 0.5rem;
-	margin-top: 0.5rem;
-}
-.proj-grid.single {
-	grid-template-columns: 1fr;
-	max-width: 42ch;
-}
-.proj {
-	border: 1px solid var(--border);
-	padding: 0.5rem 0.65rem;
-	background: var(--bg-card);
-	display: flex;
-	flex-direction: column;
-	gap: 0.2rem;
-	transition: border-color var(--tr-fast);
-}
-.proj:hover {
-	border-color: var(--accent);
-}
-.pname {
-	color: var(--accent);
-	font-weight: 700;
-}
-button.pname-btn {
-	display: block;
-	width: 100%;
-	text-align: left;
-	cursor: pointer;
-}
-button.pname-btn:hover,
-button.pname-btn:focus-visible {
-	text-decoration: underline;
-	text-underline-offset: 2px;
-}
-.pdesc {
-	color: var(--fg-dim);
-	font-size: var(--fs-small);
-}
-.ptags {
+.tagline,
+.node-lede,
+.when,
+.tip {
 	color: var(--fg-mute);
 	font-size: var(--fs-small);
-	margin-top: auto;
 }
-.proj a {
-	display: block;
+.tags {
+	color: var(--accent-2);
 	font-size: var(--fs-small);
-	overflow-wrap: anywhere;
 }
-
-.social-list {
-	list-style: none;
-	padding: 0;
-}
-.social-list li {
-	padding: 0.35rem 0;
-	display: flex;
-	gap: 0.8rem;
-}
-.social-list .k {
-	color: var(--fg-dim);
-	width: 10ch;
-	display: inline-block;
-}
-
 .pdf-btn {
 	display: inline-block;
-	border: 1px solid var(--accent);
-	padding: 0.5rem 1rem;
-	margin: 0.6rem 0;
+	margin: 0.2rem 0 1rem;
+	border: 1px solid var(--border-bright);
+	padding: 0.36rem 0.55rem;
 	color: var(--accent);
-	white-space: nowrap;
-}
-.pdf-btn:hover {
-	background: var(--accent);
-	color: var(--bg);
 	text-decoration: none;
 }
-
+.pdf-btn:hover,
+.pdf-btn:focus-visible {
+	border-color: var(--accent);
+	background: var(--bg-inset);
+}
 .warning {
 	color: var(--warn);
 }
 .redacted {
-	background: var(--fg);
-	color: var(--fg);
-	padding: 0 0.4em;
-	user-select: none;
-}
-.redacted:hover {
-	color: var(--bg);
+	color: var(--accent-2);
 }
 
-/* Content inside any narrow container (a scaled-down expanded node, or the
-   collapsed card) stacks. #card, .pnode and .fnode are all query containers,
-   so this unnamed query resolves against whichever one is nearest. */
-@container (max-width: 420px) {
-	.bio-grid {
-		grid-template-columns: 1fr;
-	}
-	.headshot {
-		width: 90px;
-		height: 90px;
-	}
-	.proj-grid {
-		grid-template-columns: 1fr 1fr;
-	}
+/* A legitimate alternate presentation: same nodes, no duplicate card. */
+#graph[data-layout="flow"],
+.nojs #graph {
+	overflow: auto;
+	padding: 1rem;
 }
-
-/* ---- breadcrumb (collapsed card's child/detail view) -------------------- */
-.breadcrumb {
-	display: flex;
-	align-items: center;
-	gap: 0.3rem;
-	margin-bottom: 0.9rem;
-	font-size: var(--fs-small);
-}
-.bc-parent {
-	color: var(--accent);
-	font-size: var(--fs-small);
-	cursor: pointer;
-	text-decoration: underline;
-	text-underline-offset: 2px;
-}
-.bc-parent:hover {
-	opacity: 0.75;
-}
-.bc-child {
-	color: var(--fg);
-}
-
-/* ---- #card: collapsed/mobile fallback ------------------------------------
-   The desktop board renders the world nodes; the card is the single
-   scrolling fallback shown only when the composition collapses (render.js
-   gates on the board scale, not width alone, so short laptop viewports
-   collapse correctly). */
-#card {
+#graph[data-layout="flow"] #graph-lines,
+.nojs #graph-lines {
 	display: none;
 }
-#graph.collapsed #world {
+#graph[data-layout="flow"] #nodes,
+.nojs #nodes {
+	position: static;
+	display: grid;
+	gap: 0.7rem;
+	max-width: 44rem;
+	margin: 0 auto;
+}
+#graph[data-layout="flow"] .node,
+.nojs .node {
+	position: static;
+	width: auto;
+	height: auto;
+	transform: none;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+#graph[data-layout="flow"] .node .compact,
+.nojs .node .compact {
+	position: static;
+	min-height: 76px;
+	opacity: 1;
+	visibility: visible;
+}
+#graph[data-layout="flow"] .node .panel,
+.nojs .node .panel {
+	position: static;
+	height: auto;
+	margin-top: -1px;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	overflow: visible;
+}
+.nojs #graph {
+	max-height: none;
+}
+.nojs #nodes {
+	display: grid;
+}
+.nojs .node {
+	display: block !important;
+}
+.nojs .compact {
 	display: none;
 }
-#graph.collapsed #card {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	position: absolute;
-	inset: 0;
-	z-index: 5;
-	overflow-y: auto;
-	background: var(--bg-inset);
-	border: 1px solid var(--accent);
-	padding: 1rem 1.4rem;
-	color: var(--fg);
-	container-type: inline-size;
-}
 
-/* =================================================================
-   bottom: slim one-line navigation hint
-   ================================================================= */
-#hintbar {
-	padding: 0.45rem 0.8rem;
-	color: var(--fg-mute);
-	font-size: var(--fs-small);
-	text-align: center;
-}
-#hintbar kbd {
-	background: var(--bg-inset);
-	border: 1px solid var(--border);
-	padding: 0 0.35em;
-	color: var(--accent);
-}
-
-/* =================================================================
-   Responsive chrome (orthogonal to the JS-driven board collapse above)
-   ================================================================= */
-@media (max-width: 600px) {
-	body {
-		font-size: 14px;
-	}
+@media (max-width: 900px) {
 	#shell {
-		padding: 0.4rem;
-		gap: 0.4rem;
+		height: auto;
+		min-height: 100dvh;
 	}
-	#topbar .meta {
+	#graph {
+		min-height: 0;
+	}
+	#graph,
+	#graph[data-layout="ring"] {
+		overflow: auto;
+		padding: 1rem;
+	}
+	#graph-lines {
 		display: none;
 	}
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-	#shell {
-		padding: 0.3rem;
-		gap: 0.3rem;
+	#nodes {
+		position: static;
+		display: grid;
+		gap: 0.7rem;
+		max-width: 44rem;
+		margin: 0 auto;
 	}
-	#topbar {
-		padding: 0.25rem 0.6rem;
-	}
-	#hintbar {
-		padding: 0.3rem 0.6rem;
-	}
-}
-
-/* =================================================================
-   No-JS fallback. `html.nojs` is removed synchronously by an inline
-   <script> in <head> the instant JS runs, so JS users never see this;
-   without JS it stacks every section's full prerendered content.
-   ================================================================= */
-html.nojs,
-html.nojs body {
-	overflow: auto;
-	height: auto;
-}
-html.nojs #shell {
-	grid-template-rows: auto 1fr auto;
-	height: auto;
-	min-height: 100dvh;
-	overflow: auto;
-}
-html.nojs #graph {
-	overflow: visible;
-	height: auto;
-}
-html.nojs #world,
-html.nojs #graph-lines {
-	display: none;
-}
-html.nojs #card {
-	display: block;
-	position: static;
-	width: 100%;
-	max-width: 820px;
-	margin: 0 auto;
-	height: auto;
-	overflow: visible;
-}
-html.nojs #hintbar {
-	display: none;
-}
-#prerendered {
-	display: none;
-}
-html.nojs #prerendered {
-	display: block;
-	max-width: 820px;
-	margin: 0 auto;
-}
-html.nojs .prerender-section {
-	margin: 1.2rem 0;
-	padding: 1rem 1.2rem;
-	border: 1px solid var(--border-bright);
-	background: var(--bg-card);
-}
-html.nojs .prerender-section h2 {
-	color: var(--accent);
-}
-
-/* =================================================================
-   Reduced motion — disables MOVEMENT only (camera pan, node repositioning
-   and resizing, spoke draw-in); it is intentionally NOT a blanket
-   `transition: none`, so the opacity/color crossfades elsewhere (node
-   dim/active, fan enter/leave, hover/focus) still play and views still
-   read as a switch, not a jump cut.
-   ================================================================= */
-@media (prefers-reduced-motion: reduce) {
-	#world {
-		transition: none !important;
-	}
-	.pnode,
-	.fnode {
-		transition-property:
-			opacity, border-color, color, background-color !important;
-		transition-delay: 0s !important;
-	}
-	.fnode.entering,
-	.fnode.leaving {
+	.node {
+		position: static;
+		width: auto !important;
+		height: auto !important;
 		transform: none !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		pointer-events: auto !important;
 	}
-	#graph-lines line {
+	.node .compact {
+		position: static;
+		min-height: 76px;
+		opacity: 1;
+		visibility: visible;
+	}
+	.node .panel {
+		position: static;
+		height: auto;
+		margin-top: -1px;
+		opacity: 1;
+		visibility: visible;
+		overflow: visible;
+		pointer-events: auto;
+	}
+}
+
+@media (max-width: 560px) {
+	#shell {
+		padding: 0.45rem;
+		gap: 0.45rem;
+	}
+	#topbar,
+	#hintbar {
+		min-height: 2.1rem;
+		padding-inline: 0.55rem;
+	}
+	.meta {
+		display: none;
+	}
+	.bio-grid {
+		grid-template-columns: 88px minmax(0, 1fr);
+		gap: 0.75rem;
+	}
+	.headshot {
+		width: 88px;
+		height: 88px;
+	}
+	.panel {
+		padding: 1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
 		transition: none !important;
+		animation: none !important;
 	}
 }

@@ -1,97 +1,137 @@
-// layout.js — pure, DOM-free geometry. No document/window references, so this
-// module is safe to unit-test with `node --test` and to import from the
-// build script. Every function takes plain numbers/objects and returns
-// plain numbers/objects.
+// layout.js — pure geometry for the focus-and-ring node board.
+// No DOM references: this module is deliberately small and unit-testable.
 
-/**
- * boardScale — the single viewport-adaptation factor for the whole world.
- * Every node size, position, and fan frame is defined at a reference scale
- * (s = 1) and multiplied by s, so all clearances between boxes are
- * scale-invariant: if the reference layout fits, every scaled layout fits.
- * The home-view world spans fitW × fitH px at s = 1; s is the smaller of the
- * two per-axis fits (the layout is wider than tall), capped at `max`.
- */
-export function boardScale({ bw, bh, margin = 12, fitW, fitH, max = 1.3 }) {
-	const sx = (bw - 2 * margin) / fitW;
-	const sy = (bh - 2 * margin) / fitH;
-	return Math.max(0, Math.min(max, sx, sy));
+export const NODE = Object.freeze({ w: 176, h: 76 });
+export const GAP = 20;
+export const MARGIN = 12;
+
+const SAMPLES = 720;
+const TAU = Math.PI * 2;
+
+function wrap(value, max) {
+	return ((value % max) + max) % max;
 }
 
 /**
- * rectPerimeterPoint — the point at arc-length `s` (clockwise from the
- * top-center) along the perimeter of a rectangle centered at the origin with
- * half-extents (halfW, halfH). Returns origin-relative {x, y}.
+ * Points distributed by arc length, rather than angle, look evenly spaced on
+ * a wide ellipse. The returned points are relative to the ellipse centre.
  */
-export function rectPerimeterPoint(halfW, halfH, s) {
-	const w = 2 * halfW;
-	const h = 2 * halfH;
-	const P = 2 * (w + h);
-	s = ((s % P) + P) % P;
-	if (s < halfW) return { x: s, y: -halfH }; // top edge, center → right
-	s -= halfW;
-	if (s < h) return { x: halfW, y: -halfH + s }; // right edge, top → bottom
-	s -= h;
-	if (s < w) return { x: halfW - s, y: halfH }; // bottom edge, right → left
-	s -= w;
-	if (s < h) return { x: -halfW, y: halfH - s }; // left edge, bottom → top
-	s -= h;
-	return { x: -halfW + s, y: -halfH }; // top edge, left → center
-}
+function ellipsePoints(count, rx, ry, startAngle) {
+	if (!count) return [];
 
-/**
- * squareWheelPositions — place `count` nodes evenly (by perimeter arc length)
- * around a rectangle ("square wheel") centered at (cx, cy) with half-extents
- * (halfW, halfH). Nodes are centered within their arc segment (offset by half
- * a step) so none sits exactly at the top-center (clear of the vertical spoke
- * to the section node) and the layout is left-right symmetric for even
- * counts. Returns an array of absolute {x, y} points, clockwise from the top.
- */
-export function squareWheelPositions({ count, cx, cy, halfW, halfH }) {
-	if (!count || count <= 0) return [];
-	const P = 2 * (2 * halfW + 2 * halfH);
-	const step = P / count;
-	const positions = [];
-	for (let i = 0; i < count; i++) {
-		const s = (i + 0.5) * step;
-		const p = rectPerimeterPoint(halfW, halfH, s);
-		positions.push({ x: cx + p.x, y: cy + p.y });
+	const lengths = [0];
+	let previous = { x: rx, y: 0 };
+	for (let index = 1; index <= SAMPLES; index++) {
+		const angle = (index / SAMPLES) * TAU;
+		const point = { x: rx * Math.cos(angle), y: ry * Math.sin(angle) };
+		lengths.push(
+			lengths[index - 1] +
+				Math.hypot(point.x - previous.x, point.y - previous.y),
+		);
+		previous = point;
 	}
-	return positions;
-}
 
-/**
- * rectEdgePoint — the point where the line from (nx, ny) to (cx, cy) crosses
- * the boundary of an axis-aligned rectangle centered at (cx, cy) with
- * half-width `hw` and half-height `hh`. Used to clip connector lines to a
- * box's edge instead of its center.
- */
-export function rectEdgePoint(cx, cy, nx, ny, hw, hh) {
-	const dx = nx - cx;
-	const dy = ny - cy;
-	if (dx === 0 && dy === 0) return { x: nx, y: ny };
-	const tx = hw / Math.abs(dx);
-	const ty = hh / Math.abs(dy);
-	const t = Math.min(tx, ty);
-	return { x: nx - dx * t, y: ny - dy * t };
-}
-
-/**
- * spokeLines — connector endpoints from one hub to its nodes, clipped to the
- * real box edges. Coordinates are supplied by the caller in one space
- * (screen or world); this helper deliberately has no knowledge of views.
- */
-export function spokeLines({ hub, nodes, type, activeId = null }) {
-	return nodes.map((node) => {
-		const start = rectEdgePoint(node.x, node.y, hub.x, hub.y, hub.hw, hub.hh);
-		const end = rectEdgePoint(hub.x, hub.y, node.x, node.y, node.hw, node.hh);
-		return {
-			id: node.id,
-			type,
-			active: node.id === activeId,
-			x1: start.x,
-			y1: start.y,
-			x2: end.x,
-			y2: end.y,
-		};
+	const perimeter = lengths.at(-1);
+	const start = (wrap(startAngle, TAU) / TAU) * perimeter;
+	return Array.from({ length: count }, (_, index) => {
+		const target = wrap(start + (index * perimeter) / count, perimeter);
+		let upper = 1;
+		while (lengths[upper] < target) upper++;
+		const lower = upper - 1;
+		const fraction =
+			lengths[upper] - lengths[lower] === 0
+				? 0
+				: (target - lengths[lower]) / (lengths[upper] - lengths[lower]);
+		const angle = ((lower + fraction) / SAMPLES) * TAU;
+		return { x: rx * Math.cos(angle), y: ry * Math.sin(angle) };
 	});
+}
+
+function clearsPanel(point, panelW, panelH) {
+	return (
+		Math.abs(point.x) - (panelW + NODE.w) / 2 >= GAP ||
+		Math.abs(point.y) - (panelH + NODE.h) / 2 >= GAP
+	);
+}
+
+function nodesClear(a, b) {
+	return (
+		Math.max(Math.abs(a.x - b.x) - NODE.w, Math.abs(a.y - b.y) - NODE.h) >= GAP
+	);
+}
+
+/**
+ * Find compact-node positions around a centred focus panel.
+ *
+ * Nodes start on the largest ellipse that keeps their full boxes on-board.
+ * A point that intersects the focus panel moves radially outward until it
+ * clears either the panel's x or y extent. If that push exits the board, or
+ * any pair of compact nodes is too close, the board is infeasible and `null`
+ * is returned. Consumers then switch to the flow presentation.
+ */
+export function ringPositions({
+	n,
+	startAngle = -Math.PI / 2,
+	panelW,
+	panelH,
+	boardW,
+	boardH,
+}) {
+	if (!Number.isInteger(n) || n < 0) return null;
+	if (n === 0) return [];
+	if (![panelW, panelH, boardW, boardH].every(Number.isFinite)) return null;
+
+	const rx = boardW / 2 - NODE.w / 2 - MARGIN;
+	const ry = boardH / 2 - NODE.h / 2 - MARGIN;
+	if (
+		rx <= 0 ||
+		ry <= 0 ||
+		panelW <= 0 ||
+		panelH <= 0 ||
+		panelW + 2 * MARGIN > boardW ||
+		panelH + 2 * MARGIN > boardH
+	)
+		return null;
+
+	const radialPoints = ellipsePoints(n, rx, ry, startAngle);
+	const points = [];
+	for (const point of radialPoints) {
+		const distance = Math.hypot(point.x, point.y);
+		const ux = point.x / distance;
+		const uy = point.y / distance;
+		const clearX =
+			Math.abs(ux) < Number.EPSILON
+				? Infinity
+				: (panelW / 2 + NODE.w / 2 + GAP) / Math.abs(ux);
+		const clearY =
+			Math.abs(uy) < Number.EPSILON
+				? Infinity
+				: (panelH / 2 + NODE.h / 2 + GAP) / Math.abs(uy);
+		const radius = clearsPanel(point, panelW, panelH)
+			? distance
+			: Math.max(distance, Math.min(clearX, clearY));
+		const pushed = { x: ux * radius, y: uy * radius };
+		if (Math.abs(pushed.x) > rx + 0.001 || Math.abs(pushed.y) > ry + 0.001)
+			return null;
+		points.push({ x: boardW / 2 + pushed.x, y: boardH / 2 + pushed.y });
+	}
+
+	for (let left = 0; left < points.length; left++) {
+		for (let right = left + 1; right < points.length; right++) {
+			if (!nodesClear(points[left], points[right])) return null;
+		}
+	}
+	return points;
+}
+
+/** Decorative SVG edge data. Node cards are opaque, so centre endpoints are
+ * intentionally overpainted by their boxes rather than clipped to the edges. */
+export function edgeLines({ from, to }) {
+	return to.map((node) => ({
+		id: node.id,
+		x1: from.x,
+		y1: from.y,
+		x2: node.x,
+		y2: node.y,
+	}));
 }

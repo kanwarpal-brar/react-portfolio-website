@@ -1,152 +1,165 @@
-// test/layout.test.js — unit tests for js/layout.js (pure geometry).
-// Run with: node --test
+// layout.test.js — invariant tests for the derived focus-and-ring geometry.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-	boardScale,
-	rectEdgePoint,
-	spokeLines,
-	rectPerimeterPoint,
-	squareWheelPositions,
-} from "../js/layout.js";
+import { edgeLines, GAP, MARGIN, NODE, ringPositions } from "../js/layout.js";
+import { renderSite } from "../scripts/build.mjs";
 
-test("boardScale takes the smaller per-axis fit, capped at max", () => {
-	const opts = { margin: 12, fitW: 1000, fitH: 500, max: 1.3 };
-	// Both axes fit exactly -> 1
-	assert.ok(Math.abs(boardScale({ bw: 1024, bh: 524, ...opts }) - 1) < 1e-9);
-	// Height binds: (274 - 24) / 500 = 0.5 even though width fits at 1
-	assert.ok(Math.abs(boardScale({ bw: 1024, bh: 274, ...opts }) - 0.5) < 1e-9);
-	// Width binds: (524 - 24) / 1000 = 0.5
-	assert.ok(Math.abs(boardScale({ bw: 524, bh: 524, ...opts }) - 0.5) < 1e-9);
-	// Larger board caps at max
-	assert.equal(boardScale({ bw: 5000, bh: 5000, ...opts }), 1.3);
-	// Never negative, even on a degenerate board
-	assert.equal(boardScale({ bw: 0, bh: 0, ...opts }), 0);
+function assertValidRing({ points, panelW, panelH, boardW, boardH }) {
+	assert.ok(points, "expected this board to fit a ring");
+	for (const [index, point] of points.entries()) {
+		assert.ok(point.x - NODE.w / 2 >= 0, `node ${index} escapes left`);
+		assert.ok(point.x + NODE.w / 2 <= boardW, `node ${index} escapes right`);
+		assert.ok(point.y - NODE.h / 2 >= 0, `node ${index} escapes top`);
+		assert.ok(point.y + NODE.h / 2 <= boardH, `node ${index} escapes bottom`);
+		const clearsPanel =
+			Math.abs(point.x - boardW / 2) - (panelW + NODE.w) / 2 >= GAP ||
+			Math.abs(point.y - boardH / 2) - (panelH + NODE.h) / 2 >= GAP;
+		assert.ok(clearsPanel, `node ${index} overlaps the focus panel`);
+	}
+	for (let left = 0; left < points.length; left++) {
+		for (let right = left + 1; right < points.length; right++) {
+			const clearance = Math.max(
+				Math.abs(points[left].x - points[right].x) - NODE.w,
+				Math.abs(points[left].y - points[right].y) - NODE.h,
+			);
+			assert.ok(clearance >= GAP, `nodes ${left}/${right} are too close`);
+		}
+	}
+}
+
+const BOARD = { boardW: 1416, boardH: 790 };
+
+test("ringPositions returns valid derived geometry for every real ring count", () => {
+	for (const [name, n, panelW, panelH, startAngle] of [
+		["home", 5, 880, 414, -Math.PI / 2],
+		["work", 11, 880, 105, Math.PI / 2],
+		["projects", 10, 880, 105, Math.PI / 2],
+		["socials", 4, 880, 105, Math.PI / 2],
+	]) {
+		const points = ringPositions({
+			n,
+			panelW,
+			panelH,
+			startAngle,
+			...BOARD,
+		});
+		assert.equal(points?.length, n, `${name} ring count`);
+		assertValidRing({ points, panelW, panelH, ...BOARD });
+	}
 });
 
-test("rectEdgePoint clips to the box centered at (nx,ny) along the ray toward (cx,cy)", () => {
-	// Box is centered at the SECOND point (nx,ny); the ray comes from (cx,cy).
-	// Box at (100,0), half 10x10, ray from the origin -> exits at its left edge.
-	const p = rectEdgePoint(0, 0, 100, 0, 10, 10);
-	assert.ok(Math.abs(p.x - 90) < 1e-9);
-	assert.ok(Math.abs(p.y - 0) < 1e-9);
+test("home begins at the top and leaves the bottom slot open", () => {
+	const points = ringPositions({
+		n: 5,
+		panelW: 700,
+		panelH: 414,
+		boardW: 1256,
+		boardH: 690,
+		startAngle: -Math.PI / 2,
+	});
+	assert.ok(points);
+	const centerX = 1256 / 2;
+	const centerY = 690 / 2;
+	const topmost = points.reduce((best, point) =>
+		point.y < best.y ? point : best,
+	);
+	assert.ok(
+		Math.abs(topmost.x - centerX) < 2,
+		"home's first neighbour is top-centred",
+	);
+	assert.ok(
+		!points.some(
+			(point) => Math.abs(point.x - centerX) < 2 && point.y > centerY,
+		),
+		"no home neighbour occupies the bottom slot",
+	);
 });
 
-test("rectEdgePoint handles a coincident point without dividing by zero", () => {
-	const p = rectEdgePoint(5, 5, 5, 5, 10, 10);
-	assert.deepEqual(p, { x: 5, y: 5 });
+test("ringPositions rejects infeasible nodes and panels instead of overflowing", () => {
+	assert.equal(
+		ringPositions({
+			n: 11,
+			panelW: 580,
+			panelH: 105,
+			boardW: 1000,
+			boardH: 658,
+			startAngle: Math.PI / 2,
+		}),
+		null,
+	);
+	assert.equal(
+		ringPositions({
+			n: 1,
+			panelW: 880,
+			panelH: 100,
+			boardW: 880 + 2 * MARGIN - 1,
+			boardH: 700,
+		}),
+		null,
+	);
 });
 
-test("rectEdgePoint clips diagonally on a non-square rect", () => {
-	// Box at (100,100), half 40x10 (wide/short), ray from the origin: the
-	// height constraint (ty=10/100) binds before the width constraint
-	// (tx=40/100), so it exits through the top/bottom edge, not the sides.
-	const p = rectEdgePoint(0, 0, 100, 100, 40, 10);
-	assert.ok(Math.abs(p.y - 90) < 1e-9);
-	assert.ok(Math.abs(p.x - 90) < 1e-9);
-});
-
-test("spokeLines returns [] for no nodes", () => {
+test("ringPositions handles empty and malformed requests", () => {
 	assert.deepEqual(
-		spokeLines({
-			hub: { x: 0, y: 0, hw: 1, hh: 1 },
-			nodes: [],
-			type: "section",
+		ringPositions({
+			n: 0,
+			panelW: 400,
+			panelH: 200,
+			boardW: 1000,
+			boardH: 700,
 		}),
 		[],
 	);
-});
-
-test("rectPerimeterPoint walks clockwise from the top-center", () => {
-	const hw = 40,
-		hh = 20; // rect 80x40
-	assert.deepEqual(rectPerimeterPoint(hw, hh, 0), { x: 0, y: -20 }); // top-center
-	assert.deepEqual(rectPerimeterPoint(hw, hh, hw), { x: 40, y: -20 }); // top-right corner
-	assert.deepEqual(rectPerimeterPoint(hw, hh, hw + hh), { x: 40, y: 0 }); // mid right edge
-	assert.deepEqual(rectPerimeterPoint(hw, hh, hw + 2 * hh), { x: 40, y: 20 }); // bottom-right corner
-	const P = 2 * (2 * hw + 2 * hh);
-	assert.deepEqual(
-		rectPerimeterPoint(hw, hh, P),
-		rectPerimeterPoint(hw, hh, 0),
-	); // wraps
-});
-
-test("squareWheelPositions returns [] for zero/undefined count", () => {
-	assert.deepEqual(
-		squareWheelPositions({ count: 0, cx: 0, cy: 0, halfW: 10, halfH: 10 }),
-		[],
-	);
-	assert.deepEqual(
-		squareWheelPositions({ cx: 0, cy: 0, halfW: 10, halfH: 10 }),
-		[],
+	assert.equal(
+		ringPositions({ n: -1, panelW: 1, panelH: 1, boardW: 1, boardH: 1 }),
+		null,
 	);
 });
 
-test("squareWheelPositions places every node on the frame perimeter, none at exact top-center", () => {
-	const cx = 100,
-		cy = 100,
-		halfW = 50,
-		halfH = 30;
-	const pts = squareWheelPositions({ count: 8, cx, cy, halfW, halfH });
-	assert.equal(pts.length, 8);
-	for (const p of pts) {
-		const dx = Math.abs(p.x - cx);
-		const dy = Math.abs(p.y - cy);
-		const onEdge = Math.abs(dx - halfW) < 1e-9 || Math.abs(dy - halfH) < 1e-9;
-		assert.ok(onEdge, `point off perimeter: (${p.x},${p.y})`);
-		assert.ok(
-			dx <= halfW + 1e-9 && dy <= halfH + 1e-9,
-			`point outside frame: (${p.x},${p.y})`,
-		);
-		assert.ok(!(dx < 1e-9 && p.y < cy), "node at exact top-center");
-	}
+test("ringPositions is deterministic and honours a one-node start angle", () => {
+	const options = {
+		n: 1,
+		panelW: 300,
+		panelH: 160,
+		boardW: 1200,
+		boardH: 800,
+		startAngle: -Math.PI / 2,
+	};
+	const first = ringPositions(options);
+	assert.deepEqual(first, ringPositions(options));
+	assert.ok(
+		first[0].y < options.boardH / 2,
+		"single node begins above the focus panel",
+	);
 });
 
-test("squareWheelPositions is left-right symmetric for even counts", () => {
-	const pts = squareWheelPositions({
-		count: 8,
-		cx: 0,
-		cy: 0,
-		halfW: 40,
-		halfH: 40,
-	});
-	for (const p of pts) {
-		const mirror = pts.some(
-			(q) => Math.abs(q.x + p.x) < 1e-9 && Math.abs(q.y - p.y) < 1e-9,
-		);
-		assert.ok(mirror, `no mirror for (${p.x},${p.y})`);
+test("generated markup has one node set and no nested anchors", () => {
+	const html = renderSite();
+	assert.equal((html.match(/data-node=/g) || []).length, 28);
+	let anchorDepth = 0;
+	for (const token of html.match(/<\/?a\b[^>]*>/gi) || []) {
+		if (token.startsWith("</")) anchorDepth--;
+		else anchorDepth++;
+		assert.ok(anchorDepth <= 1, "anchors must not nest");
 	}
+	assert.equal(anchorDepth, 0, "all anchors must close");
+	assert.equal(html.includes('id="world"'), false);
+	assert.equal(html.includes('id="card"'), false);
 });
 
-test("spokeLines clips both real node edges and identifies the active node", () => {
-	const lines = spokeLines({
-		hub: { id: "home", x: 100, y: 100, hw: 20, hh: 20 },
-		nodes: [
-			{ id: "work", x: 100, y: 0, hw: 10, hh: 5 },
-			{ id: "hive", x: 200, y: 100, hw: 10, hh: 5 },
+test("edgeLines returns centre-to-centre SVG coordinates", () => {
+	assert.deepEqual(
+		edgeLines({
+			from: { x: 30, y: 40 },
+			to: [
+				{ id: "work", x: 100, y: 200 },
+				{ id: "projects", x: 300, y: 400 },
+			],
+		}),
+		[
+			{ id: "work", x1: 30, y1: 40, x2: 100, y2: 200 },
+			{ id: "projects", x1: 30, y1: 40, x2: 300, y2: 400 },
 		],
-		type: "section",
-		activeId: "work",
-	});
-
-	assert.equal(lines.length, 2);
-	assert.deepEqual(lines[0], {
-		id: "work",
-		type: "section",
-		active: true,
-		x1: 100,
-		y1: 80,
-		x2: 100,
-		y2: 5,
-	});
-	assert.deepEqual(lines[1], {
-		id: "hive",
-		type: "section",
-		active: false,
-		x1: 120,
-		y1: 100,
-		x2: 190,
-		y2: 100,
-	});
+	);
 });
