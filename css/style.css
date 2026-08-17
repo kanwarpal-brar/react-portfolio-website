@@ -150,16 +150,10 @@ kbd {
 }
 /* The edge back to where you came from reads solid and distinct; paths onward
  * the dashed accent. */
-#graph-lines [data-rank="up"] {
+#graph-lines [data-rank="up"],
+#graph-lines [data-stub] {
 	stroke: var(--accent-2);
 	stroke-dasharray: none;
-}
-/* A stub is only a hint that the map continues past the parent card, so it is
- * muted and subordinate to both real edge kinds. */
-#graph-lines [data-stub] {
-	stroke: var(--fg-mute);
-	stroke-dasharray: 2 4;
-	opacity: 0.5;
 }
 #nodes {
 	position: absolute;

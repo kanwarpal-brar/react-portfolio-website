@@ -62,7 +62,8 @@ Current behavior only — not a backlog, not a correctness guarantee.
   everything else gets `data-hidden` + `inert`, not dimmed.
 - Edges recompute per navigation (`edgeKey` folds in `focus`): only lines
   touching focus are drawn, tagged `up` (backlink) or `down` (onward); a
-  non-null `stubEdge` adds one muted line (`drawEdges`).
+  non-null `stubEdge` adds one stub line to `drawEdges`. Backlink and stub
+  share the solid `--accent-2` stroke (dashed accent = onward).
 - The backlink parent card gets an `--accent-2` border: `applyGeometry`
   tags `data-link="up"` on `graphTree[focus].parent` each render (stale tags
   cleared; `null` on `home`), `clearWorldStyles` strips it, and
