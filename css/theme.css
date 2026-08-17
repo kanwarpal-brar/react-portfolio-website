@@ -38,23 +38,20 @@
 
 	/* timing */
 	--t-fast: 140ms;
-	--t-med: 420ms;
+	--t-med: 315ms;
 	--ease: cubic-bezier(0.4, 0, 0.2, 1);
 	--tr-fast: var(--t-fast) linear; /* shorthand for the common linear color/border fade */
 
-	/* camera motion: the pan is the main event and is deliberately unhurried, so
-	 * the eye can follow the edge from the old node to the new one. */
-	--t-pan: 700ms;
-	--t-size: 400ms;
-	--t-fade: 220ms;
-	/* Neighbours appear while the camera is still moving, and the focused node
-	 * begins to grow just before the pan lands, so travel and arrival overlap
-	 * into one gesture instead of reading as two separate steps. */
-	--d-neighbour: calc(var(--t-pan) * 0.5);
-	--d-arrive: calc(var(--t-pan) * 0.72);
+	/* camera motion: the pan is the main event. Growth starts almost
+	 * immediately (--d-arrive) and its duration (--t-size) spans nearly the
+	 * whole pan, so the focused card visibly grows *while* the camera is
+	 * still moving, instead of sitting compact for most of the pan and then
+	 * bursting open in a short tail once the camera has already stopped. */
+	--t-pan: 637.5ms;
+	--t-size: 487.5ms;
+	--t-fade: 165ms;
+	--d-arrive: calc(var(--t-pan) * 0.08);
 	--d-size: 0s;
-	--d-fade: 0s;
-	--d-vis: var(--t-fade);
 	/* Gentle accelerate-then-settle, with no overshoot: a camera move, not a
 	 * bounce. */
 	--ease-pan: cubic-bezier(0.32, 0.02, 0.18, 1);
