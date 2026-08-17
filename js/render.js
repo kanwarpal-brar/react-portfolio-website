@@ -5,16 +5,20 @@
 // sits at board centre. Because nodes keep their positions, the parent of a
 // node keeps its real direction and the transition reads as a pan along the
 // edge to the next node, rather than a per-view re-slotting.
+//
+// Only the focused node and its direct links are drawn: focus + parent +
+// children (`visibleFor`). Everything else is hidden and inert, so each view
+// is a clean star, not a dimmed cloud.
 
 import {
 	allEdges,
 	buildGraph,
 	buildWorld,
 	cameraFor,
-	distancesFrom,
 	linkedFor,
 	NODE,
 	occludedBy,
+	stubEdge,
 	visibleFor,
 } from "./layout.js";
 import { nodeIds, pageTitle } from "./content.js";
@@ -30,9 +34,6 @@ const FLOW_QUERY = "(max-width: 1100px)";
 const REFLOW_TOLERANCE = 8;
 // Preferred breathing room between a neighbour card and the board edge.
 const EDGE_GAP = 36;
-// Beyond this many hops the map is context rather than content, so all further
-// nodes share the faintest tier instead of fading to nothing.
-const MAX_DIM_TIER = 3;
 
 const graphTree = buildGraph(TREE, "home");
 
@@ -162,10 +163,9 @@ function ensureWorld(boardW, boardH) {
 }
 
 /**
- * Draw the whole graph's edges once, in world coordinates. The edge layer shares
- * the camera transform with the node layer, so lines pan welded to their cards
- * and are never redrawn mid-transition. Edges touching the focused node are
- * marked so CSS can bring them forward.
+ * Draw edges that touch the focused node. The edge layer shares the camera
+ * transform with the node layer, so lines pan welded to their cards and are
+ * never redrawn mid-transition.
  */
 function drawEdges(graph, focus) {
 	const svg = graph.querySelector("#graph-lines");
@@ -176,47 +176,55 @@ function drawEdges(graph, focus) {
 		return;
 	}
 	const board = graph.getBoundingClientRect();
-	// The board is a window onto a larger world, so the SVG viewBox is centred on
-	// the origin and overflow is left visible.
 	svg.setAttribute(
 		"viewBox",
 		`${-board.width / 2} ${-board.height / 2} ${board.width} ${board.height}`,
 	);
-	const active = new Set(linkedFor(graphTree, focus));
-	const key = `${worldKey}|${board.width}x${board.height}`;
+	const key = `${worldKey}|${board.width}x${board.height}|${focus}`;
 	if (edgeKey !== key) {
 		edgeKey = key;
-		svg.replaceChildren(
-			...allEdges(graphTree, world.positions).map((line) => {
-				const element = document.createElementNS(
-					"http://www.w3.org/2000/svg",
-					"line",
-				);
-				element.setAttribute("x1", line.x1);
-				element.setAttribute("y1", line.y1);
-				element.setAttribute("x2", line.x2);
-				element.setAttribute("y2", line.y2);
-				element.dataset.from = line.from;
-				element.dataset.to = line.to;
-				return element;
-			}),
+		const edges = allEdges(graphTree, world.positions).filter(
+			(line) => line.from === focus || line.to === focus,
 		);
-	}
-	for (const line of svg.children) {
-		const touchesFocus =
-			line.dataset.from === focus || line.dataset.to === focus;
-		const adjacent =
-			active.has(line.dataset.from) || active.has(line.dataset.to);
-		if (touchesFocus) line.dataset.rank = "focus";
-		else if (adjacent) line.dataset.rank = "near";
-		else line.dataset.rank = "far";
+		const elements = edges.map((line) => {
+			const element = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"line",
+			);
+			element.setAttribute("x1", line.x1);
+			element.setAttribute("y1", line.y1);
+			element.setAttribute("x2", line.x2);
+			element.setAttribute("y2", line.y2);
+			element.dataset.from = line.from;
+			element.dataset.to = line.to;
+			// The backlink (to === focus) is the way back to where the viewer
+			// came from; everything else is a path onward.
+			element.dataset.rank = line.to === focus ? "up" : "down";
+			return element;
+		});
+		const stub = stubEdge(graphTree, world.positions, focus);
+		if (stub) {
+			const element = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"line",
+			);
+			element.setAttribute("x1", stub.x1);
+			element.setAttribute("y1", stub.y1);
+			element.setAttribute("x2", stub.x2);
+			element.setAttribute("y2", stub.y2);
+			element.dataset.stub = "";
+			// The stub renders first so a real edge paints over it where they
+			// cross; it is a hint about space beyond the star, not a link.
+			elements.unshift(element);
+		}
+		svg.replaceChildren(...elements);
 	}
 }
 
 /**
- * Every node stays interactive, because every node stays on the map. Only the
- * focused node's panel is exposed, and only panel-occluded nodes are dropped
- * from the tab order along with being hidden.
+ * Only the focused node and its direct links are drawn or interactive. Nodes
+ * outside that set are hidden and dropped from the tab order; the focused
+ * node's panel is the only exposed panel.
  */
 function setInteractivity(focus, hidden) {
 	for (const id of nodeIds()) {
@@ -248,7 +256,7 @@ function clearWorldStyles(graph) {
 		node.style.removeProperty("--y");
 		node.style.removeProperty("--panel-w");
 		node.style.removeProperty("--panel-h");
-		node.removeAttribute("data-depth");
+		node.removeAttribute("data-hidden");
 	}
 	graph.style.removeProperty("--cam-x");
 	graph.style.removeProperty("--cam-y");
@@ -294,16 +302,18 @@ function applyGeometry() {
 	graph.style.setProperty("--cam-x", `${Math.round(camera.x)}px`);
 	graph.style.setProperty("--cam-y", `${Math.round(camera.y)}px`);
 
-	// Depth dims the map by hop distance so the eye can tell where it is, while
-	// the rest of the graph stays present as context.
-	const distance = distancesFrom(graphTree, focus);
-	const hidden = occludedBy(positions, focus, sizes[focus]);
+	// Visibility is a property of the view: focus + parent + children, nothing
+	// else. Occlusion is the last-ditch safety net for a visible node the
+	// focused panel would still cover.
+	const visible = new Set(visibleFor(graphTree, focus));
+	const hidden = new Set(
+		[...nodeIds()].filter((id) => !visible.has(id)),
+	);
+	for (const id of occludedBy(positions, focus, sizes[focus])) hidden.add(id);
 	for (const id of nodeIds()) {
 		const node = elementFor(id);
 		if (!node) continue;
-		const depth = distance[id] ?? MAX_DIM_TIER;
-		node.dataset.depth = String(Math.min(depth, MAX_DIM_TIER));
-		node.toggleAttribute("data-occluded", hidden.has(id));
+		node.toggleAttribute("data-hidden", hidden.has(id));
 	}
 
 	setInteractivity(focus, hidden);
@@ -357,16 +367,13 @@ export function render(state, { moveFocus = false } = {}) {
 	graph.dataset.focus = focus;
 	document.title = pageTitle(state);
 
-	// Every node stays on the map: only the focused one expands, its direct
-	// links are highlighted, and everything else remains visible context.
+	// Roles drive CSS emphasis: the focused node expands, its links stay compact
+	// cards. Everything else isn't rendered at all.
 	const linked = new Set(linkedFor(graphTree, focus));
 	for (const id of nodeIds()) {
 		const node = elementFor(id);
 		if (!node) continue;
-		let role = "distant";
-		if (id === focus) role = "focus";
-		else if (linked.has(id)) role = "linked";
-		node.dataset.role = role;
+		node.dataset.role = id === focus ? "focus" : linked.has(id) ? "linked" : "";
 		const link = node.querySelector(".node-link");
 		if (link) {
 			if (id === focus) link.setAttribute("aria-current", "page");

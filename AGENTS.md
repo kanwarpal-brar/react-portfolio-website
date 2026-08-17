@@ -22,7 +22,11 @@ built from `index.template.html` + `js/data.js` + `js/content.js` by
 2. Use Playwright to navigate to `http://localhost:8000/`
 3. Take accessibility snapshot and screenshot
 4. Verify hash routing (`#/work`, `#/projects`, `#/projects/hive`), no overlaps
-   or off-board cards, panels do not scroll, and edge count == visible − 1
+   or off-board cards, panels do not scroll, and real edges == visible − 1
+   (plus one stub line). Confirm `up` edges (the backlink) render
+   solid/`--accent-2` distinct from dashed `down` edges, and a stub is present
+   on every non-`home` focus whose parent has an onward direction, absent on
+   `home`
 5. Check browser console for errors and test Tab/Enter/Esc. Keyboard activation
    must leave focus on the visible focused `.panel`, not `<body>`
 6. Test 1440×900, 1366×768, 1280×800, 1024×768, 900×700 and 390×844 viewports
@@ -33,8 +37,9 @@ built from `index.template.html` + `js/data.js` + `js/content.js` by
    `B`, `A` must be up-right.
 8. Verify the pan is **rigid**: sample a node's screen position before and after
    navigating and confirm every node moved by the same delta.
-9. Verify all edges are present in every world view, and that no two on-board
-   cards overlap.
+9. Verify only the focused node, its parent, and its own children are visible
+   or interactive in any world view — nothing else may render or take focus —
+   and that no two on-board cards overlap.
 10. Run `node --test` and confirm the `js/layout.js` unit tests pass
 11. If `js/data.js`/`js/content.js`/`index.template.html` changed, run
     `node scripts/build.mjs --check` and confirm it reports clean before committing

@@ -2,7 +2,8 @@
 //
 // The contract under test is the one the user cares about: the graph is ONE
 // fixed structure, a node's parent keeps its real direction, and every view is
-// legible without overlap. So these tests assert properties of the whole world
+// legible without overlap. Each view draws only its focused star — focus +
+// parent + children — so these tests assert properties of that visible set
 // across every focusable node, not the value of any hand-tuned constant.
 
 import { test } from "node:test";
@@ -14,13 +15,13 @@ import {
 	cameraFor,
 	cardsClear,
 	clearsPanel,
-	distancesFrom,
 	framePoint,
 	GAP,
 	linkedFor,
 	MARGIN,
 	NODE,
 	occludedBy,
+	stubEdge,
 	visibleFor,
 } from "../js/layout.js";
 import { TREE } from "../js/data.js";
@@ -105,9 +106,8 @@ test("a focused node can always reach its neighbours on the board", () => {
 					y: world[id].y + camera.y,
 				}));
 
-			// The board is a window onto a bigger map, so a link may sit past the
-			// edge; what must hold is that the panel is never covered and that enough
-			// links stay reachable to navigate with.
+			// Every link must land on the board: a view renders only the focused
+			// star, so a neighbour hidden off-board would leave the view orphaned.
 			let reachable = 0;
 			for (const card of cards) {
 				assert.ok(
@@ -121,8 +121,9 @@ test("a focused node can always reach its neighbours on the board", () => {
 					reachable++;
 			}
 			if (cards.length)
-				assert.ok(
-					reachable >= Math.max(1, Math.ceil(cards.length / 2)),
+				assert.equal(
+					reachable,
+					cards.length,
 					`${board.label} ${focus}: only ${reachable}/${cards.length} links reachable`,
 				);
 			for (let left = 0; left < cards.length; left++) {
@@ -137,49 +138,145 @@ test("a focused node can always reach its neighbours on the board", () => {
 	}
 });
 
-test("the whole map is drawn at once, so no two nodes may ever overlap", () => {
-	// The entire graph stays on screen, so clearance is a GLOBAL property. An
-	// earlier version only separated co-visible nodes, which silently allowed
-	// branches from different sections to sit on top of each other.
+test("a view never shows two overlapping cards", () => {
+	// Only the focused star is drawn, so clearance only needs to hold within
+	// each view. Branches of different sections may share map space: they are
+	// never on screen together.
 	for (const board of BOARDS) {
 		const world = worldFor(board);
 		assert.ok(world, `expected a feasible world at ${board.label}`);
-		const ids = Object.keys(world);
-		for (let left = 0; left < ids.length; left++) {
-			for (let right = left + 1; right < ids.length; right++) {
-				assert.ok(
-					cardsClear(world[ids[left]], world[ids[right]]),
-					`${board.label}: ${ids[left]}/${ids[right]} overlap on the map`,
-				);
+		for (const focus of Object.keys(world)) {
+			const camera = cameraFor(world, focus);
+			const cards = visibleFor(GRAPH, focus)
+				.filter((id) => id !== focus)
+				.map((id) => ({
+					id,
+					x: world[id].x + camera.x,
+					y: world[id].y + camera.y,
+				}));
+			for (let left = 0; left < cards.length; left++) {
+				for (let right = left + 1; right < cards.length; right++) {
+					assert.ok(
+						cardsClear(cards[left], cards[right]),
+						`${board.label} ${focus}: ${cards[left].id}/${cards[right].id} collide on screen`,
+					);
+				}
 			}
 		}
 	}
 });
 
-test("every edge in the graph is emitted once, in world coordinates", () => {
+test("only the edges touching the focus are drawn", () => {
 	const world = worldFor(BOARDS[0]);
-	const edges = allEdges(GRAPH, world);
-	// 28 nodes in a tree => 27 edges, drawn regardless of which node is focused.
-	assert.equal(edges.length, 27);
-	const seen = new Set(edges.map((edge) => edge.id));
-	assert.equal(seen.size, 27, "edges must not be duplicated");
-	for (const edge of edges) {
-		assert.equal(edge.x1, world[edge.from].x);
-		assert.equal(edge.y1, world[edge.from].y);
-		assert.equal(edge.x2, world[edge.to].x);
-		assert.equal(edge.y2, world[edge.to].y);
+	// The full graph is 28 nodes in a tree, but a view draws only its star:
+	// focus + parent + children, and one edge per visible neighbour.
+	for (const focus of Object.keys(GRAPH)) {
+		const visible = visibleFor(GRAPH, focus);
+		const edges = allEdges(GRAPH, world).filter(
+			(line) => line.from === focus || line.to === focus,
+		);
+		assert.equal(
+			edges.length,
+			visible.length - 1,
+			`${focus}: drawn edges must equal visible neighbours`,
+		);
+		for (const edge of edges) {
+			assert.equal(edge.x1, world[edge.from].x);
+			assert.equal(edge.y1, world[edge.from].y);
+			assert.equal(edge.x2, world[edge.to].x);
+			assert.equal(edge.y2, world[edge.to].y);
+		}
 	}
 });
 
-test("distance grows with hops and only panel-covered nodes are suppressed", () => {
-	const distance = distancesFrom(GRAPH, "socials");
-	assert.equal(distance.socials, 0);
-	assert.equal(distance.home, 1);
-	assert.equal(distance.github, 1);
-	assert.equal(distance.work, 2);
-	assert.equal(distance["carta-2024-payments"], 3);
-	assert.deepEqual(distancesFrom(GRAPH, "missing"), {});
+test("every focus with a parent has exactly one backlink edge", () => {
+	// The renderer tags an edge `up` exactly when `line.to === focus` (the way
+	// back to where the viewer came from), so that invariant must hold for the
+	// rank tagging to be meaningful: one and only one `up` edge per view, and
+	// none at home.
+	const world = worldFor(BOARDS[0]);
+	for (const focus of Object.keys(GRAPH)) {
+		const backlinks = allEdges(GRAPH, world).filter(
+			(line) => line.to === focus,
+		);
+		if (GRAPH[focus].parent)
+			assert.equal(
+				backlinks.length,
+				1,
+				`${focus}: exactly one edge points back to it`,
+			);
+		else
+			assert.equal(backlinks.length, 0, `${focus}: the root has no backlink`);
+	}
+});
 
+test("stubEdge hints where a parent's map continues", () => {
+	const world = worldFor(BOARDS[0]);
+	assert.equal(
+		stubEdge(GRAPH, world, "home"),
+		null,
+		"home has no parent, so no stub",
+	);
+	assert.equal(
+		stubEdge(GRAPH, world, "missing"),
+		null,
+		"an unknown focus has no stub",
+	);
+
+	// `projects` has its own parent (home) plus 9 children; `hive` is one of
+	// those children, so from `projects` there is a whole map beyond the hive
+	// view to hint at.
+	const stub = stubEdge(GRAPH, world, "hive");
+	assert.ok(stub, "projects keeps other neighbours to hint at");
+	assert.equal(stub.from, "projects");
+	const dir = { x: stub.x2 - stub.x1, y: stub.y2 - stub.y1 };
+	const toHive = {
+		x: world.hive.x - world.projects.x,
+		y: world.hive.y - world.projects.y,
+	};
+	assert.ok(
+		dir.x * toHive.x + dir.y * toHive.y < 0,
+		"the stub points away from hive's own slot",
+	);
+	assert.ok(
+		Math.abs(Math.hypot(dir.x, dir.y) - 56) < 1e-6,
+		"the stub extends exactly `length` px from the parent card",
+	);
+	assert.ok(
+		Math.hypot(stub.x2 - world.projects.x, stub.y2 - world.projects.y) > 56,
+		"the stub starts on the card boundary, beyond the centre",
+	);
+});
+
+test("stubEdge returns null when the parent's neighbours cancel", () => {
+	// Two of `projects`' neighbours (home and a sibling) placed exactly
+	// opposite and equidistant leave no clear onward direction.
+	assert.equal(
+		stubEdge(
+			GRAPH,
+			{
+				projects: { x: 0, y: 0 },
+				home: { x: -100, y: 0 },
+				nyabot: { x: 100, y: 0 },
+				hive: { x: 0, y: 100 },
+			},
+			"hive",
+		),
+		null,
+		"cancelling directions must not produce a stub",
+	);
+	assert.equal(
+		stubEdge(
+			GRAPH,
+			{ projects: { x: 0, y: 0 }, hive: { x: 0, y: 100 } },
+			"hive",
+		),
+		null,
+		"a parent with no other placed neighbours has no stub",
+	);
+});
+
+test("only nodes the focused panel would cover are occluded", () => {
 	const positions = {
 		home: { x: 0, y: 0 },
 		behind: { x: 0, y: 0 },
@@ -187,9 +284,15 @@ test("distance grows with hops and only panel-covered nodes are suppressed", () 
 	};
 	const hidden = occludedBy(positions, "home", { w: 800, h: 400 });
 	assert.ok(hidden.has("behind"), "a node under the panel is suppressed");
-	assert.ok(!hidden.has("far"), "a distant node stays on the map");
+	assert.ok(!hidden.has("far"), "a distant node stays drawn");
 	assert.ok(!hidden.has("home"), "the focus is never suppressed");
 	assert.equal(occludedBy(positions, "missing", { w: 10, h: 10 }).size, 0);
+});
+
+test("a leaf's visible set is itself and its parent, never its siblings", () => {
+	assert.deepEqual(visibleFor(GRAPH, "hive"), ["hive", "projects"]);
+	assert.deepEqual(visibleFor(GRAPH, "github"), ["github", "socials"]);
+	assert.deepEqual(visibleFor(GRAPH, "missing"), []);
 });
 
 test("the structure is rigid: relative positions never depend on the focus", () => {

@@ -126,23 +126,27 @@ kbd {
 	pointer-events: none;
 	overflow: visible;
 }
-/* Edges belong to the map, so all of them are drawn. Rank only changes emphasis:
- * the focused node's own edges read clearly, the rest recede into context. */
+/* Edges are a property of the view, not the map: only lines touching the
+ * focused node are drawn, and they pan welded to their cards. */
 #graph-lines line {
-	stroke: var(--border-bright);
+	stroke: var(--accent);
 	stroke-width: 1;
 	stroke-dasharray: 3 5;
+	opacity: 0.75;
 	transition: opacity var(--t-pan) var(--ease-pan);
 }
-#graph-lines line[data-rank="focus"] {
-	stroke: var(--accent);
-	opacity: 0.75;
+/* The edge back to where you came from reads solid and distinct; paths onward
+ * the dashed accent. */
+#graph-lines [data-rank="up"] {
+	stroke: var(--accent-2);
+	stroke-dasharray: none;
 }
-#graph-lines line[data-rank="near"] {
+/* A stub is only a hint that the map continues past the parent card, so it is
+ * muted and subordinate to both real edge kinds. */
+#graph-lines [data-stub] {
+	stroke: var(--fg-mute);
+	stroke-dasharray: 2 4;
 	opacity: 0.5;
-}
-#graph-lines line[data-rank="far"] {
-	opacity: 0.22;
 }
 #nodes {
 	position: absolute;
@@ -150,9 +154,9 @@ kbd {
 	z-index: 1;
 }
 
-/* Nodes are placed in world coordinates and never move between views. The whole
- * map is always rendered; only the focused node's size and each node's emphasis
- * change, so the graph stays one continuous structure while the camera moves. */
+/* Nodes are placed in world coordinates and never move between views. A view
+ * draws only the focused node and its direct links; everything else is hidden
+ * outright rather than dimmed, so each view is a clean star around the focus. */
 .node {
 	position: absolute;
 	top: 50%;
@@ -170,26 +174,6 @@ kbd {
 		margin var(--t-size) var(--ease) var(--d-size),
 		opacity var(--t-pan) var(--ease-pan);
 }
-/* Distance dimming: the focus and its links are legible, the rest of the map
- * recedes but stays visible so connectivity is never lost.
- *
- * These floors are an accessibility constraint, not a taste call. Distant cards
- * are still real links with real text, so they must keep AA contrast — dimming
- * them to a whisper (0.22) failed Lighthouse's colour-contrast audit. Depth is
- * carried mostly by the border and edge treatment instead. */
-.node[data-depth="1"] {
-	opacity: 0.92;
-}
-.node[data-depth="2"] {
-	opacity: 0.82;
-}
-.node[data-depth="3"] {
-	opacity: 0.74;
-}
-.node[data-depth="2"] .compact,
-.node[data-depth="3"] .compact {
-	border-color: var(--border);
-}
 .node[data-role="focus"] {
 	z-index: 3;
 	width: var(--panel-w);
@@ -200,9 +184,9 @@ kbd {
 	 * arrival into a single gesture. */
 	--d-size: var(--d-arrive);
 }
-/* A node the focused panel would cover is removed rather than drawn underneath
- * it. It is also made inert, so it cannot be tabbed to while invisible. */
-.node[data-occluded] {
+/* A node outside the focused star is removed rather than drawn underneath it.
+ * It is also made inert, so it cannot be tabbed to while invisible. */
+.node[data-hidden] {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
@@ -260,11 +244,6 @@ kbd {
 	transition:
 		opacity var(--t-med) var(--ease),
 		visibility 0s linear var(--t-med);
-}
-.node[data-role="linked"] .compact,
-.node[data-role="distant"] .compact {
-	opacity: 1;
-	visibility: visible;
 }
 .node[data-role="focus"] .compact {
 	pointer-events: none;

@@ -12,13 +12,6 @@ export const GAP = 20;
 export const MARGIN = 12;
 
 const TOP = -Math.PI / 2;
-// How far a child may be nudged outward along its own spoke to escape another
-// branch, and in what increment.
-const PUSH_STEP = 8;
-const PUSH_LIMIT = 120;
-// Fraction of the board the root's ring may use, leaving room outside it for the
-// sections' own children.
-const ROOT_RING_ROOM = 0.62;
 
 /** Half-extents of the area a compact card centre may occupy on a board. */
 function boardLimits(boardW, boardH) {
@@ -132,35 +125,18 @@ function viewIsValid(graph, positions, id, panelSize, limits) {
 	const panel = panelSize(id);
 	if (!panel) return false;
 	const offsets = neighbourOffsets(graph, positions, id);
-	let onBoard = 0;
 	for (const offset of offsets) {
 		if (!clearsPanel(offset, panel.w, panel.h)) return false;
 		if (
-			Math.abs(offset.x) <= limits.x + 0.5 &&
-			Math.abs(offset.y) <= limits.y + 0.5
+			Math.abs(offset.x) > limits.x + 0.5 ||
+			Math.abs(offset.y) > limits.y + 0.5
 		)
-			onBoard++;
+			return false;
 	}
 	for (let left = 0; left < offsets.length; left++) {
 		for (let right = left + 1; right < offsets.length; right++) {
 			if (!cardsClear(offsets[left], offsets[right])) return false;
 		}
-	}
-	// The parent must always be reachable, so at least one link is required, and
-	// a majority keeps a hub navigable without panning blindly.
-	if (!offsets.length) return true;
-	return onBoard >= Math.max(1, Math.ceil(offsets.length / 2));
-}
-
-/**
- * Every node stays on the map, so a placement must clear EVERY node already
- * placed — not just its own siblings. Without this, branches from different
- * sections silently overlap wherever their subtrees happen to meet.
- */
-function clearOfEveryNode(positions, point, exclude) {
-	for (const [id, other] of Object.entries(positions)) {
-		if (exclude.has(id)) continue;
-		if (!cardsClear(point, other)) return false;
 	}
 	return true;
 }
@@ -173,14 +149,16 @@ function clearOfEveryNode(positions, point, exclude) {
  * view the placement participates in:
  *   - each child clears the parent's panel envelope (parent-focused view);
  *   - the parent card clears each child's own panel envelope (child-focused);
- *   - neighbours clear each other and stay on-board when the node is centred;
- *   - the placement clears EVERY other node in the world, because the whole
- *     map stays visible and distant branches must not collide.
+ *   - neighbours clear each other and stay on-board when the node is centred.
+ * Only co-visible nodes must avoid each other — a view renders focus, parent,
+ * and children, nothing else — so branches of different sections are free to
+ * share map space. That per-branch independence is what lets every hub use the
+ * full board for its own ring instead of a reduced one.
+ *
  * The parent's slot is anchored to its true world direction so directions stay
  * globally consistent, and children fill the remaining frame. Frames are tried
  * largest-first so the board is filled rather than leaving a hollow ring, and
- * each frame is also tried at several rotations so a branch can step around
- * another branch instead of failing outright.
+ * each frame is also tried at several rotations.
  */
 export function buildWorld({ graph, root, panelSize, boardW, boardH }) {
 	if (!graph?.[root]) return null;
@@ -195,17 +173,11 @@ export function buildWorld({ graph, root, panelSize, boardW, boardH }) {
 
 	const positions = { [root]: { x: 0, y: 0 } };
 	const queue = [root];
-	// The root's own ring is placed on a reduced frame rather than the full board.
-	// Placing it at the edge is greedy: it looks generous on the home view but
-	// leaves the busiest hubs (work has 10 children) with nowhere to put their own
-	// subtree, and there is no backtracking to recover.
-	const ringRoom = graph[root].children?.length ? ROOT_RING_ROOM : 1;
 
 	while (queue.length) {
 		const id = queue.shift();
 		const children = graph[id].children ?? [];
 		if (!children.length) continue;
-		const frameRoom = id === root ? ringRoom : 1;
 
 		const parent = graph[id].parent;
 		const parentAngle = parent
@@ -217,10 +189,8 @@ export function buildWorld({ graph, root, panelSize, boardW, boardH }) {
 		const slots = children.length + (parent ? 1 : 0);
 
 		let placed = null;
-		const family = new Set([id, ...children]);
 		// A frame smaller than the node's own panel would drop children on top of
-		// it, so the frame is clamped outward to the panel envelope. Children can
-		// still be pushed further out, never closer in.
+		// it, so the frame is clamped outward to the panel envelope.
 		const ownPanel = panelSize(id);
 		if (!ownPanel) return null;
 		const minHalfW = ownPanel.w / 2 + NODE.w / 2 + GAP;
@@ -231,8 +201,8 @@ export function buildWorld({ graph, root, panelSize, boardW, boardH }) {
 			// small frame leaves a hollow centre surrounded by dead space.
 			const scale = 1 - step * 0.01;
 			if (scale < 0.24) break;
-			const halfW = Math.max(limits.x * scale * frameRoom, minHalfW);
-			const halfH = Math.max(limits.y * scale * frameRoom, minHalfH);
+			const halfW = Math.max(limits.x * scale, minHalfW);
+			const halfH = Math.max(limits.y * scale, minHalfH);
 			const base = frameFraction(parentAngle, halfW, halfH);
 			for (let turn = 0; turn < slots; turn++) {
 				const candidate = children.map((_, index) =>
@@ -245,57 +215,6 @@ export function buildWorld({ graph, root, panelSize, boardW, boardH }) {
 						y: positions[id].y + candidate[index].y,
 					};
 				});
-				// A hub near the edge of its parent's frame has children that wrap back
-				// over the rest of the map. Rather than reject the whole frame, push the
-				// offending child further out along its own spoke: the edge direction is
-				// preserved, so the structure still reads correctly. The push also has to
-				// respect the child's OWN panel, which will be centred here when the child
-				// is focused — otherwise the hub would sit on top of it.
-				const settled = [];
-				children.forEach((child, index) => {
-					const spoke = candidate[index];
-					const length = Math.hypot(spoke.x, spoke.y) || 1;
-					const ux = spoke.x / length;
-					const uy = spoke.y / length;
-					const childPanel = panelSize(child);
-					// The push must not carry the child so far that its own parent falls off
-					// the board when the child is focused, or the child becomes a dead end.
-					const reaches = (point) =>
-						Math.abs(positions[id].x - point.x) <= limits.x + 0.5 &&
-						Math.abs(positions[id].y - point.y) <= limits.y + 0.5;
-					let best = null;
-					for (let push = 0; push < PUSH_LIMIT; push++) {
-						const point = trial[child];
-						if (!reaches(point)) break;
-						const clearOfMap = clearOfEveryNode(positions, point, family);
-						const clearOfSiblings = settled.every((other) =>
-							cardsClear(point, trial[other]),
-						);
-						const room =
-							!childPanel ||
-							clearsPanel(
-								{ x: positions[id].x - point.x, y: positions[id].y - point.y },
-								childPanel.w,
-								childPanel.h,
-							);
-						if (clearOfMap && clearOfSiblings && room) {
-							best = point;
-							break;
-						}
-						trial[child] = {
-							x: point.x + ux * PUSH_STEP,
-							y: point.y + uy * PUSH_STEP,
-						};
-					}
-					if (best) trial[child] = best;
-					settled.push(child);
-				});
-				if (
-					!children.every((child) =>
-						clearOfEveryNode(positions, trial[child], family),
-					)
-				)
-					continue;
 				if (
 					!children.every((child, index) =>
 						children
@@ -348,26 +267,6 @@ export function linkedFor(graph, focus) {
 }
 
 /**
- * Hop distance from `focus` to every node, so the renderer can dim by depth.
- * The whole map stays on screen; distance is what tells the eye where it is.
- */
-export function distancesFrom(graph, focus) {
-	const distance = {};
-	if (!graph?.[focus]) return distance;
-	distance[focus] = 0;
-	const queue = [focus];
-	while (queue.length) {
-		const id = queue.shift();
-		for (const next of neighbourIds(graph, id)) {
-			if (distance[next] !== undefined) continue;
-			distance[next] = distance[id] + 1;
-			queue.push(next);
-		}
-	}
-	return distance;
-}
-
-/**
  * A node is suppressed only when the focused panel would cover it. Everything
  * else stays drawn, even far off the board edge, so the graph reads as one
  * continuous map rather than a fresh star per view.
@@ -407,4 +306,48 @@ export function allEdges(graph, positions) {
 		}
 	}
 	return edges;
+}
+
+/**
+ * A one-ended continuation hint for the focused node's parent. The parent card
+ * shown as a backlink may itself link onward to neighbours this view
+ * deliberately never draws (`visibleFor`), so a short stub starts at the
+ * parent card's boundary and points in the averaged unit direction of those
+ * hidden neighbours. Returns `null` when the focus has no parent (`home`), or
+ * when the parent's other neighbours have no clear common direction — none
+ * placed, or vectors that cancel exactly.
+ */
+export function stubEdge(graph, positions, focus, length = 56) {
+	const parent = graph[focus]?.parent;
+	if (!parent || !positions[parent]) return null;
+	const others = neighbourIds(graph, parent).filter(
+		(id) => id !== focus && positions[id],
+	);
+	let dx = 0;
+	let dy = 0;
+	for (const other of others) {
+		const vx = positions[other].x - positions[parent].x;
+		const vy = positions[other].y - positions[parent].y;
+		const norm = Math.hypot(vx, vy);
+		if (!norm) continue;
+		dx += vx / norm;
+		dy += vy / norm;
+	}
+	const magnitude = Math.hypot(dx, dy);
+	if (!magnitude) return null;
+	const angle = Math.atan2(dy, dx);
+	// Where the resultant direction meets the parent card's boundary, then
+	// `length` px further outward — the same frame math used to seat children.
+	const boundary = framePoint(
+		frameFraction(angle, NODE.w / 2, NODE.h / 2),
+		NODE.w / 2,
+		NODE.h / 2,
+	);
+	return {
+		from: parent,
+		x1: positions[parent].x + boundary.x,
+		y1: positions[parent].y + boundary.y,
+		x2: positions[parent].x + boundary.x + (dx / magnitude) * length,
+		y2: positions[parent].y + boundary.y + (dy / magnitude) * length,
+	};
 }
