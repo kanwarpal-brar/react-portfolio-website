@@ -55,4 +55,10 @@
 	/* Gentle accelerate-then-settle, with no overshoot: a camera move, not a
 	 * bounce. */
 	--ease-pan: cubic-bezier(0.32, 0.02, 0.18, 1);
+
+	/* children appearing or disappearing around a focused node get their own
+	 * motion, decoupled from the camera's curve (see PLAN.md, Motion):
+	 * populating cards grow in, departing ones shrink out, instead of relying
+	 * on the shared opacity fade alone. */
+	--t-pop: 320ms;
 }

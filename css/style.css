@@ -179,13 +179,15 @@ kbd {
 	height: 76px;
 	margin: -38px 0 0 -88px;
 	translate: var(--x, 0px) var(--y, 0px);
+	scale: 1;
 	opacity: 1;
 	pointer-events: auto;
 	transition:
 		width var(--t-size) var(--ease) var(--d-size),
 		height var(--t-size) var(--ease) var(--d-size),
 		margin var(--t-size) var(--ease) var(--d-size),
-		opacity var(--t-pan) var(--ease-pan);
+		opacity var(--t-pan) var(--ease-pan),
+		scale var(--t-pop) var(--ease);
 }
 .node[data-role="focus"] {
 	z-index: 3;
@@ -203,9 +205,11 @@ kbd {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
+	scale: 0.94;
 	transition:
 		opacity var(--t-fade) linear,
-		visibility 0s linear var(--t-fade);
+		visibility 0s linear var(--t-fade),
+		scale var(--t-fade) var(--ease);
 }
 
 .compact,
