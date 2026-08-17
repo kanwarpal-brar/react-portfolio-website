@@ -105,31 +105,31 @@ function homePanelHTML() {
 function sectionPanelHTML(id) {
 	if (id === "resume") {
 		const filename = resumePath.split("/").pop();
-		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2>resume</h2><p>${esc(resumeBlurb)}</p><a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ open ${esc(filename)} ]</a><p class="tip">${esc(resumeCopy.tip)}</p>`;
+		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">resume</h2><p>${esc(resumeBlurb)}</p><a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ open ${esc(filename)} ]</a><p class="tip">${esc(resumeCopy.tip)}</p>`;
 	}
 	if (id === "cluster") {
-		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2>${esc(clusterCopy.title.toLowerCase())}</h2><p class="warning">[!] Access to this infrastructure is strictly controlled.</p><p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p><p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p><ul>${clusterCopy.requirements.map((requirement) => `<li>${esc(requirement)}</li>`).join("")}</ul>`;
+		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">${esc(clusterCopy.title.toLowerCase())}</h2><p class="warning">[!] Access to this infrastructure is strictly controlled.</p><p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p><p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p><ul>${clusterCopy.requirements.map((requirement) => `<li>${esc(requirement)}</li>`).join("")}</ul>`;
 	}
 	const count = TREE[id].children.length;
 	const label = id === "socials" ? "connection" : "node";
-	return `<p class="node-lede">${esc(sectionLede(id))}</p><h2>${esc(id)}</h2><p>${countLabel(count, label)} on this branch. Select one to explore it.</p>`;
+	return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">${esc(id)}</h2><p>${countLabel(count, label)} on this branch. Select one to explore it.</p>`;
 }
 
 function childPanelHTML(id) {
 	const child = CHILD_INDEX[id];
 	if (child.kind === "project") {
-		return `<h2>${esc(child.data.name)}</h2><p>${esc(child.data.desc)}</p><p class="tags">${child.data.tags.map((tag) => `[${esc(tag)}]`).join(" ")}</p><a href="${esc(child.data.url)}" target="_blank" rel="noopener">→ ${esc(child.data.url.replace("https://", ""))}</a>`;
+		return `<h2 class="node-title">${esc(child.data.name)}</h2><p>${esc(child.data.desc)}</p><p class="tags">${child.data.tags.map((tag) => `[${esc(tag)}]`).join(" ")}</p><a href="${esc(child.data.url)}" target="_blank" rel="noopener">→ ${esc(child.data.url.replace("https://", ""))}</a>`;
 	}
 	if (child.kind === "social") {
 		const external = child.data.url.startsWith("http");
-		return `<h2>${esc(child.data.label)}</h2><p>${esc(child.data.handle)}</p><a href="${esc(child.data.url)}"${external ? ' target="_blank" rel="noopener"' : ""}>open ↗</a>`;
+		return `<h2 class="node-title">${esc(child.data.label)}</h2><p>${esc(child.data.handle)}</p><a href="${esc(child.data.url)}"${external ? ' target="_blank" rel="noopener"' : ""}>open ↗</a>`;
 	}
 	const title = child.data.title || child.data.name;
 	const subtitle = child.kind === "work" ? child.data.company : child.data.role;
 	const date = child.data.date
 		? `<p class="when">${esc(child.data.date)}</p>`
 		: "";
-	return `<h2>${esc(title)}</h2><p class="node-lede">${esc(subtitle)}</p>${date}<p>${esc(child.data.paragraph || child.data.desc)}</p>`;
+	return `<h2 class="node-title">${esc(title)}</h2><p class="node-lede">${esc(subtitle)}</p>${date}<p>${esc(child.data.paragraph || child.data.desc)}</p>`;
 }
 
 function panelHTML(id) {
