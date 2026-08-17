@@ -220,6 +220,7 @@ kbd {
 	gap: 0.2rem;
 	padding: 0.8rem;
 	color: var(--fg);
+	text-align: center;
 	text-decoration: none;
 	opacity: 1;
 	visibility: visible;
@@ -238,7 +239,11 @@ kbd {
 .compact-name {
 	overflow: hidden;
 	color: var(--accent);
+	font-family: var(--mono-label);
+	font-size: 1.3em;
 	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.01em;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }

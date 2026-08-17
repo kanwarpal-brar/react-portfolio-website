@@ -32,6 +32,12 @@
 	--mono:
 		ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Mono",
 		Menlo, Consolas, "Liberation Mono", monospace;
+	/* A bolder, more overtly "IDE" stack for the collapsed-card title: these
+	 * are the fonts developers associate with a code editor, ranked ahead of
+	 * the plainer system defaults used for body copy. */
+	--mono-label:
+		Menlo, Consolas, "JetBrains Mono", "Fira Code", ui-monospace, "SF Mono",
+		"Cascadia Mono", "Liberation Mono", monospace;
 	--fs-base: 15px;
 	--fs-small: 13px;
 	--lh: 1.5;
