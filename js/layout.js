@@ -9,7 +9,7 @@
 
 export const NODE = Object.freeze({ w: 176, h: 76 });
 export const GAP = 20;
-export const MARGIN = 12;
+export const MARGIN = 14;
 
 const TOP = -Math.PI / 2;
 
