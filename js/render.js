@@ -257,6 +257,7 @@ function clearWorldStyles(graph) {
 		node.style.removeProperty("--panel-w");
 		node.style.removeProperty("--panel-h");
 		node.removeAttribute("data-hidden");
+		node.removeAttribute("data-link");
 	}
 	graph.style.removeProperty("--cam-x");
 	graph.style.removeProperty("--cam-y");
@@ -314,6 +315,7 @@ function applyGeometry() {
 		const node = elementFor(id);
 		if (!node) continue;
 		node.toggleAttribute("data-hidden", hidden.has(id));
+		node.dataset.link = id === (graphTree[focus].parent ?? null) ? "up" : "";
 	}
 
 	setInteractivity(focus, hidden);

@@ -238,6 +238,9 @@ kbd {
 	border-color: var(--accent);
 	background: #17171d;
 }
+.node[data-link="up"] .compact {
+	border-color: var(--accent-2);
+}
 .compact-name {
 	overflow: hidden;
 	color: var(--accent);

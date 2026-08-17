@@ -63,6 +63,10 @@ Current behavior only — not a backlog, not a correctness guarantee.
 - Edges recompute per navigation (`edgeKey` folds in `focus`): only lines
   touching focus are drawn, tagged `up` (backlink) or `down` (onward); a
   non-null `stubEdge` adds one muted line (`drawEdges`).
+- The backlink parent card gets an `--accent-2` border: `applyGeometry`
+  tags `data-link="up"` on `graphTree[focus].parent` each render (stale tags
+  cleared; `null` on `home`), `clearWorldStyles` strips it, and
+  `.node[data-link="up"] .compact` styles the ring.
 - Camera-only transform (`--cam-x`/`--cam-y`); node sizes are measured px,
   never `auto`, so growth/shrink animates.
 - Falls back to a static flow column (same DOM, no separate no-JS markup)
