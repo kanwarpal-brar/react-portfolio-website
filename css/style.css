@@ -110,6 +110,19 @@ kbd {
 	overflow: hidden;
 	isolation: isolate;
 }
+/* Boot suppression: the very first render must snap into place. There is no
+ * painted "before" frame for CSS to transition from on a cold load, so leaving
+ * transitions enabled hands the initial reveal of `home` to a timing race
+ * (see PLAN.md, Interaction). `data-boot` ships in the static markup and is
+ * removed one frame after the first paint, re-enabling transitions for all
+ * navigation. */
+#graph[data-boot] .node,
+#graph[data-boot] .node .compact,
+#graph[data-boot] .node .panel,
+#graph[data-boot] #nodes,
+#graph[data-boot] #graph-lines {
+	transition: none !important;
+}
 /* The camera. Both layers share one transform, so edges stay welded to cards
  * for the whole pan without being redrawn frame by frame. */
 #graph-lines,

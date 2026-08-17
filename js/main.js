@@ -23,6 +23,16 @@ function boot() {
 	render(applyHash());
 	updateDimensions();
 
+	const graph = document.querySelector("#graph");
+	// The first render must snap into place, not animate: on a cold load there
+	// is no painted "before" frame to transition from (see PLAN.md §A), so the
+	// static `data-boot` attribute keeps every transition suppressed until the
+	// first frame has actually been painted. The double rAF fires after that
+	// paint; transitions then re-enable for every subsequent navigation.
+	requestAnimationFrame(() => {
+		requestAnimationFrame(() => graph?.removeAttribute("data-boot"));
+	});
+
 	// Activating a node link makes that node the focus, and the focused node's
 	// link is removed from the tab order — so by the time `hashchange` fires,
 	// activeElement is already <body>. Record the intent at click/keydown time
@@ -43,7 +53,6 @@ function boot() {
 	});
 	window.addEventListener("resize", updateDimensions);
 
-	const graph = document.querySelector("#graph");
 	graph?.addEventListener("click", (event) => {
 		if (!event.target.closest(".node") && currentState().view !== "home")
 			go("home");
