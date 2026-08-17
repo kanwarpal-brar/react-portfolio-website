@@ -47,8 +47,8 @@
 	 * whole pan, so the focused card visibly grows *while* the camera is
 	 * still moving, instead of sitting compact for most of the pan and then
 	 * bursting open in a short tail once the camera has already stopped. */
-	--t-pan: 637.5ms;
-	--t-size: 487.5ms;
+	--t-pan: 478ms;
+	--t-size: 366ms;
 	--t-fade: 165ms;
 	--d-arrive: calc(var(--t-pan) * 0.08);
 	--d-size: 0s;

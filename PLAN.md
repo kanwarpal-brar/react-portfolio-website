@@ -82,7 +82,7 @@ Current behavior only — not a backlog, not a correctness guarantee.
 
 ## Motion (`css/theme.css`, `css/style.css`)
 
-- Pan `--t-pan: 637.5ms`; resize `--t-size: 487.5ms` starts at 8% of the
+- Pan `--t-pan: 478ms`; resize `--t-size: 366ms` starts at 8% of the
   pan (`--d-arrive`) and spans nearly all of it, so growth overlaps travel
   instead of bursting open at the end. Fade `--t-fade: 165ms`.
 - Population `--t-pop: 320ms`: populating cards scale `0.94 → 1` on
