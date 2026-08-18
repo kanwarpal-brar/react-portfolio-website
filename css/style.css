@@ -197,8 +197,8 @@ kbd {
 	left: 50%;
 	z-index: 2;
 	width: 176px;
-	height: 76px;
-	margin: -38px 0 0 -88px;
+	height: 88px;
+	margin: -44px 0 0 -88px;
 	translate: var(--x, 0px) var(--y, 0px);
 	scale: 1;
 	opacity: 1;
@@ -276,11 +276,14 @@ kbd {
 	white-space: nowrap;
 }
 .compact-meta {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
 	overflow: hidden;
 	color: var(--fg-mute);
 	font-size: var(--fs-small);
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	line-height: 1.4;
+	overflow-wrap: break-word;
 }
 .panel {
 	padding: 1.25rem 1.4rem;
@@ -304,6 +307,13 @@ kbd {
 	pointer-events: auto;
 	transition-delay:
 		calc(var(--d-arrive) + var(--t-size) * 0.3), var(--d-arrive);
+}
+/* The home panel is the tallest on the board: the name + tagline + biography
+ * must fit inside the height budget that lets 1366×768 host the world layout
+ * (taller cards crowd the ring), so its vertical padding gives back the
+ * space the taller cards take from the ring. */
+.node[data-node="home"] .panel {
+	padding-block: 1rem;
 }
 
 .bio-grid {
@@ -388,7 +398,7 @@ kbd {
 #graph[data-layout="flow"] .node .compact,
 .nojs .node .compact {
 	position: static;
-	min-height: 76px;
+	min-height: 88px;
 	opacity: 1;
 	visibility: visible;
 }
@@ -454,7 +464,7 @@ kbd {
 	}
 	.node .compact {
 		position: static;
-		min-height: 76px;
+		min-height: 88px;
 		opacity: 1;
 		visibility: visible;
 	}
