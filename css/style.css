@@ -35,11 +35,11 @@ h2 {
 	font-size: 1em;
 	text-transform: lowercase;
 }
-/* The focused panel's own identity heading: same technical treatment as the
- * collapsed card's `.compact-name` (self-hosted mono, upright weight,
- * uppercase) so a node's title reads as continuous, not swapped out, when
- * it expands from card to panel. Sub-headings within a panel's body copy
- * (e.g. "about") stay plain `h2` — lowercase, UA-default weight. */
+/* A panel's identity heading: the same technical treatment as the collapsed
+ * card's `.compact-name` (self-hosted mono, upright weight, uppercase) so a
+ * node's title reads as continuous, not swapped out, when it expands from
+ * card to panel. Applied to section and child titles, the home panel's name,
+ * and its "about" heading alike. */
 .node-title {
 	font-family: var(--mono-label);
 	font-weight: 400;
