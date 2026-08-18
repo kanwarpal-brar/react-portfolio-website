@@ -51,7 +51,7 @@ export const socials = [
 export const workExperience = [
 	{
 		id: "carta-2024-payments",
-		title: "Payments Software Engineering Co-op",
+		title: "Payments SWE Co-op",
 		company: "Carta",
 		date: "Sept–Dec 2024",
 		paragraph:
@@ -67,7 +67,7 @@ export const workExperience = [
 	},
 	{
 		id: "carta-2024-backend",
-		title: "Backend Software Engineering Co-op",
+		title: "Backend SWE Co-op",
 		company: "Carta",
 		date: "Jan–April 2024",
 		paragraph:
@@ -91,7 +91,7 @@ export const workExperience = [
 	},
 	{
 		id: "cloudspark-2022",
-		title: "Software Engineering Intern",
+		title: "SWE Intern",
 		company: "Cloudspark",
 		date: "Jan–Apr 2022",
 		paragraph:
