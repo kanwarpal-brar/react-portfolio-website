@@ -53,7 +53,7 @@ export const workExperience = [
 		id: "carta-2024-payments",
 		title: "Payments Software Engineering Co-op",
 		company: "Carta",
-		date: "Sept — Dec 2024",
+		date: "Sept–Dec 2024",
 		paragraph:
 			"Shipped critical fund impersonation controls within first 2 weeks of joining, preventing $5000+ in potential audit penalties using Django + React. Implemented scalable Microservices on AWS using Docker and Kubernetes, ensuring robust and reliable fintech solutions. Led multi-service banking integration expansion processing $5M+ monthly, implementing international account workflows using Python, gRPC, Protocol Buffers, and Domain Driven Design.",
 	},
@@ -61,7 +61,7 @@ export const workExperience = [
 		id: "uwaterloo-2024",
 		title: "Distributed Systems Research Assistant",
 		company: "UWaterloo",
-		date: "May — Aug 2024",
+		date: "May–Aug 2024",
 		paragraph:
 			"Conducted comprehensive benchmarking of Serverless frameworks to inform the design of a new high-performance Serverless platform. Deployed & Optimized Kubernetes clusters achieving 200+ requests/second per node with KNative Serving. Reduced cold-start latency 20% through analysis and tuning of autoscaling, node configuration, and container runtime. Authored a comprehensive technical report proposing architectural changes, improving resource utilization 15%.",
 	},
@@ -69,7 +69,7 @@ export const workExperience = [
 		id: "carta-2024-backend",
 		title: "Backend Software Engineering Co-op",
 		company: "Carta",
-		date: "Jan — April 2024",
+		date: "Jan–April 2024",
 		paragraph:
 			"Improved OCX report generation speed 10% by implementing an O(n) complexity cell management system with Apache POI + Java. Enhanced AI powered search accuracy 6% through prompt engineering of report questions & use-cases. Resolved 3000+ support tickets by streamlining Ownership Report access permissions in Carta Web's Django codebase. Optimized ownership report query complexity in Spring framework, resulting in a 5% decrease in user wait times.",
 	},
@@ -77,7 +77,7 @@ export const workExperience = [
 		id: "arctic-wolf-2023",
 		title: "Software Developer",
 		company: "Arctic Wolf",
-		date: "May — Aug 2023",
+		date: "May–Aug 2023",
 		paragraph:
 			"Reduced response times 25% by developing a concurrent Prometheus metrics monitoring system in Go for an Apache Kafka Wrapper. Developed a reflection-based Golang unit test verifier, identifying missing/broken metrics tests with 100% accuracy. Reduced lead times by designing a forward/backwards compatible Kafka Serialization system using SchemaVer and Avro.",
 	},
@@ -85,7 +85,7 @@ export const workExperience = [
 		id: "genesys-2022",
 		title: "Full Stack Software Developer",
 		company: "Genesys",
-		date: "Sept — Dec 2022",
+		date: "Sept–Dec 2022",
 		paragraph:
 			"Reduced hosting costs 5% by transitioning scheduling API to serverless architecture using Python, Flask, and Lambda. Shrunk codebase size 30% by rewriting schedule statement management REST API in Python + Flask + RESTX.",
 	},
@@ -93,7 +93,7 @@ export const workExperience = [
 		id: "cloudspark-2022",
 		title: "Software Engineering Intern",
 		company: "Cloudspark",
-		date: "Jan — Apr 2022",
+		date: "Jan–Apr 2022",
 		paragraph:
 			"Designed & Implemented scalable RESTful and Event-Driven microservices for web apps leveraging Microsoft Azure. Led the development of Licensing, Notification, and Auth microservices for a start-up MVP, utilizing TypeScript, Nest.JS, CosmosDB, Dependency Injection, and Azure Service Bus.",
 	},
@@ -101,7 +101,7 @@ export const workExperience = [
 		id: "pillar-to-post-2021",
 		title: "DevOps Specialist",
 		company: "Pillar To Post",
-		date: "May — Aug 2021",
+		date: "May–Aug 2021",
 		paragraph:
 			"Designed and Developed an Automated Web Software Testing Framework in Selenium using Python and JavaScript, eliminating manual testing and saving 100+ company hours.",
 	},
@@ -153,7 +153,7 @@ export const projects = [
 	{
 		id: "thread-music",
 		name: "thread-music",
-		desc: "Thread scheduling as conductor — threads play MIDI notes on cue.",
+		desc: "Thread scheduling as conductor: threads play MIDI notes on cue.",
 		url: "https://github.com/kanwarpal-brar/thread-music",
 		tags: ["c++", "threading", "midi"],
 	},

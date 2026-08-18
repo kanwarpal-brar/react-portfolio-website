@@ -155,15 +155,15 @@ export function nodesHTML() {
 }
 
 export function pageTitle(state) {
-	if (state.view === "home") return `${identity.name} — ${identity.tagline}`;
+	if (state.view === "home") return `${identity.name} · ${identity.tagline}`;
 	if (state.view === "child")
-		return `${state.child} — ${state.section} — ${identity.name}`;
+		return `${state.child} · ${state.section} · ${identity.name}`;
 	const titles = {
-		work: `work — ${identity.name}`,
-		projects: `projects — ${identity.name}`,
-		socials: `connect — ${identity.name}`,
-		resume: `resume — ${identity.name}`,
-		cluster: `cluster — ${identity.name}`,
+		work: `work · ${identity.name}`,
+		projects: `projects · ${identity.name}`,
+		socials: `connect · ${identity.name}`,
+		resume: `resume · ${identity.name}`,
+		cluster: `cluster · ${identity.name}`,
 	};
 	return titles[state.section] || identity.name;
 }
