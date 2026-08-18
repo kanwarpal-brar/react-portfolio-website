@@ -51,6 +51,11 @@ h2 {
  * an inline muted subtitle. One line instead of two keeps the home panel
  * under the height budget that lets 1366×768 host the world layout. */
 .home-name {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	column-gap: 0.95rem;
+	row-gap: 0.15rem;
 	font-size: 1.3em;
 	line-height: 1.35;
 	margin-bottom: 0.45rem;
