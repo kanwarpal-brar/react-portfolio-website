@@ -211,27 +211,17 @@ export const clusterCopy = {
 export const resumePath = "assets/Kanwarpal_Brar_Resume.pdf";
 
 /**
- * Presentational copy that isn't tied to a specific content array. Counts
- * ("7 roles", "9 curated") are derived at render time from array lengths —
- * only the free-text summary lives here, so there is nothing to keep in sync.
+ * One-line taglines for the section hub nodes. Short enough to sit under the
+ * card's title on a collapsed node, and meaningful enough to stand in the
+ * expanded panel, so there is no long, self-explanatory count line to repeat
+ * it. Kept as free text (no derived counts) so nothing needs to stay in sync.
  */
-export const sectionSummary = {
-	work: "Carta, UWaterloo, Arctic Wolf, Genesys, Cloudspark, Pillar To Post",
-	projects: "systems, concurrency, devops",
-	resume: "open to view",
-	socials: "github · linkedin · email",
-	cluster: "private K8s · access by request",
-};
-
-/**
- * Short taglines for the small hub nodes of sections that fan out children
- * (work/projects/socials) — the fan carries the actual content, so this
- * node is just a title + one line.
- */
-export const hubTagline = {
-	work: "Systems that scale.",
-	projects: "Side builds, real systems.",
-	socials: "Say hi, or send a PR.",
+export const sectionTagline = {
+	work: "Systems that scale",
+	projects: "Side builds, real systems",
+	resume: "The one-pager",
+	socials: "Say hi, or send a PR",
+	cluster: "Private K8s",
 };
 
 export const resumeCopy = {

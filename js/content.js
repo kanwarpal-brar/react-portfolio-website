@@ -10,7 +10,7 @@ import {
 	resumeBlurb,
 	resumeCopy,
 	resumePath,
-	sectionSummary,
+	sectionTagline,
 	socials,
 	TREE,
 	workExperience,
@@ -44,25 +44,8 @@ const PARENT_INDEX = Object.fromEntries(
 	),
 );
 
-function countLabel(count, word) {
-	return `${count} ${word}${count === 1 ? "" : "s"}`;
-}
-
 export function sectionLede(id) {
-	switch (id) {
-		case "work":
-			return `${countLabel(workExperience.length, "role")} · ${sectionSummary.work}`;
-		case "projects":
-			return `${countLabel(projects.length, "project")} curated · ${sectionSummary.projects}`;
-		case "resume":
-			return sectionSummary.resume;
-		case "socials":
-			return sectionSummary.socials;
-		case "cluster":
-			return sectionSummary.cluster;
-		default:
-			return "";
-	}
+	return sectionTagline[id] || "";
 }
 
 export function nodeIds() {
@@ -105,14 +88,12 @@ function homePanelHTML() {
 function sectionPanelHTML(id) {
 	if (id === "resume") {
 		const filename = resumePath.split("/").pop();
-		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">resume</h2><p>${esc(resumeBlurb)}</p><a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ open ${esc(filename)} ]</a><p class="tip">${esc(resumeCopy.tip)}</p>`;
+		return `<h2 class="node-title">resume</h2><p>${esc(resumeBlurb)}</p><a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ open ${esc(filename)} ]</a><p class="tip">${esc(resumeCopy.tip)}</p>`;
 	}
 	if (id === "cluster") {
-		return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">${esc(clusterCopy.title.toLowerCase())}</h2><p class="warning">[!] Access to this infrastructure is strictly controlled.</p><p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p><p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p><ul>${clusterCopy.requirements.map((requirement) => `<li>${esc(requirement)}</li>`).join("")}</ul>`;
+		return `<h2 class="node-title">${esc(clusterCopy.title.toLowerCase())}</h2><p class="warning">[!] Access to this infrastructure is strictly controlled.</p><p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p><p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p><ul>${clusterCopy.requirements.map((requirement) => `<li>${esc(requirement)}</li>`).join("")}</ul>`;
 	}
-	const count = TREE[id].children.length;
-	const label = id === "socials" ? "connection" : "node";
-	return `<p class="node-lede">${esc(sectionLede(id))}</p><h2 class="node-title">${esc(id)}</h2><p>${countLabel(count, label)} on this branch. Select one to explore it.</p>`;
+	return `<h2 class="node-title">${esc(id)}</h2><p class="node-lede">${esc(sectionLede(id))}</p>`;
 }
 
 function childPanelHTML(id) {
