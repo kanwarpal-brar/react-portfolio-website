@@ -14,6 +14,7 @@ import {
 	socials,
 	TREE,
 	workExperience,
+	workFocus,
 	extraCurricular,
 } from "./data.js";
 
@@ -92,6 +93,9 @@ function sectionPanelHTML(id) {
 	}
 	if (id === "cluster") {
 		return `<h2 class="node-title">${esc(clusterCopy.title.toLowerCase())}</h2><p class="warning">[!] Access to this infrastructure is strictly controlled.</p><p>${esc(clusterCopy.intro)} Endpoint: <strong><span class="redacted" aria-hidden="true">${esc(clusterCopy.redactedUrl)}</span></strong>.</p><p>To request access, email <a href="mailto:${esc(clusterCopy.contactEmail)}">${esc(clusterCopy.contactEmail)}</a> with:</p><ul>${clusterCopy.requirements.map((requirement) => `<li>${esc(requirement)}</li>`).join("")}</ul>`;
+	}
+	if (id === "work") {
+		return `<h2 class="node-title">work</h2><p class="node-lede">${esc(sectionLede(id))}</p><p>${esc(workFocus)}</p>`;
 	}
 	return `<h2 class="node-title">${esc(id)}</h2><p class="node-lede">${esc(sectionLede(id))}</p>`;
 }

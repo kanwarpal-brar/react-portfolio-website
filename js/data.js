@@ -217,12 +217,19 @@ export const resumePath = "assets/Kanwarpal_Brar_Resume.pdf";
  * it. Kept as free text (no derived counts) so nothing needs to stay in sync.
  */
 export const sectionTagline = {
-	work: "Systems that scale",
+	work: "Infrastructure and concurrency",
 	projects: "Side builds, real systems",
 	resume: "The one-pager",
 	socials: "Say hi, or send a PR",
 	cluster: "Private K8s",
 };
+
+/**
+ * The throughline behind the work section, expanded on its panel: the one
+ * section that earns a real paragraph instead of a one-line tagline.
+ */
+export const workFocus =
+	"These roles span fintech, research, and cloud infrastructure, but underneath they share one thread: concurrency. A lock inside a single process and a coordination protocol across a cluster are, structurally, the same problem at different scales (the mechanism differs, the shape doesn't), and untangling one tends to sharpen the other.";
 
 export const resumeCopy = {
 	tip: "Opens the PDF in a new tab.",

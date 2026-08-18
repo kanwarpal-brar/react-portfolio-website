@@ -33,7 +33,7 @@ const GRAPH = buildGraph(TREE, "home");
 // taller, which is why board height is the binding constraint.
 const HEIGHTS = {
 	home: { 960: 316, 880: 361, 800: 361, 720: 361, 680: 384 },
-	work: { 960: 98, 880: 98, 800: 98, 720: 98, 680: 98 },
+	work: { 960: 210, 880: 210, 800: 232, 720: 232, 680: 255 },
 	projects: { 960: 98, 880: 98, 800: 98, 720: 98, 680: 98 },
 	socials: { 960: 98, 880: 98, 800: 98, 720: 98, 680: 98 },
 	resume: { 960: 190, 880: 212, 800: 212, 720: 212, 680: 212 },
