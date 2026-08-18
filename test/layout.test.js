@@ -32,7 +32,7 @@ const GRAPH = buildGraph(TREE, "home");
 // Panel heights measured in Chrome, keyed by panel width. Narrower panels are
 // taller, which is why board height is the binding constraint.
 const HEIGHTS = {
-	home: { 960: 391, 880: 414, 800: 436, 720: 459, 680: 470 },
+	home: { 960: 392, 880: 414, 800: 437, 720: 459, 680: 504 },
 	work: { 960: 142, 880: 142, 800: 142, 720: 142, 680: 142 },
 	projects: { 960: 142, 880: 142, 800: 142, 720: 142, 680: 142 },
 	socials: { 960: 142, 880: 142, 800: 142, 720: 142, 680: 142 },

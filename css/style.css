@@ -46,6 +46,22 @@ h2 {
 	letter-spacing: 0.015em;
 	text-transform: uppercase;
 }
+/* The home panel's own lead: the visitor's name in the card's technical
+ * treatment, sized up from the body copy, with the tagline riding along as
+ * an inline muted subtitle. One line instead of two keeps the home panel
+ * under the height budget that lets 1366×768 host the world layout. */
+.home-name {
+	font-size: 1.3em;
+	line-height: 1.35;
+	margin-bottom: 0.45rem;
+}
+.home-tagline {
+	color: var(--fg-mute);
+	font-size: calc(1em / 1.3);
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: none;
+}
 ul {
 	margin: 0;
 	padding-left: 1.25rem;

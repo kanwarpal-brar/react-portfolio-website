@@ -96,7 +96,7 @@ function compactHTML(id) {
 function homePanelHTML() {
 	return `<div class="bio-grid">
   <img class="headshot" src="assets/headshot.webp" alt="${esc(identity.name)}" width="120" height="120" fetchpriority="high" decoding="async">
-  <div><p class="tagline">${esc(identity.tagline)}</p><p>${esc(parablurb)}</p></div>
+  <div><h2 class="node-title home-name">${esc(identity.name)} <span class="home-tagline">${esc(identity.tagline)}</span></h2><p>${esc(parablurb)}</p></div>
 </div>
 <a class="pdf-btn" href="${esc(resumePath)}" target="_blank" rel="noopener">[ view resume ]</a>
 <h2>about</h2><p>${esc(aboutBlurb)}</p>`;
